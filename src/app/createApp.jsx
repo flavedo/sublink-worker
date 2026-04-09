@@ -141,6 +141,8 @@ export function createApp(bindings = {}) {
             const geoxUrlGeosite = c.req.query('geox_url_geosite');
             const geoxUrlMmdb = c.req.query('geox_url_mmdb');
             const geoxUrlAsn = c.req.query('geox_url_asn');
+            const dnsEnable = c.req.query('dns_enable') !== 'false';
+            const dnsIpv6 = c.req.query('dns_ipv6') !== 'false';
             const configId = c.req.query('configId');
             const lang = c.get('lang');
 
@@ -167,7 +169,9 @@ export function createApp(bindings = {}) {
                 geoxUrlGeoip,
                 geoxUrlGeosite,
                 geoxUrlMmdb,
-                geoxUrlAsn
+                geoxUrlAsn,
+                dnsEnable,
+                dnsIpv6
             );
             await builder.build();
             return c.text(builder.formatConfig(), 200, {
