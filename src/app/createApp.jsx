@@ -143,6 +143,7 @@ export function createApp(bindings = {}) {
             const geoxUrlAsn = c.req.query('geox_url_asn');
             const dnsEnable = c.req.query('dns_enable') !== 'false';
             const dnsIpv6 = c.req.query('dns_ipv6') !== 'false';
+            const skipCertVerify = c.req.query('skip_cert_verify') === 'true';
             const configId = c.req.query('configId');
             const lang = c.get('lang');
 
@@ -171,7 +172,8 @@ export function createApp(bindings = {}) {
                 geoxUrlMmdb,
                 geoxUrlAsn,
                 dnsEnable,
-                dnsIpv6
+                dnsIpv6,
+                skipCertVerify
             );
             await builder.build();
             return c.text(builder.formatConfig(), 200, {
