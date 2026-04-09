@@ -153,6 +153,8 @@ export const translations = {
     geoxUrlGeositePlaceholder: 'GeoSite.dat 下载地址',
     geoxUrlMmdbPlaceholder: 'Country.mmdb 下载地址',
     geoxUrlAsnPlaceholder: 'ASN.mmdb 下载地址',
+    dnsEnable: '启用 DNS',
+    dnsIpv6: '启用 IPv6 DNS',
     UASettings: '自定义UserAgent',
     UAtip: '默认值curl/7.74.0',
     subscriptionLinks: '订阅链接',
