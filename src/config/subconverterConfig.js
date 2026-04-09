@@ -8,34 +8,27 @@ import { generateRules } from './ruleGenerators.js';
 import { COUNTRY_DATA } from '../utils.js';
 import { DIRECT_DEFAULT_RULES } from './rules.js';
 
-// Rule names that should default to REJECT
-const REJECT_RULES = new Set(['Ad Block']);
+const REJECT_RULES = new Set(['Adobe']);
 
 const SPEED_TEST_URL = 'http://www.gstatic.com/generate_204';
 
-/**
- * Escape special regex characters in a string for use inside subconverter regex
- */
 function escapeRegex(str) {
 	return str.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
 
-/**
- * Build the member list suffix for a proxy group that references country groups.
- * Used by Node Select and rule outbound groups when groupByCountry is enabled.
- */
 function buildCountryGroupRefs(countryGroupNames) {
 	return countryGroupNames.map(name => `[]${name}`).join('`');
 }
 
+function resolveGroupName(rule, t) {
+	const outbound = rule.outbound || rule.name;
+	if (outbound === 'DIRECT') return 'DIRECT';
+	if (outbound === 'REJECT') return 'REJECT';
+	return t(`outboundNames.${outbound}`);
+}
+
 /**
  * Generate subconverter external config (INI format)
- * @param {object} options
- * @param {string[]|string} options.selectedRules - Selected rule names or preset name
- * @param {string} options.lang - Language for group name translation
- * @param {boolean} options.includeAutoSelect - Whether to include auto select group
- * @param {boolean} options.groupByCountry - Whether to group proxies by country
- * @returns {string} INI format config string
  */
 export function generateSubconverterConfig({ selectedRules = [], customRules = [], lang = 'zh-CN', includeAutoSelect = true, groupByCountry = false } = {}) {
 	const t = createTranslator(lang);
@@ -43,12 +36,8 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 
 	const lines = ['[custom]'];
 
-	// --- Ruleset lines ---
-	// Domain-type rules first, then IP-type rules (reduces DNS leaks, same as SurgeConfigBuilder)
-
-	// Source-IP rules first (highest priority, no DNS needed)
 	rules.forEach(rule => {
-		const groupName = t(`outboundNames.${rule.outbound}`);
+		const groupName = resolveGroupName(rule, t);
 
 		if (rule.src_ip_cidr) {
 			rule.src_ip_cidr.forEach(cidr => {
@@ -57,9 +46,8 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 		}
 	});
 
-	// First pass: domain-type rules (DOMAIN-SUFFIX, DOMAIN-KEYWORD, GEOSITE)
 	rules.forEach(rule => {
-		const groupName = t(`outboundNames.${rule.outbound}`);
+		const groupName = resolveGroupName(rule, t);
 
 		if (rule.domain_suffix) {
 			rule.domain_suffix.forEach(suffix => {
@@ -76,15 +64,24 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 				if (site) lines.push(`ruleset=${groupName},[]GEOSITE,${site}`);
 			});
 		}
+		if (rule.remote_rules) {
+			rule.remote_rules.forEach(remote => {
+				if (remote.type === 'clash-domain') {
+					lines.push(`ruleset=${groupName},clash-domain:${remote.url}`);
+				} else if (remote.type === 'clash-classic') {
+					lines.push(`ruleset=${groupName},clash-classic:${remote.url}`);
+				}
+			});
+		}
 	});
 
-	// Second pass: IP-type rules (GEOIP, IP-CIDR)
 	rules.forEach(rule => {
-		const groupName = t(`outboundNames.${rule.outbound}`);
+		const groupName = resolveGroupName(rule, t);
+		const noResolve = rule.ip_no_resolve ? ',no-resolve' : '';
 
 		if (rule.ip_rules) {
 			rule.ip_rules.forEach(ip => {
-				if (ip) lines.push(`ruleset=${groupName},[]GEOIP,${ip}`);
+				if (ip) lines.push(`ruleset=${groupName},[]GEOIP,${ip}${noResolve}`);
 			});
 		}
 		if (rule.ip_cidr) {
@@ -94,18 +91,15 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 		}
 	});
 
-	// FINAL rule
 	const fallBackName = t('outboundNames.Fall Back');
 	lines.push(`ruleset=${fallBackName},[]FINAL`);
 
-	// --- Proxy group lines ---
 	lines.push('');
 
 	const nodeSelectName = t('outboundNames.Node Select');
 	const autoSelectName = t('outboundNames.Auto Select');
 	const manualSwitchName = t('outboundNames.Manual Switch');
 
-	// Pre-compute country group names and lines if groupByCountry is enabled
 	const countryGroupNames = [];
 	const countryGroupLines = [];
 
@@ -115,14 +109,12 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 			countryGroupNames.push(groupName);
 			const regex = country.aliases.map(a => {
 				const escaped = escapeRegex(a);
-				// Add word boundary for ASCII aliases to prevent substring matching (e.g. US matching AUS/RUS)
 				return /^[A-Za-z\s]+$/.test(a) ? `\\b${escaped}\\b` : escaped;
 			}).join('|');
 			countryGroupLines.push(`custom_proxy_group=${groupName}\`url-test\`(?i)(${regex})\`${SPEED_TEST_URL}\`300,,50`);
 		});
 	}
 
-	// Node Select group (top-level selector)
 	if (groupByCountry) {
 		const refs = buildCountryGroupRefs(countryGroupNames);
 		if (includeAutoSelect) {
@@ -138,20 +130,16 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 		}
 	}
 
-	// Auto Select group
 	if (includeAutoSelect) {
 		lines.push(`custom_proxy_group=${autoSelectName}\`url-test\`.*\`${SPEED_TEST_URL}\`300,,50`);
 	}
 
-	// Manual Switch group (when groupByCountry, provides access to all individual nodes)
 	if (groupByCountry) {
 		lines.push(`custom_proxy_group=${manualSwitchName}\`select\`.*`);
 	}
 
-	// Country groups (url-test per country with regex matching)
 	countryGroupLines.forEach(line => lines.push(line));
 
-	// Rule outbound groups
 	const processedGroups = new Set([nodeSelectName]);
 	if (includeAutoSelect) processedGroups.add(autoSelectName);
 	if (groupByCountry) {
@@ -159,14 +147,19 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 		countryGroupNames.forEach(name => processedGroups.add(name));
 	}
 
+	const BUILTIN_OUTBOUNDS = new Set(['DIRECT', 'REJECT']);
+
 	rules.forEach(rule => {
-		const groupName = t(`outboundNames.${rule.outbound}`);
+		const outbound = rule.outbound || rule.name;
+		if (BUILTIN_OUTBOUNDS.has(outbound)) return;
+
+		const groupName = resolveGroupName(rule, t);
 		if (processedGroups.has(groupName)) return;
 		processedGroups.add(groupName);
 
-		if (REJECT_RULES.has(rule.outbound)) {
+		if (REJECT_RULES.has(outbound)) {
 			lines.push(`custom_proxy_group=${groupName}\`select\`[]REJECT\`[]DIRECT`);
-		} else if (DIRECT_DEFAULT_RULES.has(rule.outbound)) {
+		} else if (DIRECT_DEFAULT_RULES.has(rule.name)) {
 			lines.push(`custom_proxy_group=${groupName}\`select\`[]DIRECT\`[]${nodeSelectName}`);
 		} else {
 			if (groupByCountry) {
@@ -186,7 +179,6 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 		}
 	});
 
-	// Fall Back group (if not already created by a rule)
 	if (!processedGroups.has(fallBackName)) {
 		if (groupByCountry) {
 			const refs = buildCountryGroupRefs(countryGroupNames);
@@ -204,7 +196,6 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 		}
 	}
 
-	// Config flags
 	lines.push('');
 	lines.push('enable_rule_generator=true');
 	lines.push('overwrite_original_rules=true');
