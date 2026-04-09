@@ -23,9 +23,19 @@ export function getOutbounds(selectedRuleNames) {
 	if (!selectedRuleNames || !Array.isArray(selectedRuleNames)) {
 		return [];
 	}
-	return UNIFIED_RULES
+	const seen = new Set();
+	const result = [];
+	const BUILTIN = new Set(['DIRECT', 'REJECT']);
+	UNIFIED_RULES
 		.filter(rule => selectedRuleNames.includes(rule.name))
-		.map(rule => rule.name);
+		.forEach(rule => {
+			const outbound = rule.outbound || rule.name;
+			if (!BUILTIN.has(outbound) && !seen.has(outbound)) {
+				seen.add(outbound);
+				result.push(outbound);
+			}
+		});
+	return result;
 }
 
 // Helper function to generate rules based on selected rule names
@@ -45,9 +55,12 @@ export function generateRules(selectedRules = [], customRules = []) {
 			rules.push({
 				site_rules: rule.site_rules,
 				ip_rules: rule.ip_rules,
+				ip_no_resolve: rule.ip_no_resolve || false,
 				domain_suffix: rule?.domain_suffix,
 				ip_cidr: rule?.ip_cidr,
-				outbound: rule.name
+				remote_rules: rule?.remote_rules,
+				outbound: rule.outbound || rule.name,
+				name: rule.name
 			});
 		}
 	});
@@ -105,15 +118,6 @@ export function generateRuleSets(selectedRules = [], customRules = []) {
 		format: 'binary',
 		url: `${IP_RULE_SET_BASE_URL}${IP_RULE_SETS[rule]}`,
 	}));
-
-	if (!selectedRules.includes('Non-China')) {
-		site_rule_sets.push({
-			tag: 'geolocation-!cn',
-			type: 'remote',
-			format: 'binary',
-			url: `${SITE_RULE_SET_BASE_URL}geosite-geolocation-!cn.srs`,
-		});
-	}
 
 	if (customRules) {
 		customRules.forEach(rule => {
@@ -191,18 +195,6 @@ export function generateClashRuleSets(selectedRules = [], customRules = [], useM
 			interval: 86400
 		};
 	});
-
-	// Add Non-China rule set if not included
-	if (!selectedRules.includes('Non-China')) {
-		site_rule_providers['geolocation-!cn'] = {
-			type: 'http',
-			format: format,
-			behavior: 'domain',
-			url: `${CLASH_SITE_RULE_SET_BASE_URL}geolocation-!cn${ext}`,
-			path: `./ruleset/geolocation-!cn${ext}`,
-			interval: 86400
-		};
-	}
 
 	// Add custom rules
 	if (customRules) {
