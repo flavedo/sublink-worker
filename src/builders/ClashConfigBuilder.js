@@ -40,7 +40,7 @@ function supportsMrsFormat(userAgent) {
 }
 
 export class ClashConfigBuilder extends BaseConfigBuilder {
-    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, groupByCountry = false, enableClashUI = false, externalController, externalUiDownloadUrl, includeAutoSelect = true) {
+    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, groupByCountry = false, enableClashUI = false, externalController, externalUiDownloadUrl, includeAutoSelect = true, geoAutoUpdate = true, geoUpdateInterval = 24, geoxUrlGeoip, geoxUrlGeosite, geoxUrlMmdb, geoxUrlAsn) {
         if (!baseConfig) {
             baseConfig = CLASH_CONFIG;
         }
@@ -52,6 +52,12 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
         this.enableClashUI = enableClashUI;
         this.externalController = externalController;
         this.externalUiDownloadUrl = externalUiDownloadUrl;
+        this.geoAutoUpdate = geoAutoUpdate;
+        this.geoUpdateInterval = geoUpdateInterval;
+        this.geoxUrlGeoip = geoxUrlGeoip;
+        this.geoxUrlGeosite = geoxUrlGeosite;
+        this.geoxUrlMmdb = geoxUrlMmdb;
+        this.geoxUrlAsn = geoxUrlAsn;
     }
 
     /**
@@ -644,6 +650,27 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
             ...ruleResults,
             `MATCH,${this.t('outboundNames.Fall Back')}`
         ];
+
+        // Apply GeoData settings
+        this.config['geodata-mode'] = true;
+        this.config['geo-auto-update'] = this.geoAutoUpdate;
+        this.config['geodata-loader'] = 'standard';
+        this.config['geo-update-interval'] = this.geoUpdateInterval;
+
+        // Build geox-url, using user-provided values or defaults
+        const defaultGeoxUrl = {
+            geoip: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat",
+            geosite: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat",
+            mmdb: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb",
+            asn: "https://github.com/xishang0128/geoip/releases/download/latest/GeoLite2-ASN.mmdb"
+        };
+
+        this.config['geox-url'] = {
+            geoip: this.geoxUrlGeoip || this.config['geox-url']?.geoip || defaultGeoxUrl.geoip,
+            geosite: this.geoxUrlGeosite || this.config['geox-url']?.geosite || defaultGeoxUrl.geosite,
+            mmdb: this.geoxUrlMmdb || this.config['geox-url']?.mmdb || defaultGeoxUrl.mmdb,
+            asn: this.geoxUrlAsn || this.config['geox-url']?.asn || defaultGeoxUrl.asn
+        };
 
         // Enable Clash UI (external controller/dashboard) when requested or when custom UI params are provided
         if (this.enableClashUI || this.externalController || this.externalUiDownloadUrl) {
