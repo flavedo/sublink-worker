@@ -135,6 +135,12 @@ export function createApp(bindings = {}) {
             const enableClashUI = parseBooleanFlag(c.req.query('enable_clash_ui'));
             const externalController = c.req.query('external_controller');
             const externalUiDownloadUrl = c.req.query('external_ui_download_url');
+            const geoAutoUpdate = c.req.query('geo_auto_update') !== 'false';
+            const geoUpdateInterval = parseInt(c.req.query('geo_update_interval')) || 24;
+            const geoxUrlGeoip = c.req.query('geox_url_geoip');
+            const geoxUrlGeosite = c.req.query('geox_url_geosite');
+            const geoxUrlMmdb = c.req.query('geox_url_mmdb');
+            const geoxUrlAsn = c.req.query('geox_url_asn');
             const configId = c.req.query('configId');
             const lang = c.get('lang');
 
@@ -155,7 +161,13 @@ export function createApp(bindings = {}) {
                 enableClashUI,
                 externalController,
                 externalUiDownloadUrl,
-                includeAutoSelect
+                includeAutoSelect,
+                geoAutoUpdate,
+                geoUpdateInterval,
+                geoxUrlGeoip,
+                geoxUrlGeosite,
+                geoxUrlMmdb,
+                geoxUrlAsn
             );
             await builder.build();
             return c.text(builder.formatConfig(), 200, {
