@@ -2,7 +2,6 @@ name: Deploy Worker
 
 on:
   workflow_dispatch:
-  repository_dispatch:
   push:
     branches:
       - main
@@ -17,12 +16,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '21'
+          cache: 'npm'
       
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       
       - name: Deploy to Cloudflare Workers
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          command: deploy
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
