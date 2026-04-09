@@ -96,6 +96,7 @@ export const formLogicFn = (t) => {
             geoxUrlAsn: '',
             dnsEnable: true,
             dnsIpv6: false,
+            skipCertVerify: false,
             configType: 'singbox',
             configEditor: '',
             savingConfig: false,
@@ -151,6 +152,7 @@ export const formLogicFn = (t) => {
                 this.geoxUrlAsn = localStorage.getItem('geoxUrlAsn') || '';
                 this.dnsEnable = localStorage.getItem('dnsEnable') !== 'false';
                 this.dnsIpv6 = localStorage.getItem('dnsIpv6') !== 'false';
+                this.skipCertVerify = localStorage.getItem('skipCertVerify') === 'true';
                 this.customUA = localStorage.getItem('userAgent') || '';
                 this.configEditor = localStorage.getItem('configEditor') || '';
                 this.configType = localStorage.getItem('configType') || 'singbox';
@@ -190,6 +192,7 @@ export const formLogicFn = (t) => {
                 this.$watch('geoxUrlAsn', val => localStorage.setItem('geoxUrlAsn', val));
                 this.$watch('dnsEnable', val => localStorage.setItem('dnsEnable', val));
                 this.$watch('dnsIpv6', val => localStorage.setItem('dnsIpv6', val));
+                this.$watch('skipCertVerify', val => localStorage.setItem('skipCertVerify', val));
                 this.$watch('customUA', val => localStorage.setItem('userAgent', val));
                 this.$watch('configEditor', val => {
                     localStorage.setItem('configEditor', val);
@@ -415,6 +418,7 @@ export const formLogicFn = (t) => {
                     if (this.geoxUrlAsn) params.append('geox_url_asn', this.geoxUrlAsn);
                     if (!this.dnsEnable) params.append('dns_enable', 'false');
                     if (!this.dnsIpv6) params.append('dns_ipv6', 'false');
+                    if (this.skipCertVerify) params.append('skip_cert_verify', 'true');
 
                     // Add configId if present in URL
                     const urlParams = new URLSearchParams(window.location.search);
@@ -690,6 +694,7 @@ export const formLogicFn = (t) => {
 
                 this.dnsEnable = params.get('dns_enable') !== 'false';
                 this.dnsIpv6 = params.get('dns_ipv6') !== 'false';
+                this.skipCertVerify = params.get('skip_cert_verify') === 'true';
 
                 const ua = params.get('ua');
                 if (ua) {
