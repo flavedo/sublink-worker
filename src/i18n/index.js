@@ -155,6 +155,8 @@ export const translations = {
     geoxUrlAsnPlaceholder: 'ASN.mmdb 下载地址',
     dnsEnable: '启用 DNS',
     dnsIpv6: '启用 IPv6 DNS',
+    skipCertVerify: '跳过证书验证',
+    skipCertVerifyTip: '跳过 TLS 证书验证（不推荐）',
     UASettings: '自定义UserAgent',
     UAtip: '默认值curl/7.74.0',
     subscriptionLinks: '订阅链接',
