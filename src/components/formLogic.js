@@ -88,12 +88,14 @@ export const formLogicFn = (t) => {
             enableClashUI: false,
             externalController: '',
             externalUiDownloadUrl: '',
-            geoAutoUpdate: true,
+            geoAutoUpdate: false,
             geoUpdateInterval: 24,
             geoxUrlGeoip: '',
             geoxUrlGeosite: '',
             geoxUrlMmdb: '',
             geoxUrlAsn: '',
+            dnsEnable: true,
+            dnsIpv6: false,
             configType: 'singbox',
             configEditor: '',
             savingConfig: false,
@@ -147,6 +149,8 @@ export const formLogicFn = (t) => {
                 this.geoxUrlGeosite = localStorage.getItem('geoxUrlGeosite') || '';
                 this.geoxUrlMmdb = localStorage.getItem('geoxUrlMmdb') || '';
                 this.geoxUrlAsn = localStorage.getItem('geoxUrlAsn') || '';
+                this.dnsEnable = localStorage.getItem('dnsEnable') !== 'false';
+                this.dnsIpv6 = localStorage.getItem('dnsIpv6') !== 'false';
                 this.customUA = localStorage.getItem('userAgent') || '';
                 this.configEditor = localStorage.getItem('configEditor') || '';
                 this.configType = localStorage.getItem('configType') || 'singbox';
@@ -184,6 +188,8 @@ export const formLogicFn = (t) => {
                 this.$watch('geoxUrlGeosite', val => localStorage.setItem('geoxUrlGeosite', val));
                 this.$watch('geoxUrlMmdb', val => localStorage.setItem('geoxUrlMmdb', val));
                 this.$watch('geoxUrlAsn', val => localStorage.setItem('geoxUrlAsn', val));
+                this.$watch('dnsEnable', val => localStorage.setItem('dnsEnable', val));
+                this.$watch('dnsIpv6', val => localStorage.setItem('dnsIpv6', val));
                 this.$watch('customUA', val => localStorage.setItem('userAgent', val));
                 this.$watch('configEditor', val => {
                     localStorage.setItem('configEditor', val);
@@ -407,6 +413,8 @@ export const formLogicFn = (t) => {
                     if (this.geoxUrlGeosite) params.append('geox_url_geosite', this.geoxUrlGeosite);
                     if (this.geoxUrlMmdb) params.append('geox_url_mmdb', this.geoxUrlMmdb);
                     if (this.geoxUrlAsn) params.append('geox_url_asn', this.geoxUrlAsn);
+                    if (!this.dnsEnable) params.append('dns_enable', 'false');
+                    if (!this.dnsIpv6) params.append('dns_ipv6', 'false');
 
                     // Add configId if present in URL
                     const urlParams = new URLSearchParams(window.location.search);
@@ -679,6 +687,9 @@ export const formLogicFn = (t) => {
                 if (geoxUrlAsn) {
                     this.geoxUrlAsn = geoxUrlAsn;
                 }
+
+                this.dnsEnable = params.get('dns_enable') !== 'false';
+                this.dnsIpv6 = params.get('dns_ipv6') !== 'false';
 
                 const ua = params.get('ua');
                 if (ua) {
