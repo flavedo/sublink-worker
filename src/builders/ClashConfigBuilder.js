@@ -684,6 +684,14 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
         // Apply global skip-cert-verify
         if (this.skipCertVerify) {
             this.config['skip-cert-verify'] = true;
+            // Also apply to all proxies
+            if (Array.isArray(this.config.proxies)) {
+                this.config.proxies.forEach(proxy => {
+                    if (proxy) {
+                        proxy['skip-cert-verify'] = true;
+                    }
+                });
+            }
         }
 
         // Enable Clash UI (external controller/dashboard) when requested or when custom UI params are provided
