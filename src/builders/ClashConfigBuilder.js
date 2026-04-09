@@ -40,7 +40,7 @@ function supportsMrsFormat(userAgent) {
 }
 
 export class ClashConfigBuilder extends BaseConfigBuilder {
-    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, groupByCountry = false, enableClashUI = false, externalController, externalUiDownloadUrl, includeAutoSelect = true, geoAutoUpdate = true, geoUpdateInterval = 24, geoxUrlGeoip, geoxUrlGeosite, geoxUrlMmdb, geoxUrlAsn, dnsEnable = true, dnsIpv6 = true) {
+    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, groupByCountry = false, enableClashUI = false, externalController, externalUiDownloadUrl, includeAutoSelect = true, geoAutoUpdate = true, geoUpdateInterval = 24, geoxUrlGeoip, geoxUrlGeosite, geoxUrlMmdb, geoxUrlAsn, dnsEnable = true, dnsIpv6 = true, skipCertVerify = false) {
         if (!baseConfig) {
             baseConfig = CLASH_CONFIG;
         }
@@ -60,6 +60,7 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
         this.geoxUrlAsn = geoxUrlAsn;
         this.dnsEnable = dnsEnable;
         this.dnsIpv6 = dnsIpv6;
+        this.skipCertVerify = skipCertVerify;
     }
 
     /**
@@ -678,6 +679,11 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
         if (this.config.dns) {
             this.config.dns.enable = this.dnsEnable;
             this.config.dns.ipv6 = this.dnsIpv6;
+        }
+
+        // Apply global skip-cert-verify
+        if (this.skipCertVerify) {
+            this.config['skip-cert-verify'] = true;
         }
 
         // Enable Clash UI (external controller/dashboard) when requested or when custom UI params are provided
