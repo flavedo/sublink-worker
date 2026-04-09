@@ -73,6 +73,12 @@ export const UNIFIED_RULES = [
 		site_rules: ['openai'],
 		ip_rules: []
 	},
+	{
+		name: 'AI Services',
+		outbound: 'AI Services',
+		site_rules: ['category-ai-!cn'],
+		ip_rules: []
+	},
 
 	{
 		name: 'Apple',
@@ -147,6 +153,19 @@ export const UNIFIED_RULES = [
 		name: 'Bybit',
 		outbound: 'Bybit',
 		site_rules: ['bybit'],
+		ip_rules: []
+	},
+
+	{
+		name: 'Communication',
+		outbound: 'Communication',
+		site_rules: ['category-communication'],
+		ip_rules: []
+	},
+	{
+		name: 'Social Media',
+		outbound: 'Social Media',
+		site_rules: ['category-social-media-!cn'],
 		ip_rules: []
 	},
 
