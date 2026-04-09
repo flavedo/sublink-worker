@@ -40,7 +40,7 @@ function supportsMrsFormat(userAgent) {
 }
 
 export class ClashConfigBuilder extends BaseConfigBuilder {
-    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, groupByCountry = false, enableClashUI = false, externalController, externalUiDownloadUrl, includeAutoSelect = true, geoAutoUpdate = true, geoUpdateInterval = 24, geoxUrlGeoip, geoxUrlGeosite, geoxUrlMmdb, geoxUrlAsn) {
+    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, groupByCountry = false, enableClashUI = false, externalController, externalUiDownloadUrl, includeAutoSelect = true, geoAutoUpdate = true, geoUpdateInterval = 24, geoxUrlGeoip, geoxUrlGeosite, geoxUrlMmdb, geoxUrlAsn, dnsEnable = true, dnsIpv6 = true) {
         if (!baseConfig) {
             baseConfig = CLASH_CONFIG;
         }
@@ -58,6 +58,8 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
         this.geoxUrlGeosite = geoxUrlGeosite;
         this.geoxUrlMmdb = geoxUrlMmdb;
         this.geoxUrlAsn = geoxUrlAsn;
+        this.dnsEnable = dnsEnable;
+        this.dnsIpv6 = dnsIpv6;
     }
 
     /**
@@ -671,6 +673,12 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
             mmdb: this.geoxUrlMmdb || this.config['geox-url']?.mmdb || defaultGeoxUrl.mmdb,
             asn: this.geoxUrlAsn || this.config['geox-url']?.asn || defaultGeoxUrl.asn
         };
+
+        // Apply DNS settings
+        if (this.config.dns) {
+            this.config.dns.enable = this.dnsEnable;
+            this.config.dns.ipv6 = this.dnsIpv6;
+        }
 
         // Enable Clash UI (external controller/dashboard) when requested or when custom UI params are provided
         if (this.enableClashUI || this.externalController || this.externalUiDownloadUrl) {
