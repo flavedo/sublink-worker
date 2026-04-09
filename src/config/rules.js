@@ -155,6 +155,12 @@ export const UNIFIED_RULES = [
 		site_rules: ['bybit'],
 		ip_rules: []
 	},
+	{
+		name: 'IBKR',
+		outbound: 'IBKR',
+		site_rules: ['ibkr'],
+		ip_rules: []
+	},
 
 	{
 		name: 'Communication',
