@@ -195,17 +195,12 @@ export const UNIFIED_RULES = [
 		ip_no_resolve: true
 	},
 	{
-		name: 'Gstatic',
-		outbound: 'Gstatic',
-		site_rules: ['gstatic'],
-		ip_rules: []
-	},
-	{
 		name: 'Google',
 		outbound: 'Google',
 		site_rules: ['google'],
 		ip_rules: ['google'],
-		ip_no_resolve: true
+		ip_no_resolve: true,
+		domain_suffix: ['gstatic.com']
 	},
 	{
 		name: 'Microsoft',
