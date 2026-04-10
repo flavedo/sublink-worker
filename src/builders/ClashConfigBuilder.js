@@ -40,7 +40,7 @@ function supportsMrsFormat(userAgent) {
 }
 
 export class ClashConfigBuilder extends BaseConfigBuilder {
-    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, groupByCountry = false, enableClashUI = false, externalController, externalUiDownloadUrl, includeAutoSelect = true, geoAutoUpdate = true, geoUpdateInterval = 24, geoxUrlGeoip, geoxUrlGeosite, geoxUrlMmdb, geoxUrlAsn, dnsEnable = true, dnsIpv6 = true, skipCertVerify = false) {
+    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, groupByCountry = false, enableClashUI = false, externalController, externalUiDownloadUrl, includeAutoSelect = true, skipCertVerify = false) {
         if (!baseConfig) {
             baseConfig = CLASH_CONFIG;
         }
@@ -52,14 +52,6 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
         this.enableClashUI = enableClashUI;
         this.externalController = externalController;
         this.externalUiDownloadUrl = externalUiDownloadUrl;
-        this.geoAutoUpdate = geoAutoUpdate;
-        this.geoUpdateInterval = geoUpdateInterval;
-        this.geoxUrlGeoip = geoxUrlGeoip;
-        this.geoxUrlGeosite = geoxUrlGeosite;
-        this.geoxUrlMmdb = geoxUrlMmdb;
-        this.geoxUrlAsn = geoxUrlAsn;
-        this.dnsEnable = dnsEnable;
-        this.dnsIpv6 = dnsIpv6;
         this.skipCertVerify = skipCertVerify;
     }
 
@@ -653,33 +645,6 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
             ...ruleResults,
             `MATCH,${this.t('outboundNames.Fall Back')}`
         ];
-
-        // Apply GeoData settings
-        this.config['geodata-mode'] = true;
-        this.config['geo-auto-update'] = this.geoAutoUpdate;
-        this.config['geodata-loader'] = 'standard';
-        this.config['geo-update-interval'] = this.geoUpdateInterval;
-
-        // Build geox-url, using user-provided values or defaults
-        const defaultGeoxUrl = {
-            geoip: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat",
-            geosite: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat",
-            mmdb: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb",
-            asn: "https://github.com/xishang0128/geoip/releases/download/latest/GeoLite2-ASN.mmdb"
-        };
-
-        this.config['geox-url'] = {
-            geoip: this.geoxUrlGeoip || this.config['geox-url']?.geoip || defaultGeoxUrl.geoip,
-            geosite: this.geoxUrlGeosite || this.config['geox-url']?.geosite || defaultGeoxUrl.geosite,
-            mmdb: this.geoxUrlMmdb || this.config['geox-url']?.mmdb || defaultGeoxUrl.mmdb,
-            asn: this.geoxUrlAsn || this.config['geox-url']?.asn || defaultGeoxUrl.asn
-        };
-
-        // Apply DNS settings
-        if (this.config.dns) {
-            this.config.dns.enable = this.dnsEnable;
-            this.config.dns.ipv6 = this.dnsIpv6;
-        }
 
         // Apply global skip-cert-verify
         if (this.skipCertVerify) {
