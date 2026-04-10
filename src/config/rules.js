@@ -68,6 +68,13 @@ export const UNIFIED_RULES = [
 		ip_no_resolve: true
 	},
 	{
+		name: 'Discord',
+		outbound: 'Discord',
+		site_rules: ['discord'],
+		ip_rules: [],
+		ip_no_resolve: true
+	},
+	{
 		name: 'ChatGPT',
 		outbound: 'ChatGPT',
 		site_rules: ['openai'],
@@ -76,14 +83,17 @@ export const UNIFIED_RULES = [
 	{
 		name: 'Grok',
 		outbound: 'Grok',
-		site_rules: ['grok'],
-		ip_rules: []
+		site_rules: [],
+		ip_rules: [],
+		domain_suffix: ['grok.com'],
+		ip_no_resolve: true
 	},
 	{
 		name: 'Gemini',
 		outbound: 'Gemini',
-		site_rules: ['gemini'],
-		ip_rules: []
+		site_rules: ['google-gemini'],
+		ip_rules: [],
+		ip_no_resolve: true
 	},
 	{
 		name: 'AI Services',
@@ -91,7 +101,6 @@ export const UNIFIED_RULES = [
 		site_rules: ['category-ai-!cn'],
 		ip_rules: []
 	},
-
 	{
 		name: 'Apple',
 		outbound: 'Apple',
@@ -173,7 +182,6 @@ export const UNIFIED_RULES = [
 		site_rules: ['ibkr'],
 		ip_rules: []
 	},
-
 	{
 		name: 'Communication',
 		outbound: 'Communication',
