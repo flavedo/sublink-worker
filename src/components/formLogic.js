@@ -81,7 +81,7 @@ export const formLogicFn = (t) => {
                 ua: false          // User Agent
             },
             selectedRules: [],
-            selectedPredefinedRule: 'balanced',
+            selectedPredefinedRule: 'comprehensive',
             subconverterCopied: false,
             groupByCountry: false,
             includeAutoSelect: true,
