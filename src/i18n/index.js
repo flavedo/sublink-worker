@@ -136,7 +136,6 @@ export const translations = {
       'Communication': '📞 即时通讯',
       'Social Media': '💬 社交媒体',
       'Cloudflare': '☁️ Cloudflare',
-      'Gstatic': '🌐 Gstatic',
       'GFW': '🚀 GFW兜底',
       'Non-Standard Port': '🔀 非标端口',
       'Manual Switch': '🖐️ 手动切换',
