@@ -115,6 +115,7 @@ export const translations = {
       'Location:CN': '🔒 国内服务',
       'CN Available': '🔒 国内可用',
       'Telegram': '📨 Telegram',
+      'Discord': '🎧 Discord',
       'ChatGPT': '🤖 ChatGPT',
       'Grok': '⚡ Grok',
       'Gemini': '💎 Gemini',
