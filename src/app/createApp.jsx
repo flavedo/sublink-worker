@@ -215,7 +215,7 @@ export function createApp(bindings = {}) {
             let selectedRules;
 
             if (!rawSelectedRules) {
-                selectedRules = PREDEFINED_RULE_SETS.balanced;
+                selectedRules = PREDEFINED_RULE_SETS.comprehensive;
             } else if (PREDEFINED_RULE_SETS[rawSelectedRules]) {
                 selectedRules = PREDEFINED_RULE_SETS[rawSelectedRules];
             } else {
