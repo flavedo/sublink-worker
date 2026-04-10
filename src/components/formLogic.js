@@ -88,14 +88,6 @@ export const formLogicFn = (t) => {
             enableClashUI: false,
             externalController: '',
             externalUiDownloadUrl: '',
-            geoAutoUpdate: false,
-            geoUpdateInterval: 24,
-            geoxUrlGeoip: '',
-            geoxUrlGeosite: '',
-            geoxUrlMmdb: '',
-            geoxUrlAsn: '',
-            dnsEnable: true,
-            dnsIpv6: false,
             skipCertVerify: false,
             configType: 'singbox',
             configEditor: '',
@@ -144,14 +136,6 @@ export const formLogicFn = (t) => {
                 this.enableClashUI = localStorage.getItem('enableClashUI') === 'true';
                 this.externalController = localStorage.getItem('externalController') || '';
                 this.externalUiDownloadUrl = localStorage.getItem('externalUiDownloadUrl') || '';
-                this.geoAutoUpdate = localStorage.getItem('geoAutoUpdate') !== 'false';
-                this.geoUpdateInterval = parseInt(localStorage.getItem('geoUpdateInterval')) || 24;
-                this.geoxUrlGeoip = localStorage.getItem('geoxUrlGeoip') || '';
-                this.geoxUrlGeosite = localStorage.getItem('geoxUrlGeosite') || '';
-                this.geoxUrlMmdb = localStorage.getItem('geoxUrlMmdb') || '';
-                this.geoxUrlAsn = localStorage.getItem('geoxUrlAsn') || '';
-                this.dnsEnable = localStorage.getItem('dnsEnable') !== 'false';
-                this.dnsIpv6 = localStorage.getItem('dnsIpv6') !== 'false';
                 this.skipCertVerify = localStorage.getItem('skipCertVerify') === 'true';
                 this.customUA = localStorage.getItem('userAgent') || '';
                 this.configEditor = localStorage.getItem('configEditor') || '';
@@ -184,14 +168,6 @@ export const formLogicFn = (t) => {
                 this.$watch('enableClashUI', val => localStorage.setItem('enableClashUI', val));
                 this.$watch('externalController', val => localStorage.setItem('externalController', val));
                 this.$watch('externalUiDownloadUrl', val => localStorage.setItem('externalUiDownloadUrl', val));
-                this.$watch('geoAutoUpdate', val => localStorage.setItem('geoAutoUpdate', val));
-                this.$watch('geoUpdateInterval', val => localStorage.setItem('geoUpdateInterval', val));
-                this.$watch('geoxUrlGeoip', val => localStorage.setItem('geoxUrlGeoip', val));
-                this.$watch('geoxUrlGeosite', val => localStorage.setItem('geoxUrlGeosite', val));
-                this.$watch('geoxUrlMmdb', val => localStorage.setItem('geoxUrlMmdb', val));
-                this.$watch('geoxUrlAsn', val => localStorage.setItem('geoxUrlAsn', val));
-                this.$watch('dnsEnable', val => localStorage.setItem('dnsEnable', val));
-                this.$watch('dnsIpv6', val => localStorage.setItem('dnsIpv6', val));
                 this.$watch('skipCertVerify', val => localStorage.setItem('skipCertVerify', val));
                 this.$watch('customUA', val => localStorage.setItem('userAgent', val));
                 this.$watch('configEditor', val => {
@@ -410,14 +386,6 @@ export const formLogicFn = (t) => {
                     if (this.enableClashUI) params.append('enable_clash_ui', 'true');
                     if (this.externalController) params.append('external_controller', this.externalController);
                     if (this.externalUiDownloadUrl) params.append('external_ui_download_url', this.externalUiDownloadUrl);
-                    if (!this.geoAutoUpdate) params.append('geo_auto_update', 'false');
-                    if (this.geoUpdateInterval !== 24) params.append('geo_update_interval', this.geoUpdateInterval.toString());
-                    if (this.geoxUrlGeoip) params.append('geox_url_geoip', this.geoxUrlGeoip);
-                    if (this.geoxUrlGeosite) params.append('geox_url_geosite', this.geoxUrlGeosite);
-                    if (this.geoxUrlMmdb) params.append('geox_url_mmdb', this.geoxUrlMmdb);
-                    if (this.geoxUrlAsn) params.append('geox_url_asn', this.geoxUrlAsn);
-                    if (!this.dnsEnable) params.append('dns_enable', 'false');
-                    if (!this.dnsIpv6) params.append('dns_ipv6', 'false');
                     if (this.skipCertVerify) params.append('skip_cert_verify', 'true');
 
                     // Add configId if present in URL
@@ -670,30 +638,6 @@ export const formLogicFn = (t) => {
                     this.externalUiDownloadUrl = externalUiDownloadUrl;
                 }
 
-                this.geoAutoUpdate = params.get('geo_auto_update') !== 'false';
-                const geoUpdateInterval = params.get('geo_update_interval');
-                if (geoUpdateInterval) {
-                    this.geoUpdateInterval = parseInt(geoUpdateInterval) || 24;
-                }
-                const geoxUrlGeoip = params.get('geox_url_geoip');
-                if (geoxUrlGeoip) {
-                    this.geoxUrlGeoip = geoxUrlGeoip;
-                }
-                const geoxUrlGeosite = params.get('geox_url_geosite');
-                if (geoxUrlGeosite) {
-                    this.geoxUrlGeosite = geoxUrlGeosite;
-                }
-                const geoxUrlMmdb = params.get('geox_url_mmdb');
-                if (geoxUrlMmdb) {
-                    this.geoxUrlMmdb = geoxUrlMmdb;
-                }
-                const geoxUrlAsn = params.get('geox_url_asn');
-                if (geoxUrlAsn) {
-                    this.geoxUrlAsn = geoxUrlAsn;
-                }
-
-                this.dnsEnable = params.get('dns_enable') !== 'false';
-                this.dnsIpv6 = params.get('dns_ipv6') !== 'false';
                 this.skipCertVerify = params.get('skip_cert_verify') === 'true';
 
                 const ua = params.get('ua');
