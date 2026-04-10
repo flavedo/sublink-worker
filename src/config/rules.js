@@ -74,6 +74,18 @@ export const UNIFIED_RULES = [
 		ip_rules: []
 	},
 	{
+		name: 'Grok',
+		outbound: 'Grok',
+		site_rules: ['grok'],
+		ip_rules: []
+	},
+	{
+		name: 'Gemini',
+		outbound: 'Gemini',
+		site_rules: ['gemini'],
+		ip_rules: []
+	},
+	{
 		name: 'AI Services',
 		outbound: 'AI Services',
 		site_rules: ['category-ai-!cn'],
@@ -181,6 +193,12 @@ export const UNIFIED_RULES = [
 		site_rules: ['cloudflare'],
 		ip_rules: ['cloudflare'],
 		ip_no_resolve: true
+	},
+	{
+		name: 'Gstatic',
+		outbound: 'Gstatic',
+		site_rules: ['gstatic'],
+		ip_rules: []
 	},
 	{
 		name: 'Google',
