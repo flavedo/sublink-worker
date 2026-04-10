@@ -135,14 +135,6 @@ export function createApp(bindings = {}) {
             const enableClashUI = parseBooleanFlag(c.req.query('enable_clash_ui'));
             const externalController = c.req.query('external_controller');
             const externalUiDownloadUrl = c.req.query('external_ui_download_url');
-            const geoAutoUpdate = c.req.query('geo_auto_update') !== 'false';
-            const geoUpdateInterval = parseInt(c.req.query('geo_update_interval')) || 24;
-            const geoxUrlGeoip = c.req.query('geox_url_geoip');
-            const geoxUrlGeosite = c.req.query('geox_url_geosite');
-            const geoxUrlMmdb = c.req.query('geox_url_mmdb');
-            const geoxUrlAsn = c.req.query('geox_url_asn');
-            const dnsEnable = c.req.query('dns_enable') !== 'false';
-            const dnsIpv6 = c.req.query('dns_ipv6') !== 'false';
             const skipCertVerify = c.req.query('skip_cert_verify') === 'true';
             const configId = c.req.query('configId');
             const lang = c.get('lang');
@@ -165,14 +157,6 @@ export function createApp(bindings = {}) {
                 externalController,
                 externalUiDownloadUrl,
                 includeAutoSelect,
-                geoAutoUpdate,
-                geoUpdateInterval,
-                geoxUrlGeoip,
-                geoxUrlGeosite,
-                geoxUrlMmdb,
-                geoxUrlAsn,
-                dnsEnable,
-                dnsIpv6,
                 skipCertVerify
             );
             await builder.build();
