@@ -32,7 +32,7 @@ export const CLASH_CONFIG = {
 			'120.53.53.53',
 			'223.5.5.5'
 		],
-		// 2. 国内解析器：负责 Fake-IP 的快速生成和国内域名解析
+		// 2. 国内解析器：负责 Fake-IP 的快速生成和国内域名解析,建议混合一个 UDP 和一个 DoH
 		'nameserver': [
 			'https://120.53.53.53/dns-query',
 			'https://223.5.5.5/dns-query'
