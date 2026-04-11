@@ -45,6 +45,10 @@ export const CLASH_CONFIG = {
 				'https://120.53.53.53/dns-query',
 				'https://223.5.5.5/dns-query'
 			],
+			"testingcf.jsdelivr.net, fastly.jsdelivr.net, gcore.jsdelivr.net, github.com, raw.githubusercontent.com": [
+      			'https://223.5.5.5/dns-query',
+				'https://mydn.chengjason.eu.org/dd'
+			],
 			'geosite:cn,private': [
 				'https://120.53.53.53/dns-query',
 				'https://223.5.5.5/dns-query'
