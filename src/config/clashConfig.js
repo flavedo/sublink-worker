@@ -27,6 +27,8 @@ export const CLASH_CONFIG = {
 		'ipv6': false,
 		'respect-rules': true,
 		'enhanced-mode': 'fake-ip', 
+		'cache-api': true,
+    	'cache-limit': 4096,
 		// # 1. 基础解析器：仅用于解析 DoH 的域名，必须用最快的 UDP DNS
 		'default-nameserver': [
 			'120.53.53.53',
