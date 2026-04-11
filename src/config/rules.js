@@ -41,19 +41,6 @@ export const UNIFIED_RULES = [
 		]
 	},
 	{
-		name: 'Location:CN',
-		outbound: 'DIRECT',
-		site_rules: ['cn'],
-		ip_rules: ['cn'],
-		ip_no_resolve: true
-	},
-	{
-		name: 'CN Available',
-		outbound: 'DIRECT',
-		site_rules: ['google-cn', 'category-games@cn', 'category-game-platforms-download', 'category-public-tracker'],
-		ip_rules: []
-	},
-	{
 		name: 'Notion',
 		outbound: 'Notion',
 		site_rules: ['Notion'],
@@ -221,6 +208,19 @@ export const UNIFIED_RULES = [
 		name: 'GFW',
 		outbound: 'Node Select',
 		site_rules: ['gfw'],
+		ip_rules: []
+	},
+	{
+		name: 'Location:CN',
+		outbound: 'DIRECT',
+		site_rules: ['cn'],
+		ip_rules: ['cn'],
+		ip_no_resolve: true
+	},
+	{
+		name: 'CN Available',
+		outbound: 'DIRECT',
+		site_rules: ['google-cn', 'category-games@cn', 'category-game-platforms-download', 'category-public-tracker'],
 		ip_rules: []
 	},
 	{
