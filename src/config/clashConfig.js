@@ -33,20 +33,25 @@ export const CLASH_CONFIG = {
 			'https://223.5.5.5/dns-query'
 		],
 		'nameserver': [
-			'https://120.53.53.53/dns-query',
-			'https://223.5.5.5/dns-query'
-		],
-		'proxy-server-nameserver': [
 			'https://mydn.chengjason.eu.org/dd',
 			'https://120.53.53.53/dns-query',
 			'https://223.5.5.5/dns-query'
 		],
+		'proxy-server-nameserver': [
+			'https://120.53.53.53/dns-query',
+			'https://223.5.5.5/dns-query'
+		],
 		'nameserver-policy': {
+			'mydn.chengjason.eu.org': [
+				'https://120.53.53.53/dns-query',
+				'https://223.5.5.5/dns-query'
+			],
 			'geosite:cn,private': [
 				'https://120.53.53.53/dns-query',
 				'https://223.5.5.5/dns-query'
 			],
 			'geosite:geolocation-!cn': [
+				'https://mydn.chengjason.eu.org/dd',
 				'https://dns.cloudflare.com/dns-query',
 				'https://dns.google/dns-query'
 			]
