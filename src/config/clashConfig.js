@@ -45,7 +45,15 @@ export const CLASH_CONFIG = {
 				'https://120.53.53.53/dns-query',
 				'https://223.5.5.5/dns-query'
 			],
-			"testingcf.jsdelivr.net, fastly.jsdelivr.net, gcore.jsdelivr.net, github.com, raw.githubusercontent.com": [
+			'raw.githubusercontent.com': [
+				'https://120.53.53.53/dns-query',
+				'https://223.5.5.5/dns-query'
+			],
+			'github.com': [
+				'https://120.53.53.53/dns-query',
+				'https://223.5.5.5/dns-query'
+			],
+			"+.jsdelivr.net": [
       			'https://223.5.5.5/dns-query',
 				'https://mydn.chengjason.eu.org/dd'
 			],
