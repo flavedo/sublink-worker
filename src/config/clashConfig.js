@@ -28,7 +28,6 @@ export const CLASH_CONFIG = {
 		'respect-rules': true,
 		'enhanced-mode': 'fake-ip',
 		'default-nameserver': [
-			'tcp://223.5.5.5#disable-ipv6=true',
 			'https://120.53.53.53/dns-query',
 			'https://223.5.5.5/dns-query'
 		],
