@@ -63,7 +63,7 @@ export const CLASH_CONFIG = {
 			'geosite:geolocation-!cn': [
 				'https://dns.cloudflare.com/dns-query',
 				'https://dns.google/dns-query',
-				'https://mydn.chengjason.eu.org/dd'
+				// 'https://mydn.chengjason.eu.org/dd'
 			]
 		}
 	},
