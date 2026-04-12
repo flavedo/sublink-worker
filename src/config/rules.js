@@ -54,7 +54,10 @@ export const UNIFIED_RULES = [
 		site_rules: [],
 		ip_rules: [],
 		ip_no_resolve: true,
-		domain_suffix: ['dpdns.org', 'eu.org', 'qzz.io']
+		domain_suffix: [
+			'dpdns.org', 'eu.org', 'qzz.io', 'de5.net', 
+			'cc.cd', 'gv.uy'
+		]
 	},
 	{
 		name: 'Notion',
