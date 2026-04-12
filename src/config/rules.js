@@ -42,7 +42,7 @@ export const UNIFIED_RULES = [
 	},
 	{
 		name: 'PT',
-		outbound: 'PT',
+		outbound: 'DIRECT',
 		site_rules: ['category-public-tracker'],
 		ip_rules: [],
 		ip_no_resolve: true,
@@ -50,7 +50,7 @@ export const UNIFIED_RULES = [
 	},
 	{
 		name: 'Personal',
-		outbound: 'Personal',
+		outbound: 'DIRECT',
 		site_rules: [],
 		ip_rules: [],
 		ip_no_resolve: true,
