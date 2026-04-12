@@ -109,6 +109,7 @@ export const translations = {
       'Node Select': '🚀 手动选择',
       'Fall Back': '🐟 漏网之鱼',
       'PT': '🟥 PT',
+      'Personal': '🏠 Personal',
       'Adobe': '🟥 Adobe',
       'Youtube': '🎬 YouTube',
       'Google': '🔎 Google',

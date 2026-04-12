@@ -49,6 +49,14 @@ export const UNIFIED_RULES = [
 		domain_suffix: ['52pt.site']
 	},
 	{
+		name: 'Personal',
+		outbound: 'Personal',
+		site_rules: [],
+		ip_rules: [],
+		ip_no_resolve: true,
+		domain_suffix: ['dpdns.org', 'eu.org', 'qzz.io']
+	},
+	{
 		name: 'Notion',
 		outbound: 'Notion',
 		site_rules: ['Notion'],
