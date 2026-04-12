@@ -41,6 +41,14 @@ export const UNIFIED_RULES = [
 		]
 	},
 	{
+		name: 'PT',
+		outbound: 'PT',
+		site_rules: ['category-public-tracker'],
+		ip_rules: [],
+		ip_no_resolve: true,
+		domain_suffix: ['52pt.site']
+	},
+	{
 		name: 'Notion',
 		outbound: 'Notion',
 		site_rules: ['Notion'],

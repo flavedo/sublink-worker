@@ -108,6 +108,7 @@ export const translations = {
       'Auto Select': '⚡ 自动选择',
       'Node Select': '🚀 手动选择',
       'Fall Back': '🐟 漏网之鱼',
+      'PT': '🟥 PT',
       'Adobe': '🟥 Adobe',
       'Youtube': '🎬 YouTube',
       'Google': '🔎 Google',
