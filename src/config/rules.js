@@ -43,10 +43,10 @@ export const UNIFIED_RULES = [
 	{
 		name: 'PT',
 		outbound: 'DIRECT',
-		site_rules: ['category-public-tracker'],
+		site_rules: ['category-public-tracker', 'category-pt'],
 		ip_rules: [],
 		ip_no_resolve: true,
-		domain_suffix: ['52pt.site']
+		domain_suffix: ['ptfans.cc', 'ptlover.cc']
 	},
 	{
 		name: 'Personal',
