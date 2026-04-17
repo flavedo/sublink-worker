@@ -91,7 +91,7 @@ export const UNIFIED_RULES = [
 		outbound: 'Grok',
 		site_rules: [],
 		ip_rules: [],
-		domain_suffix: ['grok.com'],
+		domain_suffix: ['grok.com', 'x.ai'],
 		ip_no_resolve: true
 	},
 	{
