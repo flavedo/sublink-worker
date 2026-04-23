@@ -46,7 +46,7 @@ export const UNIFIED_RULES = [
 		site_rules: ['category-public-tracker', 'category-pt'],
 		ip_rules: [],
 		ip_no_resolve: true,
-		domain_suffix: ['ptfans.cc', 'ptlover.cc']
+		domain_suffix: ['ptfans.cc', 'ptlover.cc', 'halomt.com']
 	},
 	{
 		name: 'Personal',
