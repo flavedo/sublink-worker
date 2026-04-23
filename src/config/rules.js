@@ -56,7 +56,7 @@ export const UNIFIED_RULES = [
 		ip_no_resolve: true,
 		domain_suffix: [
 			'dpdns.org', 'eu.org', 'qzz.io', 'de5.net', 
-			'cc.cd', 'gv.uy', 'tailwindcss.com'
+			'cc.cd', 'gv.uy', 'tailwindcss.com', 'parsec.app'
 		]
 	},
 	{
