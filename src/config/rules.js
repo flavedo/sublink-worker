@@ -81,6 +81,12 @@ export const UNIFIED_RULES = [
 		ip_no_resolve: true
 	},
 	{
+		name: 'Docker',
+		outbound: 'Docker',
+		site_rules: ['docker'],
+		ip_rules: []
+	},
+	{
 		name: 'ChatGPT',
 		outbound: 'ChatGPT',
 		site_rules: ['openai'],
