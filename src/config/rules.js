@@ -43,6 +43,8 @@ export const UNIFIED_RULES = [
 	{
 		name: 'MTeam',
 		outbound: 'MTeam',
+		site_rules: [],
+		ip_rules: [],
 		ip_no_resolve: true,
 		domain_suffix: ['m-team.cc', 'm-team.io']
 	},
