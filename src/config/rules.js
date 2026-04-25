@@ -41,7 +41,13 @@ export const UNIFIED_RULES = [
 		]
 	},
 	{
-		name: 'PT',
+		name: 'MTeam',
+		outbound: 'MTeam',
+		ip_no_resolve: true,
+		domain_suffix: ['m-team.cc', 'm-team.io']
+	},
+	{
+		name: 'PublicTracker',
 		outbound: 'DIRECT',
 		site_rules: ['category-public-tracker', 'category-pt'],
 		ip_rules: [],

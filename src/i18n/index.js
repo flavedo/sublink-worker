@@ -127,6 +127,7 @@ export const translations = {
       'Netflix': '🎥 Netflix',
       'TikTok': '🎵 TikTok',
       'Instagram': '📸 Instagram',
+      'MTeam': '😈 MTeam',
       'X': '🐦 X',
       'Speedtest': '🚝 测速工具',
       'Steam': '🎮 Steam',
