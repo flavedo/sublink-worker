@@ -46,6 +46,14 @@ export const CLASH_CONFIG = {
 		],
 		// 4. 策略分流：特定域名直接指定解析器，减少逻辑判断
 		'nameserver-policy': {
+			'+.m-team.cc': [
+				'https://dns.cloudflare.com/dns-query',
+				'https://dns.google/dns-query',
+			],
+			'+.m-team.io': [
+				'https://dns.cloudflare.com/dns-query',
+				'https://dns.google/dns-query',
+			],
 			'raw.githubusercontent.com': [
 				'https://120.53.53.53/dns-query',
 				'https://223.5.5.5/dns-query'
