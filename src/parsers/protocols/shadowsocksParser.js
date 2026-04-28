@@ -114,25 +114,39 @@ export function parseShadowsocks(url) {
         if (!serverPart) {
             const decodedLegacy = base64ToBinary(mainPart);
             const lastAtIndex = decodedLegacy.lastIndexOf('@');
-            const methodAndPass = decodedLegacy.substring(0, lastAtIndex);
-            const serverInfo = decodedLegacy.substring(lastAtIndex + 1);
+            if (lastAtIndex !== -1) {
+                const methodAndPass = decodedLegacy.substring(0, lastAtIndex);
+                const serverInfo = decodedLegacy.substring(lastAtIndex + 1);
+                const firstColonIndex = methodAndPass.indexOf(':');
+                const method = methodAndPass.substring(0, firstColonIndex);
+                const password = methodAndPass.substring(firstColonIndex + 1);
+                const [server, server_port] = parseServer(serverInfo);
+                return createConfig(tag, server, server_port, method, password, pluginInfo);
+            } else {
+                const firstColonIndex = decodedLegacy.indexOf(':');
+                const method = decodedLegacy.substring(0, firstColonIndex);
+                const password = decodedLegacy.substring(firstColonIndex + 1);
+                return createConfig(tag, '', '', method, password, pluginInfo);
+            }
+        }
+
+        let decoded = base64ToBinary(decodeURIComponent(base64));
+        if (decoded.includes('@')) {
+            const lastAtIndex = decoded.lastIndexOf('@');
+            const methodAndPass = decoded.substring(0, lastAtIndex);
+            const serverInfo = decoded.substring(lastAtIndex + 1);
             const firstColonIndex = methodAndPass.indexOf(':');
             const method = methodAndPass.substring(0, firstColonIndex);
             const password = methodAndPass.substring(firstColonIndex + 1);
             const [server, server_port] = parseServer(serverInfo);
             return createConfig(tag, server, server_port, method, password, pluginInfo);
+        } else {
+            const firstColonIndex = decoded.indexOf(':');
+            const method = decoded.substring(0, firstColonIndex);
+            const password = decoded.substring(firstColonIndex + 1);
+            const [server, server_port] = parseServer(serverPart);
+            return createConfig(tag, server, server_port, method, password, pluginInfo);
         }
-
-        let decoded = base64ToBinary(decodeURIComponent(base64));
-        const lastAtIndex = decoded.lastIndexOf('@');
-        const methodAndPass = decoded.substring(0, lastAtIndex);
-        const serverInfo = decoded.substring(lastAtIndex + 1);
-        const firstColonIndex = methodAndPass.indexOf(':');
-        const method = methodAndPass.substring(0, firstColonIndex);
-        const password = methodAndPass.substring(firstColonIndex + 1);
-        const [server, server_port] = parseServer(serverInfo);
-
-        return createConfig(tag, server, server_port, method, password, pluginInfo);
     } catch (e) {
         console.error('Failed to parse shadowsocks URL:', e);
         return null;
