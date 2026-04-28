@@ -154,6 +154,14 @@ export const UNIFIED_RULES = [
 		ip_rules: []
 	},
 	{
+		name: 'Investing',
+		outbound: 'Investing',
+		site_rules: [],
+		ip_rules: [],
+		ip_no_resolve: true,
+		domain_suffix: ['investing.com']
+	},
+	{
 		name: 'X',
 		outbound: 'X',
 		site_rules: ['twitter'],
@@ -214,7 +222,6 @@ export const UNIFIED_RULES = [
 		site_rules: ['category-social-media-!cn'],
 		ip_rules: []
 	},
-
 	{
 		name: 'Cloudflare',
 		outbound: 'Cloudflare',

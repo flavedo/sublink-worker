@@ -128,6 +128,7 @@ export const translations = {
       'TikTok': '🎵 TikTok',
       'Instagram': '📸 Instagram',
       'MTeam': '😈 MTeam',
+      'Investing': '💰 英为财情',
       'X': '🐦 X',
       'Speedtest': '🚝 测速工具',
       'Steam': '🎮 Steam',
