@@ -47,6 +47,10 @@ export const CLASH_CONFIG = {
 		],
 		// 4. 策略分流：特定域名直接指定解析器，减少逻辑判断
 		'nameserver-policy': {
+			"+.484845845.xyz": [
+    			"120.53.53.53",
+    			"2400:3200::1",
+    		],
 			'+.m-team.cc': [
 				'https://dns.cloudflare.com/dns-query',
 				'https://dns.google/dns-query',
@@ -73,8 +77,7 @@ export const CLASH_CONFIG = {
 			],
 			'geosite:geolocation-!cn': [
 				'https://dns.cloudflare.com/dns-query',
-				'https://dns.google/dns-query',
-				// 'https://mydn.chengjason.eu.org/dd'
+				'https://dns.google/dns-query'
 			]
 		}
 	},
