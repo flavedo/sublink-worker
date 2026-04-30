@@ -13,6 +13,8 @@ export const CLASH_CONFIG = {
 	'geo-auto-update': false,
 	'geodata-loader': 'standard',
 	'geo-update-interval': 24,
+	'keep-alive-interval': 15,
+	'keep-alive-idle': 30,
 	'geox-url': {
 		"geoip": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat",
   		"geosite": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat",
