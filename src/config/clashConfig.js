@@ -42,7 +42,8 @@ export const CLASH_CONFIG = {
 		// 3. 专门给你的代理服务器（节点）域名使用的 DNS。
 		'proxy-server-nameserver': [
 			'120.53.53.53',
-			'223.5.5.5'
+			'223.5.5.5',
+			'2400:3200::1'
 		],
 		// 4. 策略分流：特定域名直接指定解析器，减少逻辑判断
 		'nameserver-policy': {
