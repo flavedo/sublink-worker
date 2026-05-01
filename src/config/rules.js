@@ -68,6 +68,13 @@ export const UNIFIED_RULES = [
 		]
 	},
 	{
+		name: 'Duolingo',
+		outbound: 'Duolingo',
+		site_rules: ['duolingo'],
+		ip_rules: ['duolingo'],
+		ip_no_resolve: true
+	},
+	{
 		name: 'Notion',
 		outbound: 'Notion',
 		site_rules: ['Notion'],
