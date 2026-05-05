@@ -129,7 +129,7 @@ export const translations = {
       'Instagram': '📸 Instagram',
       'MTeam': '😈 MTeam',
       'Duolingo': '📚 Duolingo',
-      'Investing': '💰 英为财情',
+      'Investing': '💰 财经投资',
       'X': '🐦 X',
       'Speedtest': '🚝 测速工具',
       'Steam': '🎮 Steam',
