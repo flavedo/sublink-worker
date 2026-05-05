@@ -46,15 +46,25 @@ export const UNIFIED_RULES = [
 		site_rules: [],
 		ip_rules: [],
 		ip_no_resolve: true,
-		domain_suffix: ['m-team.cc', 'm-team.io']
+		domain_suffix: [
+			'm-team.cc', 
+			'm-team.io'
+		]
 	},
 	{
 		name: 'PublicTracker',
 		outbound: 'DIRECT',
-		site_rules: ['category-public-tracker', 'category-pt'],
+		site_rules: [
+			'category-public-tracker', 
+			'category-pt'
+		],
 		ip_rules: [],
 		ip_no_resolve: true,
-		domain_suffix: ['ptfans.cc', 'ptlover.cc', 'halomt.com']
+		domain_suffix: [
+			'ptfans.cc', 
+			'ptlover.cc', 
+			'halomt.com'
+		]
 	},
 	{
 		name: 'Personal',
@@ -63,8 +73,14 @@ export const UNIFIED_RULES = [
 		ip_rules: [],
 		ip_no_resolve: true,
 		domain_suffix: [
-			'dpdns.org', 'eu.org', 'qzz.io', 'de5.net', 
-			'cc.cd', 'gv.uy', 'tailwindcss.com', 'parsec.app'
+			'dpdns.org', 
+			'eu.org', 
+			'qzz.io', 
+			'de5.net', 
+			'cc.cd', 
+			'gv.uy', 
+			'tailwindcss.com', 
+			'parsec.app'
 		]
 	},
 	{
@@ -112,7 +128,10 @@ export const UNIFIED_RULES = [
 		outbound: 'Grok',
 		site_rules: [],
 		ip_rules: [],
-		domain_suffix: ['grok.com', 'x.ai'],
+		domain_suffix: [
+			'grok.com', 
+			'x.ai'
+		],
 		ip_no_resolve: true
 	},
 	{
@@ -166,7 +185,12 @@ export const UNIFIED_RULES = [
 		site_rules: [],
 		ip_rules: [],
 		ip_no_resolve: true,
-		domain_suffix: ['investing.com']
+		domain_suffix: [
+			'investing.com', 
+			'benzinga.com', 
+			'alpaca.markets',
+			'massive.com'
+		]
 	},
 	{
 		name: 'X',
