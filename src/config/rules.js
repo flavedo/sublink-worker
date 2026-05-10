@@ -80,7 +80,8 @@ export const UNIFIED_RULES = [
 			'cc.cd', 
 			'gv.uy', 
 			'tailwindcss.com', 
-			'parsec.app'
+			'parsec.app',
+			'obsidian.md'
 		]
 	},
 	{
