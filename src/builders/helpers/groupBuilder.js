@@ -21,6 +21,21 @@ export function withDirectReject(options = []) {
     ]);
 }
 
+export function buildPrioritySelectMembers({ proxyList = [], translator, groupByCountry = false, manualGroupName, countryGroupNames = [] }) {
+    if (!translator) {
+        throw new Error('buildPrioritySelectMembers requires a translator function');
+    }
+    const base = groupByCountry
+        ? [
+            ...(manualGroupName ? [manualGroupName] : []),
+            ...countryGroupNames
+        ]
+        : [
+            ...proxyList
+        ];
+    return withDirectReject(base);
+}
+
 export function buildNodeSelectMembers({ proxyList = [], translator, groupByCountry = false, manualGroupName, countryGroupNames = [], includeAutoSelect = true }) {
     if (!translator) {
         throw new Error('buildNodeSelectMembers requires a translator function');

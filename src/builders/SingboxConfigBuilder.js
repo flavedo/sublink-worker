@@ -3,13 +3,13 @@ import { SING_BOX_CONFIG, generateRuleSets, generateRules, getOutbounds, PREDEFI
 import { BaseConfigBuilder } from './BaseConfigBuilder.js';
 import { deepCopy, groupProxiesByCountry } from '../utils.js';
 import { addProxyWithDedup } from './helpers/proxyHelpers.js';
-import { buildSelectorMembers as buildSelectorMemberList, buildNodeSelectMembers, uniqueNames } from './helpers/groupBuilder.js';
+import { buildSelectorMembers as buildSelectorMemberList, buildNodeSelectMembers, buildPrioritySelectMembers, uniqueNames } from './helpers/groupBuilder.js';
 import { normalizeGroupName } from './helpers/groupNameUtils.js';
 
 export class SingboxConfigBuilder extends BaseConfigBuilder {
-    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, groupByCountry = false, enableClashUI = false, externalController, externalUiDownloadUrl, singboxVersion = '1.12', includeAutoSelect = true) {
+    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, groupByCountry = false, enableClashUI = false, externalController, externalUiDownloadUrl, singboxVersion = '1.12', includeAutoSelect = true, includePrioritySelect = false) {
         const resolvedBaseConfig = baseConfig ?? SING_BOX_CONFIG;
-        super(inputString, resolvedBaseConfig, lang, userAgent, groupByCountry, includeAutoSelect);
+        super(inputString, resolvedBaseConfig, lang, userAgent, groupByCountry, includeAutoSelect, includePrioritySelect);
 
         this.selectedRules = selectedRules;
         this.customRules = customRules;
@@ -151,6 +151,33 @@ export class SingboxConfigBuilder extends BaseConfigBuilder {
         };
 
         // Add 'providers' field if we have outbound_providers
+        const providerTags = this.getAllProviderTags();
+        if (providerTags.length > 0) {
+            group.providers = providerTags;
+        }
+
+        this.config.outbounds.unshift(group);
+    }
+
+    addPrioritySelectGroup(proxyList) {
+        if (!this.includePrioritySelect) return;
+        this.config.outbounds = this.config.outbounds || [];
+        const tag = this.t('outboundNames.Priority Select');
+        if (this.hasOutboundTag(tag)) return;
+        const members = buildPrioritySelectMembers({
+            proxyList,
+            translator: this.t,
+            groupByCountry: this.groupByCountry,
+            manualGroupName: this.manualGroupName,
+            countryGroupNames: this.countryGroupNames
+        });
+
+        const group = {
+            type: "selector",
+            tag,
+            outbounds: members
+        };
+
         const providerTags = this.getAllProviderTags();
         if (providerTags.length > 0) {
             group.providers = providerTags;

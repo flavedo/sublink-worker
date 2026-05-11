@@ -106,6 +106,7 @@ export const translations = {
     jsonValidationErrors: 'JSON验证错误',
     outboundNames: {
       'Auto Select': '⚡ 自动选择',
+      'Priority Select': '⭐ 优先选择',
       'Node Select': '🚀 手动选择',
       'Fall Back': '🐟 漏网之鱼',
       'Adobe': '🟥 Adobe',
@@ -150,6 +151,7 @@ export const translations = {
     groupByCountry: '按国家分组',
     groupByCountryTip: '仅 Clash/Surge/SingBox 生效',
     includeAutoSelect: '包含自动选择分组',
+    includePrioritySelect: '包含优先选择分组',
     skipCertVerify: '跳过证书验证',
     skipCertVerifyTip: '跳过 TLS 证书验证（不推荐）',
     UASettings: '自定义UserAgent',

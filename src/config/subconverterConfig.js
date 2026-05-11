@@ -30,7 +30,7 @@ function resolveGroupName(rule, t) {
 /**
  * Generate subconverter external config (INI format)
  */
-export function generateSubconverterConfig({ selectedRules = [], customRules = [], lang = 'zh-CN', includeAutoSelect = true, groupByCountry = false } = {}) {
+export function generateSubconverterConfig({ selectedRules = [], customRules = [], lang = 'zh-CN', includeAutoSelect = true, includePrioritySelect = false, groupByCountry = false } = {}) {
 	const t = createTranslator(lang);
 	const rules = generateRules(selectedRules, customRules);
 
@@ -98,6 +98,7 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 
 	const nodeSelectName = t('outboundNames.Node Select');
 	const autoSelectName = t('outboundNames.Auto Select');
+	const prioritySelectName = t('outboundNames.Priority Select');
 	const manualSwitchName = t('outboundNames.Manual Switch');
 
 	const countryGroupNames = [];
@@ -134,6 +135,10 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 		lines.push(`custom_proxy_group=${autoSelectName}\`url-test\`.*\`${SPEED_TEST_URL}\`300,,50`);
 	}
 
+	if (includePrioritySelect) {
+		lines.push(`custom_proxy_group=${prioritySelectName}\`select\`.*\`[]DIRECT`);
+	}
+
 	if (groupByCountry) {
 		lines.push(`custom_proxy_group=${manualSwitchName}\`select\`.*`);
 	}
@@ -142,6 +147,7 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 
 	const processedGroups = new Set([nodeSelectName]);
 	if (includeAutoSelect) processedGroups.add(autoSelectName);
+	if (includePrioritySelect) processedGroups.add(prioritySelectName);
 	if (groupByCountry) {
 		processedGroups.add(manualSwitchName);
 		countryGroupNames.forEach(name => processedGroups.add(name));

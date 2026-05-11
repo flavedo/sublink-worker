@@ -2,12 +2,12 @@ import { BaseConfigBuilder } from './BaseConfigBuilder.js';
 import { groupProxiesByCountry } from '../utils.js';
 import { SURGE_CONFIG, SURGE_SITE_RULE_SET_BASEURL, SURGE_IP_RULE_SET_BASEURL, generateRules, getOutbounds, PREDEFINED_RULE_SETS, DIRECT_DEFAULT_RULES } from '../config/index.js';
 import { addProxyWithDedup } from './helpers/proxyHelpers.js';
-import { buildSelectorMembers, buildNodeSelectMembers, uniqueNames } from './helpers/groupBuilder.js';
+import { buildSelectorMembers, buildNodeSelectMembers, buildPrioritySelectMembers, uniqueNames } from './helpers/groupBuilder.js';
 
 export class SurgeConfigBuilder extends BaseConfigBuilder {
-    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, groupByCountry, includeAutoSelect = true) {
+    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, groupByCountry, includeAutoSelect = true, includePrioritySelect = false) {
         const resolvedBaseConfig = baseConfig ?? SURGE_CONFIG;
-        super(inputString, resolvedBaseConfig, lang, userAgent, groupByCountry, includeAutoSelect);
+        super(inputString, resolvedBaseConfig, lang, userAgent, groupByCountry, includeAutoSelect, includePrioritySelect);
         this.selectedRules = selectedRules;
         this.customRules = customRules;
         this.subscriptionUrl = null;
@@ -263,6 +263,25 @@ export class SurgeConfigBuilder extends BaseConfigBuilder {
                 this.sanitizeOptions(proxyList),
                 ', url=http://www.gstatic.com/generate_204, interval=300'
             )
+        );
+    }
+
+    buildPrioritySelectOptions(proxyList = []) {
+        return buildPrioritySelectMembers({
+            proxyList,
+            translator: this.t,
+            groupByCountry: false,
+            manualGroupName: this.manualGroupName,
+            countryGroupNames: this.countryGroupNames
+        });
+    }
+
+    addPrioritySelectGroup(proxyList) {
+        if (!this.includePrioritySelect) return;
+        const options = this.buildPrioritySelectOptions(proxyList);
+        if (this.hasProxyGroup(this.t('outboundNames.Priority Select'))) return;
+        this.config['proxy-groups'].push(
+            this.createProxyGroup(this.t('outboundNames.Priority Select'), 'select', options)
         );
     }
 

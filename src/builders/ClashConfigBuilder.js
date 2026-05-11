@@ -3,7 +3,7 @@ import { CLASH_CONFIG, generateRules, generateClashRuleSets, getOutbounds, PREDE
 import { BaseConfigBuilder } from './BaseConfigBuilder.js';
 import { deepCopy, groupProxiesByCountry } from '../utils.js';
 import { addProxyWithDedup } from './helpers/proxyHelpers.js';
-import { buildSelectorMembers, buildNodeSelectMembers, uniqueNames } from './helpers/groupBuilder.js';
+import { buildSelectorMembers, buildNodeSelectMembers, buildPrioritySelectMembers, uniqueNames } from './helpers/groupBuilder.js';
 import { emitClashRules, sanitizeClashProxyGroups } from './helpers/clashConfigUtils.js';
 import { normalizeGroupName, findGroupIndexByName } from './helpers/groupNameUtils.js';
 
@@ -40,11 +40,11 @@ function supportsMrsFormat(userAgent) {
 }
 
 export class ClashConfigBuilder extends BaseConfigBuilder {
-    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, groupByCountry = false, enableClashUI = false, externalController, externalUiDownloadUrl, includeAutoSelect = true, skipCertVerify = false) {
+    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, groupByCountry = false, enableClashUI = false, externalController, externalUiDownloadUrl, includeAutoSelect = true, skipCertVerify = false, includePrioritySelect = false) {
         if (!baseConfig) {
             baseConfig = CLASH_CONFIG;
         }
-        super(inputString, baseConfig, lang, userAgent, groupByCountry, includeAutoSelect);
+        super(inputString, baseConfig, lang, userAgent, groupByCountry, includeAutoSelect, includePrioritySelect);
         this.selectedRules = selectedRules;
         this.customRules = customRules;
         this.countryGroupNames = [];
@@ -327,6 +327,33 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
         };
 
         // Add 'use' field if we have proxy-providers
+        const providerNames = this.getAllProviderNames();
+        if (providerNames.length > 0) {
+            group.use = providerNames;
+        }
+
+        this.config['proxy-groups'].push(group);
+    }
+
+    addPrioritySelectGroup(proxyList) {
+        if (!this.includePrioritySelect) return;
+        this.config['proxy-groups'] = this.config['proxy-groups'] || [];
+        const priorityName = this.t('outboundNames.Priority Select');
+        if (this.hasProxyGroup(priorityName)) return;
+        const list = buildPrioritySelectMembers({
+            proxyList,
+            translator: this.t,
+            groupByCountry: this.groupByCountry,
+            manualGroupName: this.manualGroupName,
+            countryGroupNames: this.countryGroupNames
+        });
+
+        const group = {
+            type: "select",
+            name: priorityName,
+            proxies: list
+        };
+
         const providerNames = this.getAllProviderNames();
         if (providerNames.length > 0) {
             group.use = providerNames;

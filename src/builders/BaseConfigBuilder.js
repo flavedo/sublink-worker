@@ -4,7 +4,7 @@ import { createTranslator } from '../i18n/index.js';
 import { generateRules, getOutbounds, PREDEFINED_RULE_SETS } from '../config/index.js';
 
 export class BaseConfigBuilder {
-    constructor(inputString, baseConfig, lang, userAgent, groupByCountry = false, includeAutoSelect = true) {
+    constructor(inputString, baseConfig, lang, userAgent, groupByCountry = false, includeAutoSelect = true, includePrioritySelect = false) {
         this.inputString = inputString;
         this.config = deepCopy(baseConfig);
         this.customRules = [];
@@ -14,6 +14,7 @@ export class BaseConfigBuilder {
         this.appliedOverrideKeys = new Set();
         this.groupByCountry = groupByCountry;
         this.includeAutoSelect = includeAutoSelect;
+        this.includePrioritySelect = includePrioritySelect;
         this.providerUrls = [];  // URLs to use as providers (auto-sync)
     }
 
@@ -290,6 +291,10 @@ export class BaseConfigBuilder {
         throw new Error('addAutoSelectGroup must be implemented in child class');
     }
 
+    addPrioritySelectGroup(proxyList) {
+        throw new Error('addPrioritySelectGroup must be implemented in child class');
+    }
+
     addNodeSelectGroup(proxyList) {
         throw new Error('addNodeSelectGroup must be implemented in child class');
     }
@@ -327,6 +332,7 @@ export class BaseConfigBuilder {
         const proxyList = this.getProxyList();
 
         this.addAutoSelectGroup(proxyList);
+        this.addPrioritySelectGroup(proxyList);
         this.addNodeSelectGroup(proxyList);
         if (this.groupByCountry) {
             this.addCountryGroups();
