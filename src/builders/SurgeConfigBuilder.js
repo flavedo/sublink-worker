@@ -236,7 +236,8 @@ export class SurgeConfigBuilder extends BaseConfigBuilder {
             groupByCountry: false,
             manualGroupName: this.manualGroupName,
             countryGroupNames: this.countryGroupNames,
-            includeAutoSelect: this.includeAutoSelect
+            includeAutoSelect: this.includeAutoSelect,
+            includePrioritySelect: this.includePrioritySelect
         });
     }
 
@@ -247,7 +248,8 @@ export class SurgeConfigBuilder extends BaseConfigBuilder {
             groupByCountry: this.groupByCountry,
             manualGroupName: this.manualGroupName,
             countryGroupNames: this.countryGroupNames,
-            includeAutoSelect: this.includeAutoSelect
+            includeAutoSelect: this.includeAutoSelect,
+            includePrioritySelect: this.includePrioritySelect
         });
     }
 
@@ -377,7 +379,8 @@ export class SurgeConfigBuilder extends BaseConfigBuilder {
                 groupByCountry: true,
                 manualGroupName,
                 countryGroupNames,
-                includeAutoSelect: this.includeAutoSelect
+                includeAutoSelect: this.includeAutoSelect,
+                includePrioritySelect: this.includePrioritySelect
             });
             const newGroup = this.createProxyGroup(this.t('outboundNames.Node Select'), 'select', newOptions);
             this.config['proxy-groups'][nodeSelectGroupIndex] = newGroup;

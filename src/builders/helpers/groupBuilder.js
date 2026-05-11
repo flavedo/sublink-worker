@@ -36,25 +36,28 @@ export function buildPrioritySelectMembers({ proxyList = [], translator, groupBy
     return withDirectReject(base);
 }
 
-export function buildNodeSelectMembers({ proxyList = [], translator, groupByCountry = false, manualGroupName, countryGroupNames = [], includeAutoSelect = true }) {
+export function buildNodeSelectMembers({ proxyList = [], translator, groupByCountry = false, manualGroupName, countryGroupNames = [], includeAutoSelect = true, includePrioritySelect = false }) {
     if (!translator) {
         throw new Error('buildNodeSelectMembers requires a translator function');
     }
     const autoName = translator('outboundNames.Auto Select');
+    const priorityName = translator('outboundNames.Priority Select');
     const base = groupByCountry
         ? [
             ...(includeAutoSelect ? [autoName] : []),
+            ...(includePrioritySelect ? [priorityName] : []),
             ...(manualGroupName ? [manualGroupName] : []),
             ...countryGroupNames
         ]
         : [
             ...(includeAutoSelect ? [autoName] : []),
+            ...(includePrioritySelect ? [priorityName] : []),
             ...proxyList
         ];
     return withDirectReject(base);
 }
 
-export function buildSelectorMembers({ proxyList = [], translator, groupByCountry = false, manualGroupName, countryGroupNames = [], includeAutoSelect = true }) {
+export function buildSelectorMembers({ proxyList = [], translator, groupByCountry = false, manualGroupName, countryGroupNames = [], includeAutoSelect = true, includePrioritySelect = false }) {
     if (!translator) {
         throw new Error('buildSelectorMembers requires a translator function');
     }
@@ -62,11 +65,13 @@ export function buildSelectorMembers({ proxyList = [], translator, groupByCountr
         ? [
             translator('outboundNames.Node Select'),
             ...(includeAutoSelect ? [translator('outboundNames.Auto Select')] : []),
+            ...(includePrioritySelect ? [translator('outboundNames.Priority Select')] : []),
             ...(manualGroupName ? [manualGroupName] : []),
             ...countryGroupNames
         ]
         : [
             translator('outboundNames.Node Select'),
+            ...(includePrioritySelect ? [translator('outboundNames.Priority Select')] : []),
             ...proxyList
         ];
     return withDirectReject(base);

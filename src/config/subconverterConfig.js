@@ -118,14 +118,22 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 
 	if (groupByCountry) {
 		const refs = buildCountryGroupRefs(countryGroupNames);
-		if (includeAutoSelect) {
+		if (includeAutoSelect && includePrioritySelect) {
+			lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${autoSelectName}\`[]${prioritySelectName}\`[]${manualSwitchName}\`${refs}\`[]DIRECT`);
+		} else if (includeAutoSelect) {
 			lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${autoSelectName}\`[]${manualSwitchName}\`${refs}\`[]DIRECT`);
+		} else if (includePrioritySelect) {
+			lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${prioritySelectName}\`[]${manualSwitchName}\`${refs}\`[]DIRECT`);
 		} else {
 			lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${manualSwitchName}\`${refs}\`[]DIRECT`);
 		}
 	} else {
-		if (includeAutoSelect) {
+		if (includeAutoSelect && includePrioritySelect) {
+			lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${autoSelectName}\`[]${prioritySelectName}\`[]DIRECT\`.*`);
+		} else if (includeAutoSelect) {
 			lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${autoSelectName}\`[]DIRECT\`.*`);
+		} else if (includePrioritySelect) {
+			lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${prioritySelectName}\`[]DIRECT\`.*`);
 		} else {
 			lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]DIRECT\`.*`);
 		}
@@ -170,14 +178,22 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 		} else {
 			if (groupByCountry) {
 				const refs = buildCountryGroupRefs(countryGroupNames);
-				if (includeAutoSelect) {
+				if (includeAutoSelect && includePrioritySelect) {
+					lines.push(`custom_proxy_group=${groupName}\`select\`[]${nodeSelectName}\`[]${autoSelectName}\`[]${prioritySelectName}\`[]${manualSwitchName}\`${refs}\`[]DIRECT`);
+				} else if (includeAutoSelect) {
 					lines.push(`custom_proxy_group=${groupName}\`select\`[]${nodeSelectName}\`[]${autoSelectName}\`[]${manualSwitchName}\`${refs}\`[]DIRECT`);
+				} else if (includePrioritySelect) {
+					lines.push(`custom_proxy_group=${groupName}\`select\`[]${nodeSelectName}\`[]${prioritySelectName}\`[]${manualSwitchName}\`${refs}\`[]DIRECT`);
 				} else {
 					lines.push(`custom_proxy_group=${groupName}\`select\`[]${nodeSelectName}\`[]${manualSwitchName}\`${refs}\`[]DIRECT`);
 				}
 			} else {
-				if (includeAutoSelect) {
+				if (includeAutoSelect && includePrioritySelect) {
+					lines.push(`custom_proxy_group=${groupName}\`select\`[]${nodeSelectName}\`[]${autoSelectName}\`[]${prioritySelectName}\`[]DIRECT\`.*`);
+				} else if (includeAutoSelect) {
 					lines.push(`custom_proxy_group=${groupName}\`select\`[]${nodeSelectName}\`[]${autoSelectName}\`[]DIRECT\`.*`);
+				} else if (includePrioritySelect) {
+					lines.push(`custom_proxy_group=${groupName}\`select\`[]${nodeSelectName}\`[]${prioritySelectName}\`[]DIRECT\`.*`);
 				} else {
 					lines.push(`custom_proxy_group=${groupName}\`select\`[]${nodeSelectName}\`[]DIRECT\`.*`);
 				}
@@ -188,14 +204,22 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 	if (!processedGroups.has(fallBackName)) {
 		if (groupByCountry) {
 			const refs = buildCountryGroupRefs(countryGroupNames);
-			if (includeAutoSelect) {
+			if (includeAutoSelect && includePrioritySelect) {
+				lines.push(`custom_proxy_group=${fallBackName}\`select\`[]${nodeSelectName}\`[]${autoSelectName}\`[]${prioritySelectName}\`[]${manualSwitchName}\`${refs}\`[]DIRECT`);
+			} else if (includeAutoSelect) {
 				lines.push(`custom_proxy_group=${fallBackName}\`select\`[]${nodeSelectName}\`[]${autoSelectName}\`[]${manualSwitchName}\`${refs}\`[]DIRECT`);
+			} else if (includePrioritySelect) {
+				lines.push(`custom_proxy_group=${fallBackName}\`select\`[]${nodeSelectName}\`[]${prioritySelectName}\`[]${manualSwitchName}\`${refs}\`[]DIRECT`);
 			} else {
 				lines.push(`custom_proxy_group=${fallBackName}\`select\`[]${nodeSelectName}\`[]${manualSwitchName}\`${refs}\`[]DIRECT`);
 			}
 		} else {
-			if (includeAutoSelect) {
+			if (includeAutoSelect && includePrioritySelect) {
+				lines.push(`custom_proxy_group=${fallBackName}\`select\`[]${nodeSelectName}\`[]${autoSelectName}\`[]${prioritySelectName}\`[]DIRECT\`.*`);
+			} else if (includeAutoSelect) {
 				lines.push(`custom_proxy_group=${fallBackName}\`select\`[]${nodeSelectName}\`[]${autoSelectName}\`[]DIRECT\`.*`);
+			} else if (includePrioritySelect) {
+				lines.push(`custom_proxy_group=${fallBackName}\`select\`[]${nodeSelectName}\`[]${prioritySelectName}\`[]DIRECT\`.*`);
 			} else {
 				lines.push(`custom_proxy_group=${fallBackName}\`select\`[]${nodeSelectName}\`[]DIRECT\`.*`);
 			}

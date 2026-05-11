@@ -372,7 +372,8 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
             groupByCountry: this.groupByCountry,
             manualGroupName: this.manualGroupName,
             countryGroupNames: this.countryGroupNames,
-            includeAutoSelect: this.includeAutoSelect
+            includeAutoSelect: this.includeAutoSelect,
+            includePrioritySelect: this.includePrioritySelect
         });
 
         const group = {
@@ -397,7 +398,8 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
             groupByCountry: this.groupByCountry,
             manualGroupName: this.manualGroupName,
             countryGroupNames: this.countryGroupNames,
-            includeAutoSelect: this.includeAutoSelect
+            includeAutoSelect: this.includeAutoSelect,
+            includePrioritySelect: this.includePrioritySelect
         });
     }
 
@@ -529,7 +531,8 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
                 groupByCountry: true,
                 manualGroupName,
                 countryGroupNames,
-                includeAutoSelect: this.includeAutoSelect
+                includeAutoSelect: this.includeAutoSelect,
+                includePrioritySelect: this.includePrioritySelect
             });
             nodeSelectGroup.proxies = rebuilt;
         }
