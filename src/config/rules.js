@@ -81,8 +81,7 @@ export const UNIFIED_RULES = [
 			'gv.uy', 
 			'tailwindcss.com', 
 			'parsec.app',
-			'obsidian.md',
-			'moomoo.com'
+			'obsidian.md'
 		]
 	},
 	{
@@ -242,6 +241,23 @@ export const UNIFIED_RULES = [
 		outbound: 'IBKR',
 		site_rules: ['ibkr'],
 		ip_rules: []
+	},
+	{
+		name: 'Moomoo',
+		outbound: 'Moomoo',
+		site_rules: [],
+		ip_rules: [],
+		domain_suffix: [
+			'moomoo.com',
+			'moomoo.com.sg',
+			'moomoo.us',
+			'moomoobull.com',
+			'futunn.com',
+			'futuapi.com',
+			'futusg.com',
+			'futuhk.com',
+			'futu.com'
+		]
 	},
 	{
 		name: 'Communication',

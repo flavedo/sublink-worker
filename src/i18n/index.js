@@ -138,6 +138,7 @@ export const translations = {
       'Binance': '🟨 Binance',
       'Bybit': '🟪 Bybit',
       'IBKR': '🏦 盈透证券',
+      'Moomoo': '🟢 富途牛牛',
       'AI Services': '🧠 AI',
       'Communication': '📞 即时通讯',
       'Social Media': '💬 社交媒体',
