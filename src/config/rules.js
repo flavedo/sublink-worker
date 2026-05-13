@@ -81,7 +81,8 @@ export const UNIFIED_RULES = [
 			'gv.uy', 
 			'tailwindcss.com', 
 			'parsec.app',
-			'obsidian.md'
+			'obsidian.md',
+			'moomoo.com'
 		]
 	},
 	{
