@@ -207,7 +207,8 @@ export const UNIFIED_RULES = [
 		domain_suffix: [
 			'kbro.com.tw',
 			'kbro.com.sg',
-			'kbro.com'
+			'kbro.com',
+			'ooklaserver.net'
 		]
 	},
 	{
