@@ -45,7 +45,6 @@ export const UNIFIED_RULES = [
 		outbound: 'MTeam',
 		site_rules: [],
 		ip_rules: [],
-		ip_no_resolve: true,
 		domain_suffix: [
 			'm-team.cc', 
 			'm-team.io'
@@ -59,7 +58,6 @@ export const UNIFIED_RULES = [
 			'category-pt'
 		],
 		ip_rules: [],
-		ip_no_resolve: true,
 		domain_suffix: [
 			'ptfans.cc', 
 			'ptlover.cc', 
@@ -71,7 +69,6 @@ export const UNIFIED_RULES = [
 		outbound: 'DIRECT',
 		site_rules: [],
 		ip_rules: [],
-		ip_no_resolve: true,
 		domain_suffix: [
 			'dpdns.org', 
 			'eu.org', 
@@ -109,8 +106,7 @@ export const UNIFIED_RULES = [
 		name: 'Discord',
 		outbound: 'Discord',
 		site_rules: ['discord'],
-		ip_rules: [],
-		ip_no_resolve: true
+		ip_rules: []
 	},
 	{
 		name: 'Docker',
@@ -132,15 +128,13 @@ export const UNIFIED_RULES = [
 		domain_suffix: [
 			'grok.com', 
 			'x.ai'
-		],
-		ip_no_resolve: true
+		]
 	},
 	{
 		name: 'Gemini',
 		outbound: 'Gemini',
 		site_rules: ['google-gemini'],
-		ip_rules: [],
-		ip_no_resolve: true
+		ip_rules: []
 	},
 	{
 		name: 'AI Services',
@@ -185,7 +179,6 @@ export const UNIFIED_RULES = [
 		outbound: 'Investing',
 		site_rules: [],
 		ip_rules: [],
-		ip_no_resolve: true,
 		domain_suffix: [
 			'investing.com', 
 			'benzinga.com', 
@@ -210,7 +203,12 @@ export const UNIFIED_RULES = [
 		name: 'Speedtest',
 		outbound: 'Speedtest',
 		site_rules: ['category-speedtest'],
-		ip_rules: []
+		ip_rules: [],
+		domain_suffix: [
+			'kbro.com.tw',
+			'kbro.com.sg',
+			'kbro.com'
+		]
 	},
 	{
 		name: 'Steam',
