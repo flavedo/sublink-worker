@@ -239,7 +239,10 @@ export const UNIFIED_RULES = [
 		name: 'IBKR',
 		outbound: 'IBKR',
 		site_rules: ['ibkr'],
-		ip_rules: []
+		ip_rules: [],
+		domain_suffix: [
+			'ibkr.com.cn'
+		]	
 	},
 	{
 		name: 'Moomoo',
