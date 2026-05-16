@@ -183,7 +183,8 @@ export const UNIFIED_RULES = [
 			'investing.com', 
 			'benzinga.com', 
 			'alpaca.markets',
-			'massive.com'
+			'massive.com',
+			'barchart.com',
 		]
 	},
 	{
