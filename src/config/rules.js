@@ -82,6 +82,15 @@ export const UNIFIED_RULES = [
 		]
 	},
 	{
+		name: 'PersonalProxy',
+		outbound: 'Node Select',
+		site_rules: [],
+		ip_rules: [],
+		domain_suffix: [
+			'crush91.cc'
+		]
+	},
+	{
 		name: 'Duolingo',
 		outbound: 'Duolingo',
 		site_rules: ['duolingo'],
@@ -261,12 +270,6 @@ export const UNIFIED_RULES = [
 			'futuhk.com',
 			'futu.com'
 		]
-	},
-	{
-		name: 'Communication',
-		outbound: 'Communication',
-		site_rules: ['category-communication'],
-		ip_rules: []
 	},
 	{
 		name: 'Social Media',
