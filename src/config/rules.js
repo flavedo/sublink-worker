@@ -7,13 +7,6 @@ export const CUSTOM_RULES = [];
 
 export const UNIFIED_RULES = [
 	{
-		name: 'Adobe',
-		outbound: 'Adobe',
-		site_rules: ['adobe'],
-		ip_rules: ['adobe'],
-		ip_no_resolve: true
-	},
-	{
 		name: 'Private',
 		outbound: 'DIRECT',
 		site_rules: ['private'],
@@ -82,6 +75,12 @@ export const UNIFIED_RULES = [
 		]
 	},
 	{
+		name: 'Youtube',
+		outbound: 'Youtube',
+		site_rules: ['youtube'],
+		ip_rules: []
+	},
+	{
 		name: 'Provider',
 		outbound: 'Provider',
 		site_rules: [],
@@ -89,6 +88,46 @@ export const UNIFIED_RULES = [
 		domain_suffix: [
 			'crush91.cc'
 		]
+	},
+	{
+		name: 'Gemini',
+		outbound: 'Gemini',
+		site_rules: ['google-gemini'],
+		ip_rules: []
+	},
+	{
+		name: 'IBKR',
+		outbound: 'IBKR',
+		site_rules: ['ibkr'],
+		ip_rules: [],
+		domain_suffix: [
+			'ibkr.com.cn'
+		]	
+	},
+	{
+		name: 'Telegram',
+		outbound: 'Telegram',
+		site_rules: ['telegram'],
+		ip_rules: ['telegram'],
+		ip_no_resolve: true
+	},
+	{
+		name: 'Docker',
+		outbound: 'Docker',
+		site_rules: ['docker'],
+		ip_rules: []
+	},
+	{
+		name: 'ChatGPT',
+		outbound: 'ChatGPT',
+		site_rules: ['openai'],
+		ip_rules: []
+	},
+	{
+		name: 'X',
+		outbound: 'X',
+		site_rules: ['twitter'],
+		ip_rules: []
 	},
 	{
 		name: 'Duolingo',
@@ -105,28 +144,9 @@ export const UNIFIED_RULES = [
 		ip_no_resolve: true
 	},
 	{
-		name: 'Telegram',
-		outbound: 'Telegram',
-		site_rules: ['telegram'],
-		ip_rules: ['telegram'],
-		ip_no_resolve: true
-	},
-	{
 		name: 'Discord',
 		outbound: 'Discord',
 		site_rules: ['discord'],
-		ip_rules: []
-	},
-	{
-		name: 'Docker',
-		outbound: 'Docker',
-		site_rules: ['docker'],
-		ip_rules: []
-	},
-	{
-		name: 'ChatGPT',
-		outbound: 'ChatGPT',
-		site_rules: ['openai'],
 		ip_rules: []
 	},
 	{
@@ -140,12 +160,6 @@ export const UNIFIED_RULES = [
 		]
 	},
 	{
-		name: 'Gemini',
-		outbound: 'Gemini',
-		site_rules: ['google-gemini'],
-		ip_rules: []
-	},
-	{
 		name: 'AI Services',
 		outbound: 'AI Services',
 		site_rules: ['category-ai-!cn'],
@@ -155,12 +169,6 @@ export const UNIFIED_RULES = [
 		name: 'Apple',
 		outbound: 'Apple',
 		site_rules: ['apple'],
-		ip_rules: []
-	},
-	{
-		name: 'Youtube',
-		outbound: 'Youtube',
-		site_rules: ['youtube'],
 		ip_rules: []
 	},
 	{
@@ -197,12 +205,6 @@ export const UNIFIED_RULES = [
 		]
 	},
 	{
-		name: 'X',
-		outbound: 'X',
-		site_rules: ['twitter'],
-		ip_rules: []
-	},
-	{
 		name: 'Github',
 		outbound: 'Github',
 		site_rules: ['github'],
@@ -234,15 +236,6 @@ export const UNIFIED_RULES = [
 		ip_rules: []
 	},
 	{
-		name: 'IBKR',
-		outbound: 'IBKR',
-		site_rules: ['ibkr'],
-		ip_rules: [],
-		domain_suffix: [
-			'ibkr.com.cn'
-		]	
-	},
-	{
 		name: 'Moomoo',
 		outbound: 'Moomoo',
 		site_rules: [],
@@ -270,6 +263,13 @@ export const UNIFIED_RULES = [
 		outbound: 'Cloudflare',
 		site_rules: ['cloudflare'],
 		ip_rules: ['cloudflare'],
+		ip_no_resolve: true
+	},
+	{
+		name: 'Adobe',
+		outbound: 'Adobe',
+		site_rules: ['adobe'],
+		ip_rules: ['adobe'],
 		ip_no_resolve: true
 	},
 	{
