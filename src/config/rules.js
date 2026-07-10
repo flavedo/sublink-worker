@@ -82,8 +82,8 @@ export const UNIFIED_RULES = [
 		]
 	},
 	{
-		name: 'PersonalProxy',
-		outbound: 'Node Select',
+		name: 'Provider',
+		outbound: 'Provider',
 		site_rules: [],
 		ip_rules: [],
 		domain_suffix: [
@@ -228,21 +228,9 @@ export const UNIFIED_RULES = [
 		ip_rules: []
 	},
 	{
-		name: 'OKX',
-		outbound: 'OKX',
-		site_rules: ['okx'],
-		ip_rules: []
-	},
-	{
-		name: 'Binance',
-		outbound: 'Binance',
-		site_rules: ['binance'],
-		ip_rules: []
-	},
-	{
-		name: 'Bybit',
-		outbound: 'Bybit',
-		site_rules: ['bybit'],
+		name: 'Crypto',
+		outbound: 'Crypto',
+		site_rules: ['okx', 'binance', 'bybit'],
 		ip_rules: []
 	},
 	{

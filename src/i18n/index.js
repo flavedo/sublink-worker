@@ -134,9 +134,7 @@ export const translations = {
       'X': '🐦 X',
       'Speedtest': '🚝 测速工具',
       'Steam': '🎮 Steam',
-      'OKX': '🟦 OKX',
-      'Binance': '🟨 Binance',
-      'Bybit': '🟪 Bybit',
+      'Crypto': '� Crypto',
       'IBKR': '🏦 盈透证券',
       'Moomoo': '🟢 富途牛牛',
       'AI Services': '🧠 AI',
@@ -144,6 +142,7 @@ export const translations = {
       'Social Media': '💬 社交媒体',
       'Cloudflare': '☁️ Cloudflare',
       'GFW': '🚀 GFW兜底',
+      'Provider': '🌐 机场',
       'Non-Standard Port': '🔀 非标端口',
       'Manual Switch': '🖐️ 手动切换',
       'GLOBAL': 'GLOBAL'
