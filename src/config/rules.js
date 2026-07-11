@@ -21,7 +21,7 @@ export const SNIFFER_SKIP_DOMAIN = [
 	'+.sunlogin.net',
 	'+.push.apple.com',
 	'tjupt.org',
-	'*.tjupt.org'
+	'+.tjupt.org'
 ];
 
 export const UNIFIED_RULES = [
