@@ -2,6 +2,7 @@
  * Clash Configuration
  * Base configuration template for Clash client
  */
+import { SNIFFER_FORCE_DOMAIN, SNIFFER_SKIP_DOMAIN } from './rules.js';
 
 export const CLASH_CONFIG = {
 	'port': 7890,
@@ -15,6 +16,21 @@ export const CLASH_CONFIG = {
 	'geo-update-interval': 24,
 	'keep-alive-interval': 15,
 	'keep-alive-idle': 30,
+	'sniffer': {
+		'enable': true,
+		'parse-pure-ip': true,
+		'sniff': {
+			'TLS': {
+				'ports': [443, 8443]
+			},
+			'HTTP': {
+				'ports': [80, 8080-8880],
+				'override-destination': true
+			}
+		},
+		'force-domain': SNIFFER_FORCE_DOMAIN,
+		'skip-domain': SNIFFER_SKIP_DOMAIN
+	},
 	'geox-url': {
 		"geoip": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat",
   		"geosite": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat",

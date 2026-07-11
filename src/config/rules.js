@@ -5,6 +5,26 @@
 
 export const CUSTOM_RULES = [];
 
+export const SNIFFER_FORCE_DOMAIN = [
+	'+.ixigua.com',
+	'+.pstatp.com',
+	'+.snssdk.com',
+	'+.bytecdn.cn',
+	'+.tik-tokapi.com',
+	'+.amemv.com',
+	'+.musical.ly'
+];
+
+export const SNIFFER_SKIP_DOMAIN = [
+	'+.microsoft.com',
+	'+.apple.com',
+	'+.live.com',
+	'+.bing.com',
+	'push.apple.com',
+	'tjupt.org',
+	'*.tjupt.org'
+];
+
 export const UNIFIED_RULES = [
 	{
 		name: 'Private',
