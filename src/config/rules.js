@@ -54,7 +54,8 @@ export const UNIFIED_RULES = [
 		domain_suffix: [
 			'ptfans.cc', 
 			'ptlover.cc', 
-			'halomt.com'
+			'halomt.com',
+			'tjupt.org'
 		]
 	},
 	{
