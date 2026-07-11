@@ -6,21 +6,20 @@
 export const CUSTOM_RULES = [];
 
 export const SNIFFER_FORCE_DOMAIN = [
-	'+.ixigua.com',
-	'+.pstatp.com',
-	'+.snssdk.com',
-	'+.bytecdn.cn',
-	'+.tik-tokapi.com',
-	'+.amemv.com',
-	'+.musical.ly'
+	'+.netflix.com',
+	'+.nflxvideo.net',
+	'+.amazonaws.com',
+	'+.media.dssott.com',
+	'+.m-team.cc',
+	'+.m-team.io'
 ];
 
 export const SNIFFER_SKIP_DOMAIN = [
-	'+.microsoft.com',
-	'+.apple.com',
-	'+.live.com',
-	'+.bing.com',
-	'push.apple.com',
+	'Mijia Cloud',
+	'dlg.io.mi.com',
+	'+.oray.com',
+	'+.sunlogin.net',
+	'+.push.apple.com',
 	'tjupt.org',
 	'*.tjupt.org'
 ];

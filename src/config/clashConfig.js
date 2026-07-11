@@ -18,18 +18,23 @@ export const CLASH_CONFIG = {
 	'keep-alive-idle': 30,
 	'sniffer': {
 		'enable': true,
-		'parse-pure-ip': true,
+		'override-destination': true,
 		'sniff': {
+			'QUIC': {
+				'ports': [443]
+			},
 			'TLS': {
 				'ports': [443, 8443]
 			},
 			'HTTP': {
-				'ports': [80, 8080-8880],
+				'ports': [80, '8080-8880'],
 				'override-destination': true
 			}
 		},
 		'force-domain': SNIFFER_FORCE_DOMAIN,
-		'skip-domain': SNIFFER_SKIP_DOMAIN
+		'skip-domain': SNIFFER_SKIP_DOMAIN,
+		'force-dns-mapping': true,
+		'parse-pure-ip': true
 	},
 	'geox-url': {
 		"geoip": "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat",
