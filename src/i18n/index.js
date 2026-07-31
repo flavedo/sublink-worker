@@ -121,6 +121,7 @@ export const translations = {
       'ChatGPT': '🤖 ChatGPT',
       'Grok': '⚡ Grok',
       'Gemini': '💎 Gemini',
+      'ClaudeCode': '💻 Claude Code',
       'Notion': '📦 Notion',
       'Github': '🧑‍💻 GitHub',
       'Microsoft': '🪟 Microsoft',

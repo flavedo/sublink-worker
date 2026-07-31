@@ -116,6 +116,16 @@ export const UNIFIED_RULES = [
 		ip_rules: []
 	},
 	{
+		name: 'ClaudeCode',
+		outbound: 'ClaudeCode',
+		site_rules: ['anthropic'],
+		ip_rules: [],
+		domain_suffix: [
+			'anthropic.com',
+			'claude.ai'
+		]
+	},
+	{
 		name: 'IBKR',
 		outbound: 'IBKR',
 		site_rules: ['ibkr'],
