@@ -78,7 +78,7 @@ export const UNIFIED_RULES = [
 		]
 	},
 	{
-		name: 'Personal',
+		name: 'PersonalDirect',
 		outbound: 'DIRECT',
 		site_rules: [],
 		ip_rules: [],
@@ -93,6 +93,15 @@ export const UNIFIED_RULES = [
 			'parsec.app',
 			'obsidian.md',
 			'genymotion.com'
+		]
+	},
+	{
+		name: 'PersonalProxy',
+		outbound: 'Node Select',
+		site_rules: [],
+		ip_rules: [],
+		domain_suffix: [
+			'uuidgenerator.net'
 		]
 	},
 	{
@@ -263,7 +272,11 @@ export const UNIFIED_RULES = [
 	{
 		name: 'Crypto',
 		outbound: 'Crypto',
-		site_rules: ['okx', 'binance', 'bybit'],
+		site_rules: [
+			'okx',
+			'binance',
+			'bybit'
+		],
 		ip_rules: []
 	},
 	{
