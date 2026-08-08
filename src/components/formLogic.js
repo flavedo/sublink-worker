@@ -189,6 +189,17 @@ export const formLogicFn = (t) => {
                 });
                 this.$watch('customShortCode', val => localStorage.setItem('customShortCode', val));
                 this.$watch('accordionSections', val => localStorage.setItem('accordionSections', JSON.stringify(val)), { deep: true });
+                // Remember the user's Auto Select node choices.
+                // All nodes selected (the default) clears the record; any other
+                // selection is persisted by node name and restored on next load.
+                this.$watch('checkedNodes', val => {
+                    if (!this.nodes.length) return;
+                    if (val.length >= this.nodes.length) {
+                        localStorage.removeItem('selectNodesChecked');
+                    } else {
+                        localStorage.setItem('selectNodesChecked', JSON.stringify(val));
+                    }
+                }, { deep: true });
             },
 
             toggleAccordion(section) {
@@ -224,7 +235,9 @@ export const formLogicFn = (t) => {
                         const data = await response.json();
                         const nodes = Array.isArray(data.nodes) ? data.nodes : [];
                         this.nodes = nodes;
-                        this.checkedNodes = [...nodes];
+                        // Restore previously saved choices (by node name); fall back to all selected
+                        const savedChecked = this.getSavedCheckedNodes(nodes);
+                        this.checkedNodes = savedChecked ?? [...nodes];
                     } catch (error) {
                         console.warn('Failed to load nodes:', error);
                     }
@@ -237,6 +250,20 @@ export const formLogicFn = (t) => {
 
             checkNoNodes() {
                 this.checkedNodes = [];
+            },
+
+            // Restore previously saved checked nodes (by name) that still exist in the
+            // current node list. Returns null when there is no usable saved selection.
+            getSavedCheckedNodes(nodes) {
+                if (!Array.isArray(nodes) || !nodes.length) return null;
+                try {
+                    const saved = JSON.parse(localStorage.getItem('selectNodesChecked'));
+                    if (!Array.isArray(saved) || !saved.length) return null;
+                    const restored = nodes.filter(node => saved.includes(node));
+                    return restored.length ? restored : null;
+                } catch {
+                    return null;
+                }
             },
 
             // Serialize the checked nodes for the selectNodes query param.
