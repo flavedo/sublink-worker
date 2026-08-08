@@ -9,6 +9,7 @@ import { UpdateChecker } from '../components/UpdateChecker.jsx';
 import { SingboxConfigBuilder } from '../builders/SingboxConfigBuilder.js';
 import { ClashConfigBuilder } from '../builders/ClashConfigBuilder.js';
 import { SurgeConfigBuilder } from '../builders/SurgeConfigBuilder.js';
+import { BaseConfigBuilder } from '../builders/BaseConfigBuilder.js';
 import { createTranslator, resolveLanguage } from '../i18n/index.js';
 import { encodeBase64, tryDecodeSubscriptionLines } from '../utils.js';
 import { ShortLinkService } from '../services/shortLinkService.js';
@@ -76,6 +77,7 @@ export function createApp(bindings = {}) {
             const externalUiDownloadUrl = c.req.query('external_ui_download_url');
             const configId = c.req.query('configId');
             const lang = c.get('lang');
+            const selectNodes = parseSelectNodes(c.req.query('selectNodes'));
 
             const requestedSingboxVersion = c.req.query('singbox_version') || c.req.query('sb_version') || c.req.query('sb_ver');
             const requestUserAgent = getRequestHeader(c.req, 'User-Agent');
@@ -103,7 +105,8 @@ export function createApp(bindings = {}) {
                 externalUiDownloadUrl,
                 singboxConfigVersion,
                 includeAutoSelect,
-                includePrioritySelect
+                includePrioritySelect,
+                selectNodes
             );
             await builder.build();
             return c.json(builder.config);
@@ -131,6 +134,7 @@ export function createApp(bindings = {}) {
             const skipCertVerify = c.req.query('skip_cert_verify') === 'true';
             const configId = c.req.query('configId');
             const lang = c.get('lang');
+            const selectNodes = parseSelectNodes(c.req.query('selectNodes'));
 
             let baseConfig;
             if (configId) {
@@ -151,7 +155,8 @@ export function createApp(bindings = {}) {
                 externalUiDownloadUrl,
                 includeAutoSelect,
                 skipCertVerify,
-                includePrioritySelect
+                includePrioritySelect,
+                selectNodes
             );
             await builder.build();
             return c.text(builder.formatConfig(), 200, {
@@ -177,6 +182,7 @@ export function createApp(bindings = {}) {
             const includePrioritySelect = c.req.query('include_priority_select') === 'true';
             const configId = c.req.query('configId');
             const lang = c.get('lang');
+            const selectNodes = parseSelectNodes(c.req.query('selectNodes'));
 
             let baseConfig;
             if (configId) {
@@ -193,7 +199,8 @@ export function createApp(bindings = {}) {
                 ua,
                 groupByCountry,
                 includeAutoSelect,
-                includePrioritySelect
+                includePrioritySelect,
+                selectNodes
             );
             builder.setSubscriptionUrl(c.req.url);
             await builder.build();
@@ -231,6 +238,7 @@ export function createApp(bindings = {}) {
             const includePrioritySelect = c.req.query('include_priority_select') === 'true';
             const groupByCountry = parseBooleanFlag(c.req.query('group_by_country'));
             const customRules = parseJsonArray(c.req.query('customRules'));
+            const selectNodes = parseSelectNodes(c.req.query('selectNodes'));
             const lang = c.get('lang');
 
             const config = generateSubconverterConfig({
@@ -239,7 +247,8 @@ export function createApp(bindings = {}) {
                 lang,
                 includeAutoSelect,
                 includePrioritySelect,
-                groupByCountry
+                groupByCountry,
+                selectNodes
             });
 
             return c.text(config, 200, {
@@ -247,6 +256,22 @@ export function createApp(bindings = {}) {
             });
         } catch (error) {
             return handleError(c, error, runtime.logger);
+        }
+    });
+
+    app.get('/nodes', async (c) => {
+        const config = c.req.query('config');
+        if (!config) {
+            return c.json({ nodes: [] });
+        }
+        const ua = c.req.query('ua') || getRequestHeader(c.req, 'User-Agent') || DEFAULT_USER_AGENT;
+        try {
+            const builder = new BaseConfigBuilder(config, {}, resolveLanguage(c.get('lang')), ua);
+            const items = await builder.parseCustomItems();
+            const nodes = [...new Set(items.map(item => item?.tag).filter(Boolean))];
+            return c.json({ nodes });
+        } catch (error) {
+            return c.json({ nodes: [], error: error?.message || 'Failed to parse nodes' });
         }
     });
 
@@ -419,6 +444,11 @@ function parseJsonArray(raw) {
     } catch {
         return [];
     }
+}
+
+function parseSelectNodes(raw) {
+    if (!raw) return [];
+    return raw.split(',').map(s => s.trim()).filter(Boolean);
 }
 
 function parseBooleanFlag(value) {

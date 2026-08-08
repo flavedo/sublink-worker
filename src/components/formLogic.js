@@ -108,6 +108,9 @@ export const formLogicFn = (t) => {
             customShortCode: '',
             parsingUrl: false,
             parseDebounceTimer: null,
+            nodes: [],
+            checkedNodes: [],
+            nodesTimer: null,
             // These will be populated from window.APP_TRANSLATIONS
             processingText: '',
             convertText: '',
@@ -131,6 +134,7 @@ export const formLogicFn = (t) => {
 
                 // Load saved data
                 this.input = localStorage.getItem('inputTextarea') || '';
+                this.loadNodes();
                 this.showAdvanced = localStorage.getItem('advancedToggle') === 'true';
                 this.groupByCountry = localStorage.getItem('groupByCountry') === 'true';
                 this.includeAutoSelect = localStorage.getItem('includeAutoSelect') !== 'false';
@@ -167,6 +171,7 @@ export const formLogicFn = (t) => {
                     localStorage.setItem('inputTextarea', val);
                     this.handleInputChange(val);
                     this.$nextTick(() => this.autoResizeTextarea());
+                    this.loadNodes();
                 });
                 this.$watch('showAdvanced', val => localStorage.setItem('advancedToggle', val));
                 this.$watch('groupByCountry', val => localStorage.setItem('groupByCountry', val));
@@ -201,6 +206,48 @@ export const formLogicFn = (t) => {
                 el.style.height = 'auto';
                 el.style.height = `${Math.min(el.scrollHeight, maxHeight)}px`;
                 el.style.overflowY = el.scrollHeight > maxHeight ? 'auto' : 'hidden';
+            },
+
+            // Fetch the node list parsed from the input source (debounced)
+            loadNodes() {
+                const val = (this.input || '').trim();
+                if (!val) {
+                    this.nodes = [];
+                    this.checkedNodes = [];
+                    return;
+                }
+                if (this.nodesTimer) clearTimeout(this.nodesTimer);
+                this.nodesTimer = setTimeout(async () => {
+                    try {
+                        const params = new URLSearchParams();
+                        params.append('config', val);
+                        if (this.customUA) params.append('ua', this.customUA);
+                        const response = await fetch(`/nodes?${params.toString()}`);
+                        if (!response.ok) return;
+                        const data = await response.json();
+                        const nodes = Array.isArray(data.nodes) ? data.nodes : [];
+                        this.nodes = nodes;
+                        this.checkedNodes = [...nodes];
+                    } catch (error) {
+                        console.warn('Failed to load nodes:', error);
+                    }
+                }, 800);
+            },
+
+            checkAllNodes() {
+                this.checkedNodes = [...this.nodes];
+            },
+
+            checkNoNodes() {
+                this.checkedNodes = [];
+            },
+
+            // Serialize the checked nodes for the selectNodes query param.
+            // Empty result (all checked / no nodes) means "all nodes" on the backend.
+            getSelectNodesParam() {
+                if (!this.nodes.length) return '';
+                if (this.checkedNodes.length >= this.nodes.length) return '';
+                return this.checkedNodes.join(',');
             },
 
             applyPredefinedRule() {
@@ -243,6 +290,11 @@ export const formLogicFn = (t) => {
 
                 if (this.groupByCountry) {
                     params.append('group_by_country', 'true');
+                }
+
+                const selectNodes = this.getSelectNodesParam();
+                if (selectNodes) {
+                    params.append('selectNodes', selectNodes);
                 }
 
                 // Include lang parameter so subconverter gets correct group names
@@ -401,6 +453,9 @@ export const formLogicFn = (t) => {
                     params.append('ua', this.customUA);
                     params.append('selectedRules', JSON.stringify(this.selectedRules));
                     params.append('customRules', JSON.stringify(customRules));
+
+                    const selectNodes = this.getSelectNodesParam();
+                    if (selectNodes) params.append('selectNodes', selectNodes);
 
                     if (this.groupByCountry) params.append('group_by_country', 'true');
                     if (!this.includeAutoSelect) params.append('include_auto_select', 'false');

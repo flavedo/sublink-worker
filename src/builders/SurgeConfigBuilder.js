@@ -5,9 +5,9 @@ import { addProxyWithDedup } from './helpers/proxyHelpers.js';
 import { buildSelectorMembers, buildNodeSelectMembers, buildPrioritySelectMembers, uniqueNames } from './helpers/groupBuilder.js';
 
 export class SurgeConfigBuilder extends BaseConfigBuilder {
-    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, groupByCountry, includeAutoSelect = true, includePrioritySelect = false) {
+    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, groupByCountry, includeAutoSelect = true, includePrioritySelect = false, selectNodes = []) {
         const resolvedBaseConfig = baseConfig ?? SURGE_CONFIG;
-        super(inputString, resolvedBaseConfig, lang, userAgent, groupByCountry, includeAutoSelect, includePrioritySelect);
+        super(inputString, resolvedBaseConfig, lang, userAgent, groupByCountry, includeAutoSelect, includePrioritySelect, selectNodes);
         this.selectedRules = selectedRules;
         this.customRules = customRules;
         this.subscriptionUrl = null;
@@ -262,7 +262,7 @@ export class SurgeConfigBuilder extends BaseConfigBuilder {
             this.createProxyGroup(
                 name,
                 'url-test',
-                this.sanitizeOptions(proxyList),
+                this.sanitizeOptions(this.filterSelectableNodes(proxyList)),
                 ', url=http://www.gstatic.com/generate_204, interval=300'
             )
         );
@@ -288,7 +288,7 @@ export class SurgeConfigBuilder extends BaseConfigBuilder {
     }
 
     addNodeSelectGroup(proxyList) {
-        const options = this.buildNodeSelectOptions(proxyList);
+        const options = this.buildNodeSelectOptions(this.filterSelectableNodes(proxyList));
         if (this.hasProxyGroup(this.t('outboundNames.Node Select'))) return;
         this.config['proxy-groups'].push(
             this.createProxyGroup(this.t('outboundNames.Node Select'), 'select', options)

@@ -40,11 +40,11 @@ function supportsMrsFormat(userAgent) {
 }
 
 export class ClashConfigBuilder extends BaseConfigBuilder {
-    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, groupByCountry = false, enableClashUI = false, externalController, externalUiDownloadUrl, includeAutoSelect = true, skipCertVerify = false, includePrioritySelect = false) {
+    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, groupByCountry = false, enableClashUI = false, externalController, externalUiDownloadUrl, includeAutoSelect = true, skipCertVerify = false, includePrioritySelect = false, selectNodes = []) {
         if (!baseConfig) {
             baseConfig = CLASH_CONFIG;
         }
-        super(inputString, baseConfig, lang, userAgent, groupByCountry, includeAutoSelect, includePrioritySelect);
+        super(inputString, baseConfig, lang, userAgent, groupByCountry, includeAutoSelect, includePrioritySelect, selectNodes);
         this.selectedRules = selectedRules;
         this.customRules = customRules;
         this.countryGroupNames = [];
@@ -320,7 +320,7 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
         const group = {
             name: autoName,
             type: 'url-test',
-            proxies: deepCopy(uniqueNames(proxyList)),
+            proxies: deepCopy(uniqueNames(this.filterSelectableNodes(proxyList))),
             url: 'https://www.gstatic.com/generate_204',
             interval: 300,
             lazy: false
@@ -367,7 +367,7 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
         const nodeName = this.t('outboundNames.Node Select');
         if (this.hasProxyGroup(nodeName)) return;
         const list = buildNodeSelectMembers({
-            proxyList,
+            proxyList: this.filterSelectableNodes(proxyList),
             translator: this.t,
             groupByCountry: this.groupByCountry,
             manualGroupName: this.manualGroupName,

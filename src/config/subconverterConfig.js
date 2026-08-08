@@ -30,9 +30,13 @@ function resolveGroupName(rule, t) {
 /**
  * Generate subconverter external config (INI format)
  */
-export function generateSubconverterConfig({ selectedRules = [], customRules = [], lang = 'zh-CN', includeAutoSelect = true, includePrioritySelect = false, groupByCountry = false } = {}) {
+export function generateSubconverterConfig({ selectedRules = [], customRules = [], lang = 'zh-CN', includeAutoSelect = true, includePrioritySelect = false, groupByCountry = false, selectNodes = [] } = {}) {
 	const t = createTranslator(lang);
 	const rules = generateRules(selectedRules, customRules);
+
+	// Regex matching the nodes allowed in the Auto Select / Node Select groups.
+	// '.*' matches all nodes (default).
+	const selectRegex = selectNodes.length > 0 ? `(${selectNodes.map(escapeRegex).join('|')})` : '.*';
 
 	const lines = ['[custom]'];
 
@@ -129,18 +133,18 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 		}
 	} else {
 		if (includeAutoSelect && includePrioritySelect) {
-			lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${autoSelectName}\`[]${prioritySelectName}\`[]DIRECT\`.*`);
+			lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${autoSelectName}\`[]${prioritySelectName}\`[]DIRECT\`${selectRegex}`);
 		} else if (includeAutoSelect) {
-			lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${autoSelectName}\`[]DIRECT\`.*`);
+			lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${autoSelectName}\`[]DIRECT\`${selectRegex}`);
 		} else if (includePrioritySelect) {
-			lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${prioritySelectName}\`[]DIRECT\`.*`);
+			lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${prioritySelectName}\`[]DIRECT\`${selectRegex}`);
 		} else {
-			lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]DIRECT\`.*`);
+			lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]DIRECT\`${selectRegex}`);
 		}
 	}
 
 	if (includeAutoSelect) {
-		lines.push(`custom_proxy_group=${autoSelectName}\`url-test\`.*\`${SPEED_TEST_URL}\`300,,50`);
+		lines.push(`custom_proxy_group=${autoSelectName}\`url-test\`${selectRegex}\`${SPEED_TEST_URL}\`300,,50`);
 	}
 
 	if (includePrioritySelect) {

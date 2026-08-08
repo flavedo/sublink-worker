@@ -7,9 +7,9 @@ import { buildSelectorMembers as buildSelectorMemberList, buildNodeSelectMembers
 import { normalizeGroupName } from './helpers/groupNameUtils.js';
 
 export class SingboxConfigBuilder extends BaseConfigBuilder {
-    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, groupByCountry = false, enableClashUI = false, externalController, externalUiDownloadUrl, singboxVersion = '1.12', includeAutoSelect = true, includePrioritySelect = false) {
+    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, groupByCountry = false, enableClashUI = false, externalController, externalUiDownloadUrl, singboxVersion = '1.12', includeAutoSelect = true, includePrioritySelect = false, selectNodes = []) {
         const resolvedBaseConfig = baseConfig ?? SING_BOX_CONFIG;
-        super(inputString, resolvedBaseConfig, lang, userAgent, groupByCountry, includeAutoSelect, includePrioritySelect);
+        super(inputString, resolvedBaseConfig, lang, userAgent, groupByCountry, includeAutoSelect, includePrioritySelect, selectNodes);
 
         this.selectedRules = selectedRules;
         this.customRules = customRules;
@@ -147,7 +147,7 @@ export class SingboxConfigBuilder extends BaseConfigBuilder {
         const group = {
             type: "urltest",
             tag,
-            outbounds: deepCopy(uniqueNames(proxyList))
+            outbounds: deepCopy(uniqueNames(this.filterSelectableNodes(proxyList)))
         };
 
         // Add 'providers' field if we have outbound_providers
@@ -191,7 +191,7 @@ export class SingboxConfigBuilder extends BaseConfigBuilder {
         const tag = this.t('outboundNames.Node Select');
         if (this.hasOutboundTag(tag)) return;
         const members = buildNodeSelectMembers({
-            proxyList,
+            proxyList: this.filterSelectableNodes(proxyList),
             translator: this.t,
             groupByCountry: this.groupByCountry,
             manualGroupName: this.manualGroupName,

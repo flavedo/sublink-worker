@@ -96,6 +96,56 @@ export const Form = (props) => {
         />
       </div>
 
+      {/* Node Selection */}
+      <div
+        x-show="nodes.length > 0"
+        {...{
+          'x-transition:enter': 'transition ease-out duration-300',
+          'x-transition:enter-start': 'opacity-0 transform -translate-y-2',
+          'x-transition:enter-end': 'opacity-100 transform translate-y-0'
+        }}
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6"
+      >
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 flex items-center justify-center">
+              <i class="fas fa-list-check text-sm"></i>
+            </span>
+            {t('nodeSelection')}
+          </h3>
+          <div class="flex gap-2">
+            <button
+              type="button"
+              x-on:click="checkAllNodes()"
+              class="px-3 py-1.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+            >
+              {t('selectAll')}
+            </button>
+            <button
+              type="button"
+              x-on:click="checkNoNodes()"
+              class="px-3 py-1.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+            >
+              {t('selectNone')}
+            </button>
+          </div>
+        </div>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('nodeSelectionTip')}</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-72 overflow-y-auto pr-1">
+          <template x-for="node in nodes" x-bind:key="node">
+            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors select-none">
+              <input
+                type="checkbox"
+                x-bind:value="node"
+                x-model="checkedNodes"
+                class="w-4 h-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
+              />
+              <span class="text-sm text-gray-700 dark:text-gray-300 truncate" x-text="node"></span>
+            </label>
+          </template>
+        </div>
+      </div>
+
       {/* Advanced Options Toggle */}
       <div 
         class="flex items-center justify-between bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors" 
