@@ -211,6 +211,7 @@ export class SingboxConfigBuilder extends BaseConfigBuilder {
         return buildSelectorMemberList({
             proxyList,
             translator: this.t,
+            includeAutoSelect: this.includeAutoSelect,
             includePrioritySelect: this.includePrioritySelect
         });
     }

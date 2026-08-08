@@ -41,12 +41,13 @@ export function buildNodeSelectMembers({ proxyList = [], translator, includeAuto
     ]);
 }
 
-export function buildSelectorMembers({ proxyList = [], translator, includePrioritySelect = false }) {
+export function buildSelectorMembers({ proxyList = [], translator, includeAutoSelect = true, includePrioritySelect = false }) {
     if (!translator) {
         throw new Error('buildSelectorMembers requires a translator function');
     }
     return withDirectReject([
         translator('outboundNames.Node Select'),
+        ...(includeAutoSelect ? [translator('outboundNames.Auto Select')] : []),
         ...(includePrioritySelect ? [translator('outboundNames.Priority Select')] : []),
         ...proxyList
     ]);

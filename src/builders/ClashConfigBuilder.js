@@ -387,6 +387,7 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
         return buildSelectorMembers({
             proxyList,
             translator: this.t,
+            includeAutoSelect: this.includeAutoSelect,
             includePrioritySelect: this.includePrioritySelect
         });
     }

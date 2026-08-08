@@ -239,6 +239,7 @@ export class SurgeConfigBuilder extends BaseConfigBuilder {
         return buildSelectorMembers({
             proxyList,
             translator: this.t,
+            includeAutoSelect: this.includeAutoSelect,
             includePrioritySelect: this.includePrioritySelect
         });
     }
