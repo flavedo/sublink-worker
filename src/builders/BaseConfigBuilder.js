@@ -4,7 +4,7 @@ import { createTranslator } from '../i18n/index.js';
 import { generateRules, getOutbounds, PREDEFINED_RULE_SETS } from '../config/index.js';
 
 export class BaseConfigBuilder {
-    constructor(inputString, baseConfig, lang, userAgent, groupByCountry = false, includeAutoSelect = true, includePrioritySelect = false, selectNodes = []) {
+    constructor(inputString, baseConfig, lang, userAgent, includeAutoSelect = true, includePrioritySelect = false, selectNodes = []) {
         this.inputString = inputString;
         this.config = deepCopy(baseConfig);
         this.customRules = [];
@@ -12,7 +12,6 @@ export class BaseConfigBuilder {
         this.t = createTranslator(lang);
         this.userAgent = userAgent;
         this.appliedOverrideKeys = new Set();
-        this.groupByCountry = groupByCountry;
         this.includeAutoSelect = includeAutoSelect;
         this.includePrioritySelect = includePrioritySelect;
         this.selectNodes = selectNodes;
@@ -322,14 +321,6 @@ export class BaseConfigBuilder {
         throw new Error('addCustomRuleGroups must be implemented in child class');
     }
 
-    addFallBackGroup(proxyList) {
-        throw new Error('addFallBackGroup must be implemented in child class');
-    }
-
-    addCountryGroups() {
-        throw new Error('addCountryGroups must be implemented in child class');
-    }
-
     addCustomItems(customItems) {
         const validItems = customItems.filter(item => item != null);
         validItems.forEach(item => {
@@ -349,9 +340,6 @@ export class BaseConfigBuilder {
         this.addAutoSelectGroup(proxyList);
         this.addPrioritySelectGroup(proxyList);
         this.addNodeSelectGroup(proxyList);
-        if (this.groupByCountry) {
-            this.addCountryGroups();
-        }
         this.addOutboundGroups(outbounds, proxyList);
         this.addCustomRuleGroups(proxyList);
         this.addFallBackGroup(proxyList);

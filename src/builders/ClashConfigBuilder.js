@@ -1,7 +1,7 @@
 import yaml from 'js-yaml';
 import { CLASH_CONFIG, generateRules, generateClashRuleSets, getOutbounds, PREDEFINED_RULE_SETS, DIRECT_DEFAULT_RULES } from '../config/index.js';
 import { BaseConfigBuilder } from './BaseConfigBuilder.js';
-import { deepCopy, groupProxiesByCountry } from '../utils.js';
+import { deepCopy } from '../utils.js';
 import { addProxyWithDedup } from './helpers/proxyHelpers.js';
 import { buildSelectorMembers, buildNodeSelectMembers, buildPrioritySelectMembers, uniqueNames } from './helpers/groupBuilder.js';
 import { emitClashRules, sanitizeClashProxyGroups } from './helpers/clashConfigUtils.js';
@@ -40,15 +40,13 @@ function supportsMrsFormat(userAgent) {
 }
 
 export class ClashConfigBuilder extends BaseConfigBuilder {
-    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, groupByCountry = false, enableClashUI = false, externalController, externalUiDownloadUrl, includeAutoSelect = true, skipCertVerify = false, includePrioritySelect = false, selectNodes = []) {
+    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, enableClashUI = false, externalController, externalUiDownloadUrl, includeAutoSelect = true, skipCertVerify = false, includePrioritySelect = false, selectNodes = []) {
         if (!baseConfig) {
             baseConfig = CLASH_CONFIG;
         }
-        super(inputString, baseConfig, lang, userAgent, groupByCountry, includeAutoSelect, includePrioritySelect, selectNodes);
+        super(inputString, baseConfig, lang, userAgent, includeAutoSelect, includePrioritySelect, selectNodes);
         this.selectedRules = selectedRules;
         this.customRules = customRules;
-        this.countryGroupNames = [];
-        this.manualGroupName = null;
         this.enableClashUI = enableClashUI;
         this.externalController = externalController;
         this.externalUiDownloadUrl = externalUiDownloadUrl;
@@ -342,10 +340,7 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
         if (this.hasProxyGroup(priorityName)) return;
         const list = buildPrioritySelectMembers({
             proxyList,
-            translator: this.t,
-            groupByCountry: this.groupByCountry,
-            manualGroupName: this.manualGroupName,
-            countryGroupNames: this.countryGroupNames
+            translator: this.t
         });
 
         const group = {
@@ -369,9 +364,6 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
         const list = buildNodeSelectMembers({
             proxyList,
             translator: this.t,
-            groupByCountry: this.groupByCountry,
-            manualGroupName: this.manualGroupName,
-            countryGroupNames: this.countryGroupNames,
             includeAutoSelect: this.includeAutoSelect,
             includePrioritySelect: this.includePrioritySelect
         });
@@ -395,10 +387,6 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
         return buildSelectorMembers({
             proxyList,
             translator: this.t,
-            groupByCountry: this.groupByCountry,
-            manualGroupName: this.manualGroupName,
-            countryGroupNames: this.countryGroupNames,
-            includeAutoSelect: this.includeAutoSelect,
             includePrioritySelect: this.includePrioritySelect
         });
     }
@@ -466,78 +454,6 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
             group.use = providerNames;
         }
         this.config['proxy-groups'].push(group);
-    }
-
-    addCountryGroups() {
-        const proxies = this.getProxies();
-        const countryGroups = groupProxiesByCountry(proxies, {
-            getName: proxy => this.getProxyName(proxy)
-        });
-
-        const existingNames = new Set((this.config['proxy-groups'] || []).map(g => normalizeGroupName(g?.name)).filter(Boolean));
-
-        const manualProxyNames = proxies.map(p => p?.name).filter(Boolean);
-        const manualGroupName = manualProxyNames.length > 0 ? this.t('outboundNames.Manual Switch') : null;
-        if (manualGroupName) {
-            const manualNorm = normalizeGroupName(manualGroupName);
-            if (!existingNames.has(manualNorm)) {
-                const group = {
-                    name: manualGroupName,
-                    type: 'select',
-                    proxies: manualProxyNames
-                };
-                // Add 'use' field if we have proxy-providers
-                const providerNames = this.getAllProviderNames();
-                if (providerNames.length > 0) {
-                    group.use = providerNames;
-                }
-                this.config['proxy-groups'].push(group);
-                existingNames.add(manualNorm);
-            }
-        }
-
-        const countries = Object.keys(countryGroups).sort((a, b) => a.localeCompare(b));
-        const countryGroupNames = [];
-
-        countries.forEach(country => {
-            const { emoji, name, proxies } = countryGroups[country];
-            const groupName = `${emoji} ${name}`;
-            const norm = normalizeGroupName(groupName);
-            if (!existingNames.has(norm)) {
-                const group = {
-                    name: groupName,
-                    type: 'url-test',
-                    proxies: proxies,
-                    url: 'https://www.gstatic.com/generate_204',
-                    interval: 300,
-                    lazy: false
-                };
-                // Add 'use' field if we have proxy-providers
-                const providerNames = this.getAllProviderNames();
-                if (providerNames.length > 0) {
-                    group.use = providerNames;
-                }
-                this.config['proxy-groups'].push(group);
-                existingNames.add(norm);
-            }
-            countryGroupNames.push(groupName);
-        });
-
-        const nodeSelectGroup = this.config['proxy-groups'].find(g => g && g.name === this.t('outboundNames.Node Select'));
-        if (nodeSelectGroup && Array.isArray(nodeSelectGroup.proxies)) {
-            const rebuilt = buildNodeSelectMembers({
-                proxyList: [],
-                translator: this.t,
-                groupByCountry: true,
-                manualGroupName,
-                countryGroupNames,
-                includeAutoSelect: this.includeAutoSelect,
-                includePrioritySelect: this.includePrioritySelect
-            });
-            nodeSelectGroup.proxies = rebuilt;
-        }
-        this.countryGroupNames = countryGroupNames;
-        this.manualGroupName = manualGroupName;
     }
 
     /**

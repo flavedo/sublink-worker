@@ -181,7 +181,6 @@ describe('Auto Proxy Providers Detection', () => {
                 null,
                 'zh-CN',
                 'test-agent',
-                false,  // groupByCountry
                 false,  // enableClashUI
                 null,   // externalController
                 null,   // externalUiDownloadUrl

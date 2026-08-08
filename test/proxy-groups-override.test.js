@@ -254,15 +254,6 @@ FINAL,DIRECT
             expect(configText).toContain('HK-Node');
             expect(configText).not.toContain('[object Object]');
         });
-
-        it('SurgeConfigBuilder with groupByCountry handles Clash input proxy-groups', async () => {
-            // Regression test for addCountryGroups with object-format groups
-            const builder = new SurgeConfigBuilder(clashInput, 'minimal', [], null, 'zh-CN', 'test-agent', true);
-            const configText = await builder.build();
-
-            expect(configText).toContain('[Proxy Group]');
-            expect(configText).not.toContain('[object Object]');
-        });
     });
 
     describe('Issue #277 - Proxy Group Merge and Validation', () => {

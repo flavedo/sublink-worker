@@ -149,12 +149,9 @@ export const translations = {
       'GFW': '🚀 GFW兜底',
       'Provider': '🌐 机场',
       'Non-Standard Port': '🔀 非标端口',
-      'Manual Switch': '🖐️ 手动切换',
       'GLOBAL': 'GLOBAL'
     },
     generalSettings: '通用设置',
-    groupByCountry: '按国家分组',
-    groupByCountryTip: '仅 Clash/Surge/SingBox 生效',
     includeAutoSelect: '包含自动选择分组',
     includePrioritySelect: '包含优先选择分组',
     skipCertVerify: '跳过证书验证',

@@ -21,8 +21,7 @@ hysteria2://11111251-af2b-49f4-aea4-56a8a8f7a391@demo1.de:8443?peer=demo1.de&ins
             [],
             null,
             'zh-CN',
-            null,
-            false
+            null
         );
 
         const result = await builder.build();
@@ -45,8 +44,7 @@ hysteria2://11111251-af2b-49f4-aea4-56a8a8f7a391@demo1.de:8443?peer=demo1.de&ins
             [],
             null,
             'zh-CN',
-            null,
-            false
+            null
         );
 
         const result = await builder.build();
@@ -71,8 +69,7 @@ hysteria2://11111251-af2b-49f4-aea4-56a8a8f7a391@demo1.de:8443?peer=demo1.de&ins
             [],
             null,
             'zh-CN',
-            null,
-            false
+            null
         );
 
         const result = await builder.build();
@@ -99,8 +96,7 @@ hysteria2://11111251-af2b-49f4-aea4-56a8a8f7a391@demo1.de:8443?peer=demo1.de&ins
             [],
             null,
             'zh-CN',
-            null,
-            false
+            null
         );
 
         const result = await builder.build();
@@ -131,8 +127,7 @@ hysteria2://11111251-af2b-49f4-aea4-56a8a8f7a391@demo1.de:8443?peer=demo1.de&ins
             [],
             null,
             'zh-CN',
-            null,
-            false
+            null
         );
 
         const result = await builder.build();

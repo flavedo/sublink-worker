@@ -83,7 +83,6 @@ export const formLogicFn = (t) => {
             selectedRules: [],
             selectedPredefinedRule: 'comprehensive',
             subconverterCopied: false,
-            groupByCountry: false,
             includeAutoSelect: true,
             includePrioritySelect: false,
             enableClashUI: false,
@@ -136,7 +135,6 @@ export const formLogicFn = (t) => {
                 this.input = localStorage.getItem('inputTextarea') || '';
                 this.loadNodes();
                 this.showAdvanced = localStorage.getItem('advancedToggle') === 'true';
-                this.groupByCountry = localStorage.getItem('groupByCountry') === 'true';
                 this.includeAutoSelect = localStorage.getItem('includeAutoSelect') !== 'false';
                 this.includePrioritySelect = localStorage.getItem('includePrioritySelect') === 'true';
                 this.enableClashUI = localStorage.getItem('enableClashUI') === 'true';
@@ -174,7 +172,6 @@ export const formLogicFn = (t) => {
                     this.loadNodes();
                 });
                 this.$watch('showAdvanced', val => localStorage.setItem('advancedToggle', val));
-                this.$watch('groupByCountry', val => localStorage.setItem('groupByCountry', val));
                 this.$watch('includeAutoSelect', val => localStorage.setItem('includeAutoSelect', val));
                 this.$watch('includePrioritySelect', val => localStorage.setItem('includePrioritySelect', val));
                 this.$watch('enableClashUI', val => localStorage.setItem('enableClashUI', val));
@@ -286,10 +283,6 @@ export const formLogicFn = (t) => {
 
                 if (this.includePrioritySelect) {
                     params.append('include_priority_select', 'true');
-                }
-
-                if (this.groupByCountry) {
-                    params.append('group_by_country', 'true');
                 }
 
                 const selectNodes = this.getSelectNodesParam();
@@ -457,7 +450,6 @@ export const formLogicFn = (t) => {
                     const selectNodes = this.getSelectNodesParam();
                     if (selectNodes) params.append('selectNodes', selectNodes);
 
-                    if (this.groupByCountry) params.append('group_by_country', 'true');
                     if (!this.includeAutoSelect) params.append('include_auto_select', 'false');
                     if (this.includePrioritySelect) params.append('include_priority_select', 'true');
                     if (this.enableClashUI) params.append('enable_clash_ui', 'true');
@@ -701,7 +693,6 @@ export const formLogicFn = (t) => {
                 }
 
                 // Extract other parameters
-                this.groupByCountry = params.get('group_by_country') === 'true';
                 this.includeAutoSelect = params.get('include_auto_select') !== 'false';
                 this.enableClashUI = params.get('enable_clash_ui') === 'true';
 
@@ -729,7 +720,7 @@ export const formLogicFn = (t) => {
                 }
 
                 // Expand advanced options if any advanced settings are present
-                if (selectedRules || customRules || this.groupByCountry || this.enableClashUI ||
+                if (selectedRules || customRules || this.enableClashUI ||
                     externalController || externalUiDownloadUrl || ua || configId) {
                     this.showAdvanced = true;
                 }

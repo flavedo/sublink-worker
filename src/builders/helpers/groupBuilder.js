@@ -21,58 +21,33 @@ export function withDirectReject(options = []) {
     ]);
 }
 
-export function buildPrioritySelectMembers({ proxyList = [], translator, groupByCountry = false, manualGroupName, countryGroupNames = [] }) {
+export function buildPrioritySelectMembers({ proxyList = [], translator }) {
     if (!translator) {
         throw new Error('buildPrioritySelectMembers requires a translator function');
     }
-    const base = groupByCountry
-        ? [
-            ...(manualGroupName ? [manualGroupName] : []),
-            ...countryGroupNames
-        ]
-        : [
-            ...proxyList
-        ];
-    return withDirectReject(base);
+    return withDirectReject([...proxyList]);
 }
 
-export function buildNodeSelectMembers({ proxyList = [], translator, groupByCountry = false, manualGroupName, countryGroupNames = [], includeAutoSelect = true, includePrioritySelect = false }) {
+export function buildNodeSelectMembers({ proxyList = [], translator, includeAutoSelect = true, includePrioritySelect = false }) {
     if (!translator) {
         throw new Error('buildNodeSelectMembers requires a translator function');
     }
     const autoName = translator('outboundNames.Auto Select');
     const priorityName = translator('outboundNames.Priority Select');
-    const base = groupByCountry
-        ? [
-            ...(includeAutoSelect ? [autoName] : []),
-            ...(includePrioritySelect ? [priorityName] : []),
-            ...(manualGroupName ? [manualGroupName] : []),
-            ...countryGroupNames
-        ]
-        : [
-            ...(includeAutoSelect ? [autoName] : []),
-            ...(includePrioritySelect ? [priorityName] : []),
-            ...proxyList
-        ];
-    return withDirectReject(base);
+    return withDirectReject([
+        ...(includeAutoSelect ? [autoName] : []),
+        ...(includePrioritySelect ? [priorityName] : []),
+        ...proxyList
+    ]);
 }
 
-export function buildSelectorMembers({ proxyList = [], translator, groupByCountry = false, manualGroupName, countryGroupNames = [], includeAutoSelect = true, includePrioritySelect = false }) {
+export function buildSelectorMembers({ proxyList = [], translator, includePrioritySelect = false }) {
     if (!translator) {
         throw new Error('buildSelectorMembers requires a translator function');
     }
-    const base = groupByCountry
-        ? [
-            translator('outboundNames.Node Select'),
-            ...(includeAutoSelect ? [translator('outboundNames.Auto Select')] : []),
-            ...(includePrioritySelect ? [translator('outboundNames.Priority Select')] : []),
-            ...(manualGroupName ? [manualGroupName] : []),
-            ...countryGroupNames
-        ]
-        : [
-            translator('outboundNames.Node Select'),
-            ...(includePrioritySelect ? [translator('outboundNames.Priority Select')] : []),
-            ...proxyList
-        ];
-    return withDirectReject(base);
+    return withDirectReject([
+        translator('outboundNames.Node Select'),
+        ...(includePrioritySelect ? [translator('outboundNames.Priority Select')] : []),
+        ...proxyList
+    ]);
 }

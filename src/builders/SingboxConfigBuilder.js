@@ -1,20 +1,18 @@
 
 import { SING_BOX_CONFIG, generateRuleSets, generateRules, getOutbounds, PREDEFINED_RULE_SETS, DIRECT_DEFAULT_RULES } from '../config/index.js';
 import { BaseConfigBuilder } from './BaseConfigBuilder.js';
-import { deepCopy, groupProxiesByCountry } from '../utils.js';
+import { deepCopy } from '../utils.js';
 import { addProxyWithDedup } from './helpers/proxyHelpers.js';
 import { buildSelectorMembers as buildSelectorMemberList, buildNodeSelectMembers, buildPrioritySelectMembers, uniqueNames } from './helpers/groupBuilder.js';
 import { normalizeGroupName } from './helpers/groupNameUtils.js';
 
 export class SingboxConfigBuilder extends BaseConfigBuilder {
-    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, groupByCountry = false, enableClashUI = false, externalController, externalUiDownloadUrl, singboxVersion = '1.12', includeAutoSelect = true, includePrioritySelect = false, selectNodes = []) {
+    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, enableClashUI = false, externalController, externalUiDownloadUrl, singboxVersion = '1.12', includeAutoSelect = true, includePrioritySelect = false, selectNodes = []) {
         const resolvedBaseConfig = baseConfig ?? SING_BOX_CONFIG;
-        super(inputString, resolvedBaseConfig, lang, userAgent, groupByCountry, includeAutoSelect, includePrioritySelect, selectNodes);
+        super(inputString, resolvedBaseConfig, lang, userAgent, includeAutoSelect, includePrioritySelect, selectNodes);
 
         this.selectedRules = selectedRules;
         this.customRules = customRules;
-        this.countryGroupNames = [];
-        this.manualGroupName = null;
         this.enableClashUI = enableClashUI;
         this.externalController = externalController;
         this.externalUiDownloadUrl = externalUiDownloadUrl;
@@ -166,10 +164,7 @@ export class SingboxConfigBuilder extends BaseConfigBuilder {
         if (this.hasOutboundTag(tag)) return;
         const members = buildPrioritySelectMembers({
             proxyList,
-            translator: this.t,
-            groupByCountry: this.groupByCountry,
-            manualGroupName: this.manualGroupName,
-            countryGroupNames: this.countryGroupNames
+            translator: this.t
         });
 
         const group = {
@@ -193,9 +188,6 @@ export class SingboxConfigBuilder extends BaseConfigBuilder {
         const members = buildNodeSelectMembers({
             proxyList,
             translator: this.t,
-            groupByCountry: this.groupByCountry,
-            manualGroupName: this.manualGroupName,
-            countryGroupNames: this.countryGroupNames,
             includeAutoSelect: this.includeAutoSelect,
             includePrioritySelect: this.includePrioritySelect
         });
@@ -219,10 +211,6 @@ export class SingboxConfigBuilder extends BaseConfigBuilder {
         return buildSelectorMemberList({
             proxyList,
             translator: this.t,
-            groupByCountry: this.groupByCountry,
-            manualGroupName: this.manualGroupName,
-            countryGroupNames: this.countryGroupNames,
-            includeAutoSelect: this.includeAutoSelect,
             includePrioritySelect: this.includePrioritySelect
         });
     }
@@ -270,68 +258,6 @@ export class SingboxConfigBuilder extends BaseConfigBuilder {
             tag: this.t('outboundNames.Fall Back'),
             outbounds: selectorMembers
         });
-    }
-
-    addCountryGroups() {
-        const proxies = this.getProxies();
-        const countryGroups = groupProxiesByCountry(proxies, {
-            getName: proxy => this.getProxyName(proxy)
-        });
-
-        const existingTags = new Set((this.config.outbounds || []).map(o => normalizeGroupName(o?.tag)).filter(Boolean));
-
-        const manualProxyNames = proxies.map(p => p?.tag).filter(Boolean);
-        const manualGroupName = manualProxyNames.length > 0 ? this.t('outboundNames.Manual Switch') : null;
-        if (manualGroupName) {
-            const manualNorm = normalizeGroupName(manualGroupName);
-            if (!existingTags.has(manualNorm)) {
-                this.config.outbounds.push({
-                    type: 'selector',
-                    tag: manualGroupName,
-                    outbounds: manualProxyNames
-                });
-                existingTags.add(manualNorm);
-            }
-        }
-
-        const countries = Object.keys(countryGroups).sort((a, b) => a.localeCompare(b));
-        const countryGroupNames = [];
-
-        countries.forEach(country => {
-            const { emoji, name, proxies: countryProxies } = countryGroups[country];
-            if (!countryProxies || countryProxies.length === 0) {
-                return;
-            }
-            const groupName = `${emoji} ${name}`;
-            const norm = normalizeGroupName(groupName);
-            if (!existingTags.has(norm)) {
-                this.config.outbounds.push({
-                    tag: groupName,
-                    type: 'urltest',
-                    outbounds: countryProxies
-                });
-                existingTags.add(norm);
-            }
-            countryGroupNames.push(groupName);
-        });
-
-        const nodeSelectTag = this.t('outboundNames.Node Select');
-        const nodeSelectGroup = this.config.outbounds.find(o => normalizeGroupName(o?.tag) === normalizeGroupName(nodeSelectTag));
-        if (nodeSelectGroup && Array.isArray(nodeSelectGroup.outbounds)) {
-            const rebuilt = buildNodeSelectMembers({
-                proxyList: [],
-                translator: this.t,
-                groupByCountry: true,
-                manualGroupName,
-                countryGroupNames,
-                includeAutoSelect: this.includeAutoSelect,
-                includePrioritySelect: this.includePrioritySelect
-            });
-            nodeSelectGroup.outbounds = rebuilt;
-        }
-
-        this.countryGroupNames = countryGroupNames;
-        this.manualGroupName = manualGroupName;
     }
 
     /**
