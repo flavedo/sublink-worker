@@ -34,8 +34,8 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 	const t = createTranslator(lang);
 	const rules = generateRules(selectedRules, customRules);
 
-	// Regex matching the nodes allowed in the Auto Select / Node Select groups.
-	// '.*' matches all nodes (default).
+	// Regex matching the nodes allowed in the Auto Select group.
+	// '.*' matches all nodes (default). Node Select keeps all nodes.
 	const selectRegex = selectNodes.length > 0 ? `(${selectNodes.map(escapeRegex).join('|')})` : '.*';
 
 	const lines = ['[custom]'];
@@ -133,13 +133,13 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 		}
 	} else {
 		if (includeAutoSelect && includePrioritySelect) {
-			lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${autoSelectName}\`[]${prioritySelectName}\`[]DIRECT\`${selectRegex}`);
+			lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${autoSelectName}\`[]${prioritySelectName}\`[]DIRECT\`.*`);
 		} else if (includeAutoSelect) {
-			lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${autoSelectName}\`[]DIRECT\`${selectRegex}`);
+			lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${autoSelectName}\`[]DIRECT\`.*`);
 		} else if (includePrioritySelect) {
-			lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${prioritySelectName}\`[]DIRECT\`${selectRegex}`);
+			lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${prioritySelectName}\`[]DIRECT\`.*`);
 		} else {
-			lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]DIRECT\`${selectRegex}`);
+			lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]DIRECT\`.*`);
 		}
 	}
 

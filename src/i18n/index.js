@@ -27,7 +27,7 @@ export const translations = {
     shareUrls: '输入源',
     urlPlaceholder: '支持粘贴：分享链接、Clash 配置、Sing-Box 配置、Surge 配置...',
     nodeSelection: '节点选择',
-    nodeSelectionTip: '勾选要加入自动选择和手动选择的节点（默认全部）',
+    nodeSelectionTip: '勾选要加入自动选择的节点（默认全部）',
     selectAll: '全选',
     selectNone: '全不选',
     advancedOptions: '高级选项',

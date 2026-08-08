@@ -367,7 +367,7 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
         const nodeName = this.t('outboundNames.Node Select');
         if (this.hasProxyGroup(nodeName)) return;
         const list = buildNodeSelectMembers({
-            proxyList: this.filterSelectableNodes(proxyList),
+            proxyList,
             translator: this.t,
             groupByCountry: this.groupByCountry,
             manualGroupName: this.manualGroupName,

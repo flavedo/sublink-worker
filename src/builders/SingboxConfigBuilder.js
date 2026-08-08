@@ -191,7 +191,7 @@ export class SingboxConfigBuilder extends BaseConfigBuilder {
         const tag = this.t('outboundNames.Node Select');
         if (this.hasOutboundTag(tag)) return;
         const members = buildNodeSelectMembers({
-            proxyList: this.filterSelectableNodes(proxyList),
+            proxyList,
             translator: this.t,
             groupByCountry: this.groupByCountry,
             manualGroupName: this.manualGroupName,
