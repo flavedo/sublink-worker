@@ -64,6 +64,7 @@ export const Form = (props) => {
           rows={5}
           placeholder={t('urlPlaceholder')}
           required
+          textareaAttrs={{ 'x-ref': 'inputTextarea', style: 'resize: none' }}
           labelActionsWrapperClass="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
           labelActions={[
             {

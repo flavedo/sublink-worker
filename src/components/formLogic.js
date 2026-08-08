@@ -159,10 +159,14 @@ export const formLogicFn = (t) => {
                 // Initialize rules
                 this.applyPredefinedRule();
 
+                // Auto-resize the input textarea once initial value is loaded
+                this.$nextTick(() => this.autoResizeTextarea());
+
                 // Watchers to save state
                 this.$watch('input', val => {
                     localStorage.setItem('inputTextarea', val);
                     this.handleInputChange(val);
+                    this.$nextTick(() => this.autoResizeTextarea());
                 });
                 this.$watch('showAdvanced', val => localStorage.setItem('advancedToggle', val));
                 this.$watch('groupByCountry', val => localStorage.setItem('groupByCountry', val));
@@ -187,6 +191,16 @@ export const formLogicFn = (t) => {
 
             toggleAccordion(section) {
                 this.accordionSections[section] = !this.accordionSections[section];
+            },
+
+            // Auto-grow the input textarea up to a max height, then scroll
+            autoResizeTextarea() {
+                const el = this.$refs.inputTextarea;
+                if (!el) return;
+                const maxHeight = 320;
+                el.style.height = 'auto';
+                el.style.height = `${Math.min(el.scrollHeight, maxHeight)}px`;
+                el.style.overflowY = el.scrollHeight > maxHeight ? 'auto' : 'hidden';
             },
 
             applyPredefinedRule() {
