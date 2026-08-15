@@ -217,7 +217,7 @@ export function createTlsConfig(params) {
 	if (params.security && params.security !== 'none') {
 		tls = {
 			enabled: true,
-			server_name: params.sni || params.host,
+			server_name: params.sni || params.peer || params.host,
 			insecure: !!params?.allowInsecure || !!params?.insecure || !!params?.allow_insecure,
 			// utls: {
 			//   enabled: true,
