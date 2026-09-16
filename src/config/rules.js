@@ -58,7 +58,7 @@ export const UNIFIED_RULES = [
 		site_rules: [],
 		ip_rules: [],
 		domain_suffix: [
-			'm-team.cc', 
+			'm-team.cc',
 			'm-team.io'
 		]
 	},
@@ -66,13 +66,13 @@ export const UNIFIED_RULES = [
 		name: 'PublicTracker',
 		outbound: 'DIRECT',
 		site_rules: [
-			'category-public-tracker', 
+			'category-public-tracker',
 			'category-pt'
 		],
 		ip_rules: [],
 		domain_suffix: [
-			'ptfans.cc', 
-			'ptlover.cc', 
+			'ptfans.cc',
+			'ptlover.cc',
 			'halomt.com',
 			'tjupt.org'
 		]
@@ -83,13 +83,13 @@ export const UNIFIED_RULES = [
 		site_rules: [],
 		ip_rules: [],
 		domain_suffix: [
-			'dpdns.org', 
-			'eu.org', 
-			'qzz.io', 
-			'de5.net', 
-			'cc.cd', 
-			'gv.uy', 
-			'tailwindcss.com', 
+			'dpdns.org',
+			'eu.org',
+			'qzz.io',
+			'de5.net',
+			'cc.cd',
+			'gv.uy',
+			'tailwindcss.com',
 			'parsec.app',
 			'obsidian.md',
 			'genymotion.com'
@@ -142,7 +142,7 @@ export const UNIFIED_RULES = [
 		ip_rules: [],
 		domain_suffix: [
 			'ibkr.com.cn'
-		]	
+		]
 	},
 	{
 		name: 'PayPal',
@@ -152,7 +152,8 @@ export const UNIFIED_RULES = [
 		domain_suffix: [
 			'paypal.com',
 			'paypal.me',
-			'paypalobjects.com'
+			'paypalobjects.com',
+			'paypal-mktg.com'
 		]
 	},
 	{
@@ -206,7 +207,7 @@ export const UNIFIED_RULES = [
 		site_rules: [],
 		ip_rules: [],
 		domain_suffix: [
-			'grok.com', 
+			'grok.com',
 			'x.ai'
 		]
 	},
@@ -248,8 +249,8 @@ export const UNIFIED_RULES = [
 		site_rules: [],
 		ip_rules: [],
 		domain_suffix: [
-			'investing.com', 
-			'benzinga.com', 
+			'investing.com',
+			'benzinga.com',
 			'alpaca.markets',
 			'massive.com',
 			'barchart.com',
