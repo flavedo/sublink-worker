@@ -145,6 +145,17 @@ export const UNIFIED_RULES = [
 		]	
 	},
 	{
+		name: 'PayPal',
+		outbound: 'PayPal',
+		site_rules: ['paypal'],
+		ip_rules: [],
+		domain_suffix: [
+			'paypal.com',
+			'paypal.me',
+			'paypalobjects.com'
+		]
+	},
+	{
 		name: 'Telegram',
 		outbound: 'Telegram',
 		site_rules: ['telegram'],

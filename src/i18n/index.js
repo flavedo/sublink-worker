@@ -141,6 +141,7 @@ export const translations = {
       'Steam': '🎮 Steam',
       'Crypto': '� Crypto',
       'IBKR': '🏦 盈透证券',
+      'PayPal': '💳 PayPal',
       'Moomoo': '🟢 富途牛牛',
       'AI Services': '🧠 AI',
       'Communication': '📞 即时通讯',
