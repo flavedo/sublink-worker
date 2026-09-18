@@ -162,7 +162,8 @@ export const UNIFIED_RULES = [
 		site_rules: [],
 		ip_rules: [],
 		domain_suffix: [
-			'lebara.co.uk'
+			'lebara.co.uk',
+			'lebara-new.app.baqend.com'
 		]
 	},
 	{
