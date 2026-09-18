@@ -142,6 +142,7 @@ export const translations = {
       'Crypto': '� Crypto',
       'IBKR': '🏦 盈透证券',
       'PayPal': '💳 PayPal',
+      'Lebara': '📱 Lebara',
       'Moomoo': '🟢 富途牛牛',
       'AI Services': '🧠 AI',
       'Communication': '📞 即时通讯',

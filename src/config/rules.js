@@ -157,6 +157,15 @@ export const UNIFIED_RULES = [
 		]
 	},
 	{
+		name: 'Lebara',
+		outbound: 'Lebara',
+		site_rules: [],
+		ip_rules: [],
+		domain_suffix: [
+			'lebara.co.uk'
+		]
+	},
+	{
 		name: 'Telegram',
 		outbound: 'Telegram',
 		site_rules: ['telegram'],
