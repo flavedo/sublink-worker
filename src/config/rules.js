@@ -264,6 +264,7 @@ export const UNIFIED_RULES = [
 			'alpaca.markets',
 			'massive.com',
 			'barchart.com',
+			'jdbinvesting.com',
 		]
 	},
 	{
