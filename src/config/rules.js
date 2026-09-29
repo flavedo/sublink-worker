@@ -183,7 +183,10 @@ export const UNIFIED_RULES = [
 		name: 'ChatGPT',
 		outbound: 'ChatGPT',
 		site_rules: ['openai'],
-		ip_rules: []
+		ip_rules: [],
+		domain_suffix: [
+			'openai.com'
+		]
 	},
 	{
 		name: 'X',
