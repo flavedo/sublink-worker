@@ -7,9 +7,9 @@ import { buildSelectorMembers as buildSelectorMemberList, buildNodeSelectMembers
 import { normalizeGroupName } from './helpers/groupNameUtils.js';
 
 export class SingboxConfigBuilder extends BaseConfigBuilder {
-    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, enableClashUI = false, externalController, externalUiDownloadUrl, singboxVersion = '1.12', includeAutoSelect = true, includePrioritySelect = false, selectNodes = []) {
+    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, enableClashUI = false, externalController, externalUiDownloadUrl, singboxVersion = '1.12', includeAutoSelect = true, includePrioritySelect = false, selectNodes = [], manualNodes = []) {
         const resolvedBaseConfig = baseConfig ?? SING_BOX_CONFIG;
-        super(inputString, resolvedBaseConfig, lang, userAgent, includeAutoSelect, includePrioritySelect, selectNodes);
+        super(inputString, resolvedBaseConfig, lang, userAgent, includeAutoSelect, includePrioritySelect, selectNodes, manualNodes);
 
         this.selectedRules = selectedRules;
         this.customRules = customRules;
@@ -163,7 +163,7 @@ export class SingboxConfigBuilder extends BaseConfigBuilder {
         const tag = this.t('outboundNames.Priority Select');
         if (this.hasOutboundTag(tag)) return;
         const members = buildPrioritySelectMembers({
-            proxyList,
+            proxyList: this.filterManualNodes(proxyList),
             translator: this.t
         });
 
@@ -186,7 +186,7 @@ export class SingboxConfigBuilder extends BaseConfigBuilder {
         const tag = this.t('outboundNames.Node Select');
         if (this.hasOutboundTag(tag)) return;
         const members = buildNodeSelectMembers({
-            proxyList,
+            proxyList: this.filterManualNodes(proxyList),
             translator: this.t,
             includeAutoSelect: this.includeAutoSelect,
             includePrioritySelect: this.includePrioritySelect
@@ -209,7 +209,7 @@ export class SingboxConfigBuilder extends BaseConfigBuilder {
 
     buildSelectorMembers(proxyList = []) {
         return buildSelectorMemberList({
-            proxyList,
+            proxyList: this.filterManualNodes(proxyList),
             translator: this.t,
             includeAutoSelect: this.includeAutoSelect,
             includePrioritySelect: this.includePrioritySelect

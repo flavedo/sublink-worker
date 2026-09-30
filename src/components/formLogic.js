@@ -109,6 +109,7 @@ export const formLogicFn = (t) => {
             parseDebounceTimer: null,
             nodes: [],
             checkedNodes: [],
+            checkedManualNodes: [],
             nodesTimer: null,
             // These will be populated from window.APP_TRANSLATIONS
             processingText: '',
@@ -200,6 +201,16 @@ export const formLogicFn = (t) => {
                         localStorage.setItem('selectNodesChecked', JSON.stringify(val));
                     }
                 }, { deep: true });
+
+                // Remember the user's Manual Select node choices.
+                this.$watch('checkedManualNodes', val => {
+                    if (!this.nodes.length) return;
+                    if (val.length >= this.nodes.length) {
+                        localStorage.removeItem('manualNodesChecked');
+                    } else {
+                        localStorage.setItem('manualNodesChecked', JSON.stringify(val));
+                    }
+                }, { deep: true });
             },
 
             toggleAccordion(section) {
@@ -222,6 +233,7 @@ export const formLogicFn = (t) => {
                 if (!val) {
                     this.nodes = [];
                     this.checkedNodes = [];
+                    this.checkedManualNodes = [];
                     return;
                 }
                 if (this.nodesTimer) clearTimeout(this.nodesTimer);
@@ -236,8 +248,10 @@ export const formLogicFn = (t) => {
                         const nodes = Array.isArray(data.nodes) ? data.nodes : [];
                         this.nodes = nodes;
                         // Restore previously saved choices (by node name); fall back to all selected
-                        const savedChecked = this.getSavedCheckedNodes(nodes);
+                        const savedChecked = this.getSavedCheckedNodes(nodes, 'selectNodesChecked');
                         this.checkedNodes = savedChecked ?? [...nodes];
+                        const savedManualChecked = this.getSavedCheckedNodes(nodes, 'manualNodesChecked');
+                        this.checkedManualNodes = savedManualChecked ?? [...nodes];
                     } catch (error) {
                         console.warn('Failed to load nodes:', error);
                     }
@@ -252,12 +266,20 @@ export const formLogicFn = (t) => {
                 this.checkedNodes = [];
             },
 
+            checkAllManualNodes() {
+                this.checkedManualNodes = [...this.nodes];
+            },
+
+            checkNoManualNodes() {
+                this.checkedManualNodes = [];
+            },
+
             // Restore previously saved checked nodes (by name) that still exist in the
             // current node list. Returns null when there is no usable saved selection.
-            getSavedCheckedNodes(nodes) {
+            getSavedCheckedNodes(nodes, storageKey = 'selectNodesChecked') {
                 if (!Array.isArray(nodes) || !nodes.length) return null;
                 try {
-                    const saved = JSON.parse(localStorage.getItem('selectNodesChecked'));
+                    const saved = JSON.parse(localStorage.getItem(storageKey));
                     if (!Array.isArray(saved) || !saved.length) return null;
                     const restored = nodes.filter(node => saved.includes(node));
                     return restored.length ? restored : null;
@@ -272,6 +294,14 @@ export const formLogicFn = (t) => {
                 if (!this.nodes.length) return '';
                 if (this.checkedNodes.length >= this.nodes.length) return '';
                 return this.checkedNodes.join(',');
+            },
+
+            // Serialize the checked manual nodes for the manualNodes query param.
+            // Empty result (all checked / no nodes) means "all nodes" on the backend.
+            getManualNodesParam() {
+                if (!this.nodes.length) return '';
+                if (this.checkedManualNodes.length >= this.nodes.length) return '';
+                return this.checkedManualNodes.join(',');
             },
 
             applyPredefinedRule() {
@@ -315,6 +345,10 @@ export const formLogicFn = (t) => {
                 const selectNodes = this.getSelectNodesParam();
                 if (selectNodes) {
                     params.append('selectNodes', selectNodes);
+                }
+                const manualNodes = this.getManualNodesParam();
+                if (manualNodes) {
+                    params.append('manualNodes', manualNodes);
                 }
 
                 // Include lang parameter so subconverter gets correct group names
@@ -445,6 +479,8 @@ export const formLogicFn = (t) => {
                     this.customShortCode = '';
                     // Also clear from localStorage
                     localStorage.removeItem('customShortCode');
+                    localStorage.removeItem('selectNodesChecked');
+                    localStorage.removeItem('manualNodesChecked');
                 }
             },
 
@@ -476,6 +512,9 @@ export const formLogicFn = (t) => {
 
                     const selectNodes = this.getSelectNodesParam();
                     if (selectNodes) params.append('selectNodes', selectNodes);
+
+                    const manualNodes = this.getManualNodesParam();
+                    if (manualNodes) params.append('manualNodes', manualNodes);
 
                     if (!this.includeAutoSelect) params.append('include_auto_select', 'false');
                     if (this.includePrioritySelect) params.append('include_priority_select', 'true');

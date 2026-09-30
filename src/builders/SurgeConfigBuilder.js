@@ -4,9 +4,9 @@ import { addProxyWithDedup } from './helpers/proxyHelpers.js';
 import { buildSelectorMembers, buildNodeSelectMembers, buildPrioritySelectMembers, uniqueNames } from './helpers/groupBuilder.js';
 
 export class SurgeConfigBuilder extends BaseConfigBuilder {
-    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, includeAutoSelect = true, includePrioritySelect = false, selectNodes = []) {
+    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, includeAutoSelect = true, includePrioritySelect = false, selectNodes = [], manualNodes = []) {
         const resolvedBaseConfig = baseConfig ?? SURGE_CONFIG;
-        super(inputString, resolvedBaseConfig, lang, userAgent, includeAutoSelect, includePrioritySelect, selectNodes);
+        super(inputString, resolvedBaseConfig, lang, userAgent, includeAutoSelect, includePrioritySelect, selectNodes, manualNodes);
         this.selectedRules = selectedRules;
         this.customRules = customRules;
         this.subscriptionUrl = null;
@@ -228,7 +228,7 @@ export class SurgeConfigBuilder extends BaseConfigBuilder {
 
     buildNodeSelectOptions(proxyList = []) {
         return buildNodeSelectMembers({
-            proxyList,
+            proxyList: this.filterManualNodes(proxyList),
             translator: this.t,
             includeAutoSelect: this.includeAutoSelect,
             includePrioritySelect: this.includePrioritySelect
@@ -237,7 +237,7 @@ export class SurgeConfigBuilder extends BaseConfigBuilder {
 
     buildAggregatedOptions(proxyList = []) {
         return buildSelectorMembers({
-            proxyList,
+            proxyList: this.filterManualNodes(proxyList),
             translator: this.t,
             includeAutoSelect: this.includeAutoSelect,
             includePrioritySelect: this.includePrioritySelect
@@ -261,7 +261,7 @@ export class SurgeConfigBuilder extends BaseConfigBuilder {
 
     buildPrioritySelectOptions(proxyList = []) {
         return buildPrioritySelectMembers({
-            proxyList,
+            proxyList: this.filterManualNodes(proxyList),
             translator: this.t
         });
     }

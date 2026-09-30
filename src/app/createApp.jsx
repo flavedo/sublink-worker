@@ -75,8 +75,8 @@ export function createApp(bindings = {}) {
             const externalController = c.req.query('external_controller');
             const externalUiDownloadUrl = c.req.query('external_ui_download_url');
             const configId = c.req.query('configId');
-            const lang = c.get('lang');
-            const selectNodes = parseSelectNodes(c.req.query('selectNodes'));
+            const selectNodes = parseSelectNodes(c.req.query('selectNodes') || c.req.query('autoSelectNodes'));
+            const manualNodes = parseSelectNodes(c.req.query('manualNodes') || c.req.query('manualSelectNodes'));
 
             const requestedSingboxVersion = c.req.query('singbox_version') || c.req.query('sb_version') || c.req.query('sb_ver');
             const requestUserAgent = getRequestHeader(c.req, 'User-Agent');
@@ -104,7 +104,8 @@ export function createApp(bindings = {}) {
                 singboxConfigVersion,
                 includeAutoSelect,
                 includePrioritySelect,
-                selectNodes
+                selectNodes,
+                manualNodes
             );
             await builder.build();
             return c.json(builder.config);
@@ -131,7 +132,8 @@ export function createApp(bindings = {}) {
             const skipCertVerify = c.req.query('skip_cert_verify') === 'true';
             const configId = c.req.query('configId');
             const lang = c.get('lang');
-            const selectNodes = parseSelectNodes(c.req.query('selectNodes'));
+            const selectNodes = parseSelectNodes(c.req.query('selectNodes') || c.req.query('autoSelectNodes'));
+            const manualNodes = parseSelectNodes(c.req.query('manualNodes') || c.req.query('manualSelectNodes'));
 
             let baseConfig;
             if (configId) {
@@ -152,7 +154,8 @@ export function createApp(bindings = {}) {
                 includeAutoSelect,
                 skipCertVerify,
                 includePrioritySelect,
-                selectNodes
+                selectNodes,
+                manualNodes
             );
             await builder.build();
             return c.text(builder.formatConfig(), 200, {
@@ -177,7 +180,8 @@ export function createApp(bindings = {}) {
             const includePrioritySelect = c.req.query('include_priority_select') === 'true';
             const configId = c.req.query('configId');
             const lang = c.get('lang');
-            const selectNodes = parseSelectNodes(c.req.query('selectNodes'));
+            const selectNodes = parseSelectNodes(c.req.query('selectNodes') || c.req.query('autoSelectNodes'));
+            const manualNodes = parseSelectNodes(c.req.query('manualNodes') || c.req.query('manualSelectNodes'));
 
             let baseConfig;
             if (configId) {
@@ -194,7 +198,8 @@ export function createApp(bindings = {}) {
                 ua,
                 includeAutoSelect,
                 includePrioritySelect,
-                selectNodes
+                selectNodes,
+                manualNodes
             );
             builder.setSubscriptionUrl(c.req.url);
             await builder.build();
@@ -231,7 +236,8 @@ export function createApp(bindings = {}) {
             const includeAutoSelect = c.req.query('include_auto_select') !== 'false';
             const includePrioritySelect = c.req.query('include_priority_select') === 'true';
             const customRules = parseJsonArray(c.req.query('customRules'));
-            const selectNodes = parseSelectNodes(c.req.query('selectNodes'));
+            const selectNodes = parseSelectNodes(c.req.query('selectNodes') || c.req.query('autoSelectNodes'));
+            const manualNodes = parseSelectNodes(c.req.query('manualNodes') || c.req.query('manualSelectNodes'));
             const lang = c.get('lang');
 
             const config = generateSubconverterConfig({
@@ -240,7 +246,8 @@ export function createApp(bindings = {}) {
                 lang,
                 includeAutoSelect,
                 includePrioritySelect,
-                selectNodes
+                selectNodes,
+                manualNodes
             });
 
             return c.text(config, 200, {

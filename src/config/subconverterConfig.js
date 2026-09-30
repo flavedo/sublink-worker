@@ -25,13 +25,16 @@ function resolveGroupName(rule, t) {
 /**
  * Generate subconverter external config (INI format)
  */
-export function generateSubconverterConfig({ selectedRules = [], customRules = [], lang = 'zh-CN', includeAutoSelect = true, includePrioritySelect = false, selectNodes = [] } = {}) {
+export function generateSubconverterConfig({ selectedRules = [], customRules = [], lang = 'zh-CN', includeAutoSelect = true, includePrioritySelect = false, selectNodes = [], manualNodes = [] } = {}) {
 	const t = createTranslator(lang);
 	const rules = generateRules(selectedRules, customRules);
 
 	// Regex matching the nodes allowed in the Auto Select group.
-	// '.*' matches all nodes (default). Node Select keeps all nodes.
+	// '.*' matches all nodes (default).
 	const selectRegex = selectNodes.length > 0 ? `(${selectNodes.map(escapeRegex).join('|')})` : '.*';
+	// Regex matching the nodes allowed in the manual select groups (type: select).
+	// '.*' matches all nodes (default).
+	const manualRegex = manualNodes.length > 0 ? `(${manualNodes.map(escapeRegex).join('|')})` : '.*';
 
 	const lines = ['[custom]'];
 
@@ -100,13 +103,13 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 	const prioritySelectName = t('outboundNames.Priority Select');
 
 	if (includeAutoSelect && includePrioritySelect) {
-		lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${autoSelectName}\`[]${prioritySelectName}\`[]DIRECT\`.*`);
+		lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${autoSelectName}\`[]${prioritySelectName}\`[]DIRECT\`${manualRegex}`);
 	} else if (includeAutoSelect) {
-		lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${autoSelectName}\`[]DIRECT\`.*`);
+		lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${autoSelectName}\`[]DIRECT\`${manualRegex}`);
 	} else if (includePrioritySelect) {
-		lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${prioritySelectName}\`[]DIRECT\`.*`);
+		lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]${prioritySelectName}\`[]DIRECT\`${manualRegex}`);
 	} else {
-		lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]DIRECT\`.*`);
+		lines.push(`custom_proxy_group=${nodeSelectName}\`select\`[]DIRECT\`${manualRegex}`);
 	}
 
 	if (includeAutoSelect) {
@@ -114,7 +117,7 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 	}
 
 	if (includePrioritySelect) {
-		lines.push(`custom_proxy_group=${prioritySelectName}\`select\`.*\`[]DIRECT`);
+		lines.push(`custom_proxy_group=${prioritySelectName}\`select\`${manualRegex}\`[]DIRECT`);
 	}
 
 	const processedGroups = new Set([nodeSelectName]);
@@ -137,26 +140,26 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 			lines.push(`custom_proxy_group=${groupName}\`select\`[]DIRECT\`[]${nodeSelectName}`);
 		} else {
 			if (includeAutoSelect && includePrioritySelect) {
-				lines.push(`custom_proxy_group=${groupName}\`select\`[]${nodeSelectName}\`[]${autoSelectName}\`[]${prioritySelectName}\`[]DIRECT\`.*`);
+				lines.push(`custom_proxy_group=${groupName}\`select\`[]${nodeSelectName}\`[]${autoSelectName}\`[]${prioritySelectName}\`[]DIRECT\`${manualRegex}`);
 			} else if (includeAutoSelect) {
-				lines.push(`custom_proxy_group=${groupName}\`select\`[]${nodeSelectName}\`[]${autoSelectName}\`[]DIRECT\`.*`);
+				lines.push(`custom_proxy_group=${groupName}\`select\`[]${nodeSelectName}\`[]${autoSelectName}\`[]DIRECT\`${manualRegex}`);
 			} else if (includePrioritySelect) {
-				lines.push(`custom_proxy_group=${groupName}\`select\`[]${nodeSelectName}\`[]${prioritySelectName}\`[]DIRECT\`.*`);
+				lines.push(`custom_proxy_group=${groupName}\`select\`[]${nodeSelectName}\`[]${prioritySelectName}\`[]DIRECT\`${manualRegex}`);
 			} else {
-				lines.push(`custom_proxy_group=${groupName}\`select\`[]${nodeSelectName}\`[]DIRECT\`.*`);
+				lines.push(`custom_proxy_group=${groupName}\`select\`[]${nodeSelectName}\`[]DIRECT\`${manualRegex}`);
 			}
 		}
 	});
 
 	if (!processedGroups.has(fallBackName)) {
 		if (includeAutoSelect && includePrioritySelect) {
-			lines.push(`custom_proxy_group=${fallBackName}\`select\`[]${nodeSelectName}\`[]${autoSelectName}\`[]${prioritySelectName}\`[]DIRECT\`.*`);
+			lines.push(`custom_proxy_group=${fallBackName}\`select\`[]${nodeSelectName}\`[]${autoSelectName}\`[]${prioritySelectName}\`[]DIRECT\`${manualRegex}`);
 		} else if (includeAutoSelect) {
-			lines.push(`custom_proxy_group=${fallBackName}\`select\`[]${nodeSelectName}\`[]${autoSelectName}\`[]DIRECT\`.*`);
+			lines.push(`custom_proxy_group=${fallBackName}\`select\`[]${nodeSelectName}\`[]${autoSelectName}\`[]DIRECT\`${manualRegex}`);
 		} else if (includePrioritySelect) {
-			lines.push(`custom_proxy_group=${fallBackName}\`select\`[]${nodeSelectName}\`[]${prioritySelectName}\`[]DIRECT\`.*`);
+			lines.push(`custom_proxy_group=${fallBackName}\`select\`[]${nodeSelectName}\`[]${prioritySelectName}\`[]DIRECT\`${manualRegex}`);
 		} else {
-			lines.push(`custom_proxy_group=${fallBackName}\`select\`[]${nodeSelectName}\`[]DIRECT\`.*`);
+			lines.push(`custom_proxy_group=${fallBackName}\`select\`[]${nodeSelectName}\`[]DIRECT\`${manualRegex}`);
 		}
 	}
 

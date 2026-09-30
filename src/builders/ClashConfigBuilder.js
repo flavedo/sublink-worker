@@ -40,11 +40,11 @@ function supportsMrsFormat(userAgent) {
 }
 
 export class ClashConfigBuilder extends BaseConfigBuilder {
-    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, enableClashUI = false, externalController, externalUiDownloadUrl, includeAutoSelect = true, skipCertVerify = false, includePrioritySelect = false, selectNodes = []) {
+    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, enableClashUI = false, externalController, externalUiDownloadUrl, includeAutoSelect = true, skipCertVerify = false, includePrioritySelect = false, selectNodes = [], manualNodes = []) {
         if (!baseConfig) {
             baseConfig = CLASH_CONFIG;
         }
-        super(inputString, baseConfig, lang, userAgent, includeAutoSelect, includePrioritySelect, selectNodes);
+        super(inputString, baseConfig, lang, userAgent, includeAutoSelect, includePrioritySelect, selectNodes, manualNodes);
         this.selectedRules = selectedRules;
         this.customRules = customRules;
         this.enableClashUI = enableClashUI;
@@ -339,7 +339,7 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
         const priorityName = this.t('outboundNames.Priority Select');
         if (this.hasProxyGroup(priorityName)) return;
         const list = buildPrioritySelectMembers({
-            proxyList,
+            proxyList: this.filterManualNodes(proxyList),
             translator: this.t
         });
 
@@ -362,7 +362,7 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
         const nodeName = this.t('outboundNames.Node Select');
         if (this.hasProxyGroup(nodeName)) return;
         const list = buildNodeSelectMembers({
-            proxyList,
+            proxyList: this.filterManualNodes(proxyList),
             translator: this.t,
             includeAutoSelect: this.includeAutoSelect,
             includePrioritySelect: this.includePrioritySelect
@@ -385,7 +385,7 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
 
     buildSelectGroupMembers(proxyList = []) {
         return buildSelectorMembers({
-            proxyList,
+            proxyList: this.filterManualNodes(proxyList),
             translator: this.t,
             includeAutoSelect: this.includeAutoSelect,
             includePrioritySelect: this.includePrioritySelect

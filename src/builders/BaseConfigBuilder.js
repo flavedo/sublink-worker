@@ -4,7 +4,7 @@ import { createTranslator } from '../i18n/index.js';
 import { generateRules, getOutbounds, PREDEFINED_RULE_SETS } from '../config/index.js';
 
 export class BaseConfigBuilder {
-    constructor(inputString, baseConfig, lang, userAgent, includeAutoSelect = true, includePrioritySelect = false, selectNodes = []) {
+    constructor(inputString, baseConfig, lang, userAgent, includeAutoSelect = true, includePrioritySelect = false, selectNodes = [], manualNodes = []) {
         this.inputString = inputString;
         this.config = deepCopy(baseConfig);
         this.customRules = [];
@@ -15,6 +15,7 @@ export class BaseConfigBuilder {
         this.includeAutoSelect = includeAutoSelect;
         this.includePrioritySelect = includePrioritySelect;
         this.selectNodes = selectNodes;
+        this.manualNodes = manualNodes;
         this.providerUrls = [];  // URLs to use as providers (auto-sync)
     }
 
@@ -282,6 +283,20 @@ export class BaseConfigBuilder {
             return proxyList;
         }
         const selected = new Set(this.selectNodes);
+        return proxyList.filter(name => selected.has(name));
+    }
+
+    /**
+     * Restrict a proxy name list to the nodes the user selected for
+     * manual select groups (type: select / selector). Empty selection means all nodes.
+     * @param {string[]} proxyList - Full proxy name list
+     * @returns {string[]} - Filtered list
+     */
+    filterManualNodes(proxyList) {
+        if (!Array.isArray(this.manualNodes) || this.manualNodes.length === 0) {
+            return proxyList;
+        }
+        const selected = new Set(this.manualNodes);
         return proxyList.filter(name => selected.has(name));
     }
 
