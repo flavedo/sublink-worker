@@ -75,7 +75,6 @@ export const formLogicFn = (t) => {
             // Accordion states for each section (二级手风琴状态)
             accordionSections: {
                 rules: true,        // 规则选择 - 默认展开
-                customRules: false, // 自定义规则
                 general: false,     // 通用设置
                 baseConfig: false,  // 基础配置
                 ua: false          // User Agent
@@ -325,14 +324,6 @@ export const formLogicFn = (t) => {
                     params.append('selectedRules', JSON.stringify(this.selectedRules));
                 }
 
-                // Include customRules when available (best-effort; may make URL long)
-                try {
-                    const customRulesInput = document.querySelector('input[name="customRules"]');
-                    const customRules = customRulesInput && customRulesInput.value ? JSON.parse(customRulesInput.value) : [];
-                    if (Array.isArray(customRules) && customRules.length > 0) {
-                        params.append('customRules', JSON.stringify(customRules));
-                    }
-                } catch { }
 
                 if (!this.includeAutoSelect) {
                     params.append('include_auto_select', 'false');
@@ -498,17 +489,12 @@ export const formLogicFn = (t) => {
                 this.loading = true;
                 this.shortenedLinks = null; // Reset shortened links when generating new links
                 try {
-                    // Get custom rules from the child component via the hidden input
-                    const customRulesInput = document.querySelector('input[name="customRules"]');
-                    const customRules = customRulesInput && customRulesInput.value ? JSON.parse(customRulesInput.value) : [];
-
                     // Construct URLs
                     const origin = window.location.origin;
                     const params = new URLSearchParams();
                     params.append('config', this.input);
                     params.append('ua', this.customUA);
                     params.append('selectedRules', JSON.stringify(this.selectedRules));
-                    params.append('customRules', JSON.stringify(customRules));
 
                     const selectNodes = this.getSelectNodesParam();
                     if (selectNodes) params.append('selectNodes', selectNodes);
@@ -742,21 +728,6 @@ export const formLogicFn = (t) => {
                     }
                 }
 
-                // Extract customRules
-                const customRules = params.get('customRules');
-                if (customRules) {
-                    try {
-                        const parsed = JSON.parse(customRules);
-                        if (Array.isArray(parsed) && parsed.length > 0) {
-                            // Dispatch custom event for CustomRules component to listen
-                            window.dispatchEvent(new CustomEvent('restore-custom-rules', {
-                                detail: { rules: parsed }
-                            }));
-                        }
-                    } catch (e) {
-                        console.warn('Failed to parse customRules:', e);
-                    }
-                }
 
                 // Extract other parameters
                 this.includeAutoSelect = params.get('include_auto_select') !== 'false';
@@ -786,7 +757,7 @@ export const formLogicFn = (t) => {
                 }
 
                 // Expand advanced options if any advanced settings are present
-                if (selectedRules || customRules || this.enableClashUI ||
+                if (selectedRules || this.enableClashUI ||
                     externalController || externalUiDownloadUrl || ua || configId) {
                     this.showAdvanced = true;
                 }
