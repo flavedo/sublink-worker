@@ -265,7 +265,67 @@ export async function getResidentialData(options = {}) {
 }
 
 /**
- * Filter residential nodes by specified countries, specific IPs, or limit count
+ * Distribute nodes evenly across countries (round-robin / stratified sampling)
+ * rather than allowing one dominant country (e.g. JP) to take up all slots.
+ */
+export function distributeNodesByCountry(nodes = [], limit = 10, preferredCountries = []) {
+    if (!Array.isArray(nodes) || nodes.length === 0) return [];
+    if (limit <= 0) return [];
+
+    // Group nodes by country (each group preserves speed descending order)
+    const countryBuckets = new Map();
+    for (const node of nodes) {
+        const c = (node.country || 'OTHER').toUpperCase();
+        if (!countryBuckets.has(c)) {
+            countryBuckets.set(c, []);
+        }
+        countryBuckets.get(c).push(node);
+    }
+
+    // Determine country ordering sequence:
+    // If specific countries requested, honor that sequence; otherwise sort by highest node speed
+    let countryOrder = [];
+    if (Array.isArray(preferredCountries) && preferredCountries.length > 0 && !preferredCountries.includes('ALL')) {
+        const uniquePreferred = [...new Set(preferredCountries.map(c => c.toUpperCase()))];
+        countryOrder = uniquePreferred.filter(c => countryBuckets.has(c));
+        for (const c of countryBuckets.keys()) {
+            if (!countryOrder.includes(c)) {
+                countryOrder.push(c);
+            }
+        }
+    } else {
+        countryOrder = Array.from(countryBuckets.keys()).sort((a, b) => {
+            const maxA = countryBuckets.get(a)[0]?.speed || 0;
+            const maxB = countryBuckets.get(b)[0]?.speed || 0;
+            return maxB - maxA;
+        });
+    }
+
+    const result = [];
+    let round = 0;
+    let addedInRound = true;
+
+    while (result.length < limit && addedInRound) {
+        addedInRound = false;
+        for (const country of countryOrder) {
+            const bucket = countryBuckets.get(country);
+            if (bucket && round < bucket.length) {
+                result.push(bucket[round]);
+                addedInRound = true;
+                if (result.length >= limit) {
+                    break;
+                }
+            }
+        }
+        round++;
+    }
+
+    return result;
+}
+
+/**
+ * Filter residential nodes by specified countries, specific IPs, or limit count.
+ * Spreads nodes evenly across regions rather than being overwhelmed by a single country.
  */
 export function filterResidentialNodes(allNodes = [], options = {}) {
     const { countries = [], ips = [], count = 10 } = options;
@@ -291,9 +351,16 @@ export function filterResidentialNodes(allNodes = [], options = {}) {
         filtered = filtered.filter(n => countrySet.has(n.country));
     }
 
-    // 3. Limit to count
+    // 3. Limit to count with regional balancing
     const limit = Number(count) > 0 ? Number(count) : 10;
-    return filtered.slice(0, limit);
+
+    // If only 1 specific country was requested, simple slice by speed
+    if (cleanCountries.length === 1 && !cleanCountries.includes('ALL')) {
+        return filtered.slice(0, limit);
+    }
+
+    // Distribute evenly across regions to avoid any country dominating
+    return distributeNodesByCountry(filtered, limit, cleanCountries);
 }
 
 /**

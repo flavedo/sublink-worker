@@ -334,7 +334,7 @@ export const Form = (props) => {
                   {t('residentialModeManual')}
                 </button>
               </div>
-              <p class="text-xs text-gray-400 mt-1" x-text="residentialMode === 'dynamic' ? '每次更新订阅时自动优选存活且速度最快的住宅 IP' : '在可用列表中自主挑选并锁定指定 IP'"></p>
+              <p class="text-xs text-gray-400 mt-1" x-text="residentialMode === 'dynamic' ? '每次更新订阅时按地区均衡优选各地区高速住宅 IP' : '在可用列表中自主挑选并锁定指定 IP'"></p>
             </div>
           </div>
 
@@ -347,7 +347,8 @@ export const Form = (props) => {
               </label>
               <div class="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto pr-1">
                 {[
-                  { code: 'JP', label: '🇯🇵 日本 (主力)' },
+                  { code: 'ALL', label: '🌐 全部地区 (均衡)' },
+                  { code: 'JP', label: '🇯🇵 日本' },
                   { code: 'KR', label: '🇰🇷 韩国' },
                   { code: 'US', label: '🇺🇸 美国 (AI)' },
                   { code: 'HK', label: '🇭🇰 香港' },
@@ -359,8 +360,7 @@ export const Form = (props) => {
                   { code: 'AU', label: '🇦🇺 澳大利亚' },
                   { code: 'TH', label: '🇹🇭 泰国' },
                   { code: 'RU', label: '🇷🇺 俄罗斯' },
-                  { code: 'VN', label: '🇻🇳 越南' },
-                  { code: 'ALL', label: '🌐 全部地区' }
+                  { code: 'VN', label: '🇻🇳 越南' }
                 ].map(c => (
                   <button
                     type="button"
@@ -417,7 +417,7 @@ export const Form = (props) => {
                   x-on:click="checkTopResidentialNodes(5)"
                   class="px-2.5 py-1 text-xs font-medium bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded border border-gray-200 dark:border-gray-600 hover:text-amber-600 transition-colors"
                 >
-                  前5最快
+                  前5优选
                 </button>
                 <button
                   type="button"

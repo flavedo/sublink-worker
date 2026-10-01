@@ -99,28 +99,26 @@ describe('Clash Residential Chained Proxy Integration Tests', () => {
         expect(jpProxy.username).toBe('vpn');
         expect(jpProxy.password).toBe('vpn');
 
-        // 2. Fallback group check
-        const resFallbackGroup = config['proxy-groups'].find(g => g.name === '🏠 家宽自动');
-        expect(resFallbackGroup).toBeDefined();
-        expect(resFallbackGroup.type).toBe('fallback');
-        expect(resFallbackGroup.lazy).toBe(true);
-        expect(resFallbackGroup.interval).toBe(1800);
-        expect(resFallbackGroup.proxies).toContain(jpProxy.name);
+        // 2. Residential group check (manual select)
+        const resGroup = config['proxy-groups'].find(g => g.name === '🏠 家宽选择');
+        expect(resGroup).toBeDefined();
+        expect(resGroup.type).toBe('select');
+        expect(resGroup.proxies).toContain(jpProxy.name);
 
-        // 3. Node select group check: should include '🏠 家宽自动'
+        // 3. Node select group check: should include '🏠 家宽选择'
         const nodeSelectGroup = config['proxy-groups'].find(g => g.name === '🚀 手动选择');
         expect(nodeSelectGroup).toBeDefined();
-        expect(nodeSelectGroup.proxies).toContain('🏠 家宽自动');
+        expect(nodeSelectGroup.proxies).toContain('🏠 家宽选择');
 
         // 4. Url-test group check: should NOT contain openvpn nodes directly
         const autoGroup = config['proxy-groups'].find(g => g.type === 'url-test');
         expect(autoGroup).toBeDefined();
         expect(autoGroup.proxies).not.toContain(jpProxy.name);
 
-        // 5. 「家宽优先分流服务」已移除：不再把家宽自动组插到服务组的第一位
+        // 5. 「家宽优先分流服务」已移除：不再把家宽组插到服务组的第一位
         const chatGptGroup = config['proxy-groups'].find(g => g.name.includes('ChatGPT'));
         expect(chatGptGroup).toBeDefined();
-        expect(chatGptGroup.proxies[0]).not.toBe('🏠 家宽自动');
+        expect(chatGptGroup.proxies[0]).not.toBe('🏠 家宽选择');
     });
 
     it('filters residential nodes by specified IPs', async () => {
@@ -156,6 +154,65 @@ describe('Clash Residential Chained Proxy Integration Tests', () => {
         expect(openvpnProxies).toHaveLength(1);
         expect(openvpnProxies[0].server).toBe('121.160.88.99');
         expect(openvpnProxies[0]['dialer-proxy']).toBe('🚀 手动选择');
+    });
+
+    it('spreads residential nodes evenly across regions in Clash config', async () => {
+        const mockDataWithMultipleRegions = {
+            nodes: [
+                { id: 'jp-1:443', ip: '221.112.45.67', port: 443, country: 'JP', countryName: '日本', speed: 100000000, speedFormatted: '100.0 Mbps', ping: 15, cipher: 'AES-128-CBC', auth: 'SHA1' },
+                { id: 'jp-2:443', ip: '221.112.45.68', port: 443, country: 'JP', countryName: '日本', speed: 90000000, speedFormatted: '90.0 Mbps', ping: 15, cipher: 'AES-128-CBC', auth: 'SHA1' },
+                { id: 'us-1:443', ip: '198.51.100.1', port: 443, country: 'US', countryName: '美国', speed: 60000000, speedFormatted: '60.0 Mbps', ping: 150, cipher: 'AES-128-CBC', auth: 'SHA1' },
+                { id: 'kr-1:443', ip: '121.160.88.99', port: 443, country: 'KR', countryName: '韩国', speed: 70000000, speedFormatted: '70.0 Mbps', ping: 40, cipher: 'AES-128-CBC', auth: 'SHA1' }
+            ],
+            certificates: {
+                ca: 'MOCK_CA',
+                cert: 'MOCK_CERT',
+                key: 'MOCK_KEY'
+            }
+        };
+
+        const residentialOptions = {
+            enabled: true,
+            frontProxy: '🚀 手动选择',
+            countries: ['ALL'],
+            count: 3,
+            vpngateData: mockDataWithMultipleRegions
+        };
+
+        const builder = new ClashConfigBuilder(
+            SAMPLE_AIRPORT_NODE,
+            ['Google'],
+            [],
+            null,
+            'zh-CN',
+            'clash.meta',
+            false,
+            null,
+            null,
+            true,
+            false,
+            false,
+            [],
+            [],
+            residentialOptions
+        );
+
+        const yamlText = await builder.build();
+        const config = yaml.load(yamlText);
+
+        const openvpnProxies = config.proxies.filter(p => p.type === 'openvpn');
+        expect(openvpnProxies).toHaveLength(3);
+
+        // Should include nodes from 3 different regions (JP, KR, US), not all JP!
+        const proxyNames = openvpnProxies.map(p => p.name);
+        expect(proxyNames.some(n => n.includes('日本家宽-01'))).toBe(true);
+        expect(proxyNames.some(n => n.includes('韩国家宽-01'))).toBe(true);
+        expect(proxyNames.some(n => n.includes('美国家宽-01'))).toBe(true);
+
+        const resGroup = config['proxy-groups'].find(g => g.name === '🏠 家宽选择');
+        expect(resGroup).toBeDefined();
+        expect(resGroup.type).toBe('select');
+        expect(resGroup.proxies).toHaveLength(3);
     });
 
     describe('HTTP Endpoints', () => {
@@ -207,8 +264,9 @@ describe('Clash Residential Chained Proxy Integration Tests', () => {
             expect(openvpnProxies).toHaveLength(1);
             expect(openvpnProxies[0].country || openvpnProxies[0].name).toContain('韩国');
 
-            const fallbackGroup = config['proxy-groups'].find(g => g.name === '🏠 家宽自动');
-            expect(fallbackGroup).toBeDefined();
+            const resGroup = config['proxy-groups'].find(g => g.name === '🏠 家宽选择');
+            expect(resGroup).toBeDefined();
+            expect(resGroup.type).toBe('select');
         });
     });
 });

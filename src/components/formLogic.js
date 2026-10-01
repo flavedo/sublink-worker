@@ -115,7 +115,7 @@ export const formLogicFn = (t) => {
             enableResidential: false,
             residentialFront: 'node-select',
             residentialMode: 'dynamic',
-            residentialCountry: 'JP',
+            residentialCountry: 'ALL',
             residentialCount: 10,
             residentialNodes: [],
             selectedResidentialIps: [],
@@ -163,7 +163,9 @@ export const formLogicFn = (t) => {
                 this.enableResidential = localStorage.getItem('enableResidential') === 'true';
                 this.residentialFront = localStorage.getItem('residentialFront') || 'node-select';
                 this.residentialMode = localStorage.getItem('residentialMode') || 'dynamic';
-                this.residentialCountry = localStorage.getItem('residentialCountry') || 'JP';
+                const explicit = localStorage.getItem('residentialCountryExplicit');
+                const savedCountry = localStorage.getItem('residentialCountry');
+                this.residentialCountry = (explicit && savedCountry) ? savedCountry : 'ALL';
                 this.residentialCount = parseInt(localStorage.getItem('residentialCount'), 10) || 10;
                 try {
                     const savedIps = localStorage.getItem('selectedResidentialIps');
@@ -338,6 +340,7 @@ export const formLogicFn = (t) => {
             setResidentialCountry(countryCode) {
                 this.residentialCountry = countryCode;
                 localStorage.setItem('residentialCountry', countryCode);
+                localStorage.setItem('residentialCountryExplicit', 'true');
                 if (this.residentialMode === 'manual' || this.residentialNodesFetched) {
                     this.fetchResidentialNodes();
                 }

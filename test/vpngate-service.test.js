@@ -104,6 +104,29 @@ describe('VPNGate Service Tests', () => {
             const limited = filterResidentialNodes(nodes, { count: 2 });
             expect(limited).toHaveLength(2);
         });
+
+        it('evenly spreads nodes across regions instead of letting one country dominate', () => {
+            // Mock a pool with many fast JP nodes and fewer US/KR nodes
+            const candidatePool = [
+                { id: 'jp-1', ip: '1.1.1.1', country: 'JP', speed: 100000000 },
+                { id: 'jp-2', ip: '1.1.1.2', country: 'JP', speed: 90000000 },
+                { id: 'jp-3', ip: '1.1.1.3', country: 'JP', speed: 80000000 },
+                { id: 'jp-4', ip: '1.1.1.4', country: 'JP', speed: 70000000 },
+                { id: 'us-1', ip: '2.2.2.1', country: 'US', speed: 50000000 },
+                { id: 'us-2', ip: '2.2.2.2', country: 'US', speed: 40000000 },
+                { id: 'kr-1', ip: '3.3.3.1', country: 'KR', speed: 60000000 }
+            ];
+
+            // Request 4 nodes across ALL countries
+            const balanced = filterResidentialNodes(candidatePool, { countries: ['ALL'], count: 4 });
+            expect(balanced).toHaveLength(4);
+
+            // Round 1 should pick 1 from JP, 1 from KR, 1 from US
+            // Round 2 should pick the second from JP
+            expect(balanced.map(n => n.id)).toEqual(['jp-1', 'kr-1', 'us-1', 'jp-2']);
+            // Regions represented: JP, KR, US (not 4 JP nodes!)
+            expect(new Set(balanced.map(n => n.country)).size).toBe(3);
+        });
     });
 
     describe('buildResidentialProxyObject', () => {

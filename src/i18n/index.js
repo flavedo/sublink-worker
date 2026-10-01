@@ -157,7 +157,8 @@ export const translations = {
       'Provider': '🌐 机场',
       'Non-Standard Port': '🔀 非标端口',
       'GLOBAL': 'GLOBAL',
-      'Residential Auto': '🏠 家宽自动'
+      'Residential Select': '🏠 家宽选择',
+      'Residential Auto': '🏠 家宽选择'
     },
     residentialProxyTitle: '家宽链式代理 (住宅 IP)',
     residentialProxyBadge: 'Clash Meta 专属',
@@ -169,7 +170,7 @@ export const translations = {
     followAutoSelect: '⚡ 跟随自动选择',
     residentialMode: '节点选取模式',
     residentialModeDynamic: '动态优选模式 (推荐)',
-    residentialModeDynamicTip: '每次更新订阅时自动优选当前存活且速度最快的住宅 IP',
+    residentialModeDynamicTip: '每次更新订阅时按地区均衡优选各地区高速住宅 IP',
     residentialModeManual: '精选指定 IP 模式',
     residentialModeManualTip: '在可用节点列表中自主挑选并锁定指定 IP',
     residentialCountry: '落地国家/地区',

@@ -353,28 +353,30 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
             if (filteredNodes.length === 0) return;
 
             this.residentialProxyNames = [];
-            filteredNodes.forEach((node, index) => {
+            const countryCountMap = new Map();
+            filteredNodes.forEach((node) => {
+                const countryCode = node.country || 'OTHER';
+                const countIndex = (countryCountMap.get(countryCode) || 0) + 1;
+                countryCountMap.set(countryCode, countIndex);
+
                 const proxyObj = buildResidentialProxyObject(node, {
                     frontProxy,
                     certificates: resData.certificates,
-                    index,
+                    index: countIndex - 1,
                     lang: this.lang
                 });
                 this.addProxyToConfig(proxyObj);
                 this.residentialProxyNames.push(proxyObj.name);
             });
 
-            const resGroupName = this.t('outboundNames.Residential Auto');
+            const resGroupName = this.t('outboundNames.Residential Select');
             this.residentialGroupName = resGroupName;
 
             this.config['proxy-groups'] = this.config['proxy-groups'] || [];
             if (!this.hasProxyGroup(resGroupName)) {
                 this.config['proxy-groups'].push({
                     name: resGroupName,
-                    type: 'fallback',
-                    url: 'https://www.gstatic.com/generate_204',
-                    interval: 1800,
-                    lazy: true,
+                    type: 'select',
                     proxies: [...this.residentialProxyNames]
                 });
             }
