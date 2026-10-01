@@ -318,7 +318,6 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
         this.addCustomItems(customItems);
         await this.addResidentialProxies();
         this.addSelectors();
-        this.applyResidentialGroupPriorities();
         return this.formatConfig();
     }
 
@@ -382,33 +381,6 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
         } catch (error) {
             console.warn('Failed to add residential proxies:', error);
         }
-    }
-
-    applyResidentialGroupPriorities() {
-        if (!this.residentialGroupName || !Array.isArray(this.residentialOptions?.rules) || this.residentialOptions.rules.length === 0) {
-            return;
-        }
-
-        const targetRules = new Set(this.residentialOptions.rules.map(r => String(r).trim().toLowerCase()));
-
-        (this.config['proxy-groups'] || []).forEach(group => {
-            if (!group || !Array.isArray(group.proxies)) return;
-
-            const isMatch = Array.from(targetRules).some(rule => {
-                const localized = this.t(`outboundNames.${rule}`);
-                return (
-                    (group.name && group.name.toLowerCase().includes(rule)) ||
-                    (localized && group.name === localized)
-                );
-            });
-
-            if (isMatch && group.proxies.includes(this.residentialGroupName)) {
-                group.proxies = [
-                    this.residentialGroupName,
-                    ...group.proxies.filter(p => p !== this.residentialGroupName)
-                ];
-            }
-        });
     }
 
     addAutoSelectGroup(proxyList) {

@@ -62,7 +62,7 @@ proxies:
     const yamlText = await builder.build();
     const built = yaml.load(yamlText);
 
-    const nodeSelect = (built['proxy-groups'] || []).find(g => g && g.name === '🚀 节点选择');
+    const nodeSelect = (built['proxy-groups'] || []).find(g => g && g.name === t('outboundNames.Node Select'));
     expect(nodeSelect).toBeDefined();
     expect(nodeSelect.use).toContain('my-provider');
   });
@@ -87,7 +87,7 @@ proxies:
     expect(grp.proxies).toContain('node-from-provider');
   });
 
-  it('should default Private and Location:CN groups to DIRECT', async () => {
+  it('should send Private and Location:CN straight to DIRECT without a dedicated group', async () => {
     const input = `
 ss://YWVzLTEyOC1nY206dGVzdA@example.com:443#HK-Node-1
 ss://YWVzLTEyOC1nY206dGVzdA@example.com:444#US-Node-1
@@ -97,22 +97,16 @@ ss://YWVzLTEyOC1nY206dGVzdA@example.com:444#US-Node-1
     const yamlText = await builder.build();
     const built = yaml.load(yamlText);
 
-    const privateName = t('outboundNames.Private');
-    const cnName = t('outboundNames.Location:CN');
+    // 现行设计：这两类规则直接落 DIRECT，不再单独生成 select 组
+    expect(built.rules).toContain('RULE-SET,private,DIRECT');
+    expect(built.rules).toContain('RULE-SET,cn,DIRECT');
 
-    const privateGroup = (built['proxy-groups'] || []).find(g => g && g.name === privateName);
-    const cnGroup = (built['proxy-groups'] || []).find(g => g && g.name === cnName);
+    const groups = built['proxy-groups'] || [];
+    expect(groups.find(g => g && g.name === t('outboundNames.Private'))).toBeUndefined();
+    expect(groups.find(g => g && g.name === t('outboundNames.Location:CN'))).toBeUndefined();
 
-    expect(privateGroup).toBeDefined();
-    expect(cnGroup).toBeDefined();
-
-    // DIRECT should be the first option (default selected)
-    expect(privateGroup.proxies[0]).toBe('DIRECT');
-    expect(cnGroup.proxies[0]).toBe('DIRECT');
-
-    // Other groups should NOT default to DIRECT
-    const fallbackName = t('outboundNames.Fall Back');
-    const fallbackGroup = (built['proxy-groups'] || []).find(g => g && g.name === fallbackName);
+    // 兜底组不应该默认 DIRECT
+    const fallbackGroup = groups.find(g => g && g.name === t('outboundNames.Fall Back'));
     expect(fallbackGroup).toBeDefined();
     expect(fallbackGroup.proxies[0]).not.toBe('DIRECT');
   });

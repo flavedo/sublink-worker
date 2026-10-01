@@ -471,30 +471,6 @@ export const Form = (props) => {
             </div>
           </div>
 
-          {/* 5. 分流服务优先设置 */}
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-1.5">
-              <i class="fas fa-route text-gray-400"></i>
-              {t('residentialRules')}
-            </label>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              {[
-                { name: 'ChatGPT', label: '🤖 ChatGPT / OpenAI' },
-                { name: 'Google', label: '🔎 Google 服务' },
-                { name: 'Netflix', label: '🎥 Netflix / 媒体' }
-              ].map(item => (
-                <label class="flex items-center p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors text-xs select-none">
-                  <input
-                    type="checkbox"
-                    value={item.name}
-                    x-model="residentialRules"
-                    class="w-4 h-4 text-amber-600 rounded border-gray-300 focus:ring-amber-500 dark:bg-gray-700 dark:border-gray-600"
-                  />
-                  <span class="ml-2.5 text-gray-700 dark:text-gray-300 font-medium">{item.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
 

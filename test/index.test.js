@@ -21,6 +21,9 @@ describe('Worker', () => {
         expect(res.headers.get('content-type')).toContain('text/html');
         const text = await res.text();
         expect(text).toContain('<!DOCTYPE html>');
+        // 已移除「家宽优先分流服务」选项，但家宽链式代理功能本身保留
+        expect(text).not.toContain('家宽优先分流服务');
+        expect(text).toContain('家宽链式代理');
     });
 
     it('responds with 404 for unknown paths', async () => {

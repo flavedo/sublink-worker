@@ -430,8 +430,13 @@ export const PREDEFINED_RULE_SETS = {
 	comprehensive: UNIFIED_RULES.map(rule => rule.name)
 };
 
+// DNS 分流用到的规则集：clash 的 dns.nameserver-policy 用 rule-set: 引用、
+// sing-box 的 dns.rules 用 rule_set: 引用，所以必须始终生成：
+// 少了 mihomo 报 not found rule-set，sing-box 则会出现悬空的 rule_set 引用。
+export const DNS_POLICY_RULE_SETS = ['cn', 'private', 'geolocation-!cn'];
+
 export const SITE_RULE_SETS = UNIFIED_RULES.reduce((acc, rule) => {
-	const sites = [...(rule.site_rules || []), ...(rule.geo_site_rules || [])];
+	const sites = [...(rule.site_rules || []), ...(rule.geo_site_rules || []), ...DNS_POLICY_RULE_SETS];
 	sites.forEach(site_rule => {
 		acc[site_rule] = `geosite-${site_rule}.srs`;
 	});
@@ -459,5 +464,4 @@ export const CLASH_IP_RULE_SETS = UNIFIED_RULES.reduce((acc, rule) => {
 	return acc;
 }, {});
 
-// dns.nameserver-policy 里用 rule-set: 引用的规则集：必须始终生成，否则 mihomo 报 not found rule-set
-export const CLASH_DNS_POLICY_RULE_SETS = ['cn', 'private', 'geolocation-!cn'];
+

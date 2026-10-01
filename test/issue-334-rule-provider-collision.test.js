@@ -46,22 +46,22 @@ describe('Issue #334: rule-provider key collision fix', () => {
     const config = yaml.load(yamlText);
 
     // Site rules use plain key
-    expect(config.rules).toContainEqual(expect.stringMatching(/^RULE-SET,google,.*谷歌/));
+    expect(config.rules).toContainEqual(expect.stringMatching(/^RULE-SET,google,.*Google/));
     // IP rules use -ip suffixed key
-    expect(config.rules).toContainEqual(expect.stringMatching(/^RULE-SET,google-ip,.*谷歌.*no-resolve/));
-    // Non-China should still work
-    expect(config.rules).toContainEqual(expect.stringMatching(/^RULE-SET,geolocation-!cn,.*非中国/));
+    expect(config.rules).toContainEqual(expect.stringMatching(/^RULE-SET,google-ip,.*Google.*no-resolve/));
+    // 兜底规则 GFW 走手动选择组
+    expect(config.rules).toContainEqual(expect.stringMatching(/^RULE-SET,gfw,.*手动选择/));
   });
 
-  it('google domain rule should come before non-china rule', async () => {
+  it('google domain rule should come before the gfw catch-all rule', async () => {
     const builder = new ClashConfigBuilder(SS_INPUT, 'balanced', [], null, 'zh-CN', 'mihomo/1.0');
     const yamlText = await builder.build();
     const config = yaml.load(yamlText);
 
     const googleIdx = config.rules.findIndex(r => r.match(/^RULE-SET,google,/));
-    const nonChinaIdx = config.rules.findIndex(r => r.includes('geolocation-!cn'));
+    const gfwIdx = config.rules.findIndex(r => r.startsWith('RULE-SET,gfw,'));
     expect(googleIdx).toBeGreaterThan(-1);
-    expect(nonChinaIdx).toBeGreaterThan(-1);
-    expect(googleIdx).toBeLessThan(nonChinaIdx);
+    expect(gfwIdx).toBeGreaterThan(-1);
+    expect(googleIdx).toBeLessThan(gfwIdx);
   });
 });

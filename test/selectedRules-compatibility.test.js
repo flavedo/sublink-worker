@@ -13,7 +13,7 @@ describe('selectedRules backward compatibility', () => {
         expect(result).toEqual(PREDEFINED_RULE_SETS.minimal);
         expect(result).toContain('Location:CN');
         expect(result).toContain('Private');
-        expect(result).toContain('Non-China');
+        expect(result).toContain('GFW');
     });
 
     it('should accept "balanced" preset name', () => {

@@ -112,6 +112,7 @@ export function createApp(bindings = {}) {
             const selectedRules = parseSelectedRules(c.req.query('selectedRules'));
             const customRules = parseJsonArray(c.req.query('customRules'));
             const ua = c.req.query('ua') || getRequestHeader(c.req, 'User-Agent') || DEFAULT_USER_AGENT;
+            const lang = c.get('lang');
             const includeAutoSelect = c.req.query('include_auto_select') !== 'false';
             const includePrioritySelect = c.req.query('include_priority_select') === 'true';
             const enableClashUI = parseBooleanFlag(c.req.query('enable_clash_ui'));
@@ -183,7 +184,6 @@ export function createApp(bindings = {}) {
             const residentialCountry = c.req.query('residential_country') || c.req.query('res_country');
             const residentialCount = c.req.query('residential_count') || c.req.query('res_count');
             const residentialIps = c.req.query('residential_ips') || c.req.query('res_ips');
-            const residentialRules = c.req.query('residential_rules') || c.req.query('res_rules');
 
             const residentialOptions = enableResidential ? {
                 enabled: true,
@@ -191,7 +191,6 @@ export function createApp(bindings = {}) {
                 countries: residentialCountry ? residentialCountry.split(',') : [],
                 count: residentialCount ? parseInt(residentialCount, 10) : 10,
                 ips: residentialIps ? residentialIps.split(',') : [],
-                rules: residentialRules ? residentialRules.split(',') : [],
                 kv: runtime.kv
             } : null;
 

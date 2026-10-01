@@ -119,7 +119,6 @@ export const formLogicFn = (t) => {
             residentialCount: 10,
             residentialNodes: [],
             selectedResidentialIps: [],
-            residentialRules: ['ChatGPT'],
             loadingResidentialNodes: false,
             residentialNodesFetched: false,
             // These will be populated from window.APP_TRANSLATIONS
@@ -169,10 +168,6 @@ export const formLogicFn = (t) => {
                 try {
                     const savedIps = localStorage.getItem('selectedResidentialIps');
                     if (savedIps) this.selectedResidentialIps = JSON.parse(savedIps);
-                } catch (_) {}
-                try {
-                    const savedRules = localStorage.getItem('residentialRules');
-                    if (savedRules) this.residentialRules = JSON.parse(savedRules);
                 } catch (_) {}
 
                 const initialUrlParams = new URLSearchParams(window.location.search);
@@ -600,16 +595,12 @@ export const formLogicFn = (t) => {
                         if (this.residentialMode === 'manual' && this.selectedResidentialIps.length > 0) {
                             params.append('res_ips', this.selectedResidentialIps.join(','));
                         }
-                        if (this.residentialRules && this.residentialRules.length > 0) {
-                            params.append('res_rules', this.residentialRules.join(','));
-                        }
                         localStorage.setItem('enableResidential', 'true');
                         localStorage.setItem('residentialFront', this.residentialFront);
                         localStorage.setItem('residentialMode', this.residentialMode);
                         localStorage.setItem('residentialCountry', this.residentialCountry);
                         localStorage.setItem('residentialCount', String(this.residentialCount));
                         localStorage.setItem('selectedResidentialIps', JSON.stringify(this.selectedResidentialIps));
-                        localStorage.setItem('residentialRules', JSON.stringify(this.residentialRules));
                     } else {
                         localStorage.setItem('enableResidential', 'false');
                     }

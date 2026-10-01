@@ -64,8 +64,7 @@ describe('Clash Residential Chained Proxy Integration Tests', () => {
             frontProxy: '⚡ 香港专线-01',
             countries: ['JP', 'KR'],
             count: 5,
-            vpngateData: MOCK_VPNGATE_DATA,
-            rules: ['ChatGPT']
+            vpngateData: MOCK_VPNGATE_DATA
         };
 
         const builder = new ClashConfigBuilder(
@@ -118,10 +117,10 @@ describe('Clash Residential Chained Proxy Integration Tests', () => {
         expect(autoGroup).toBeDefined();
         expect(autoGroup.proxies).not.toContain(jpProxy.name);
 
-        // 5. Rule priority check: ChatGPT group should have '🏠 家宽自动' as first option
+        // 5. 「家宽优先分流服务」已移除：不再把家宽自动组插到服务组的第一位
         const chatGptGroup = config['proxy-groups'].find(g => g.name.includes('ChatGPT'));
         expect(chatGptGroup).toBeDefined();
-        expect(chatGptGroup.proxies[0]).toBe('🏠 家宽自动');
+        expect(chatGptGroup.proxies[0]).not.toBe('🏠 家宽自动');
     });
 
     it('filters residential nodes by specified IPs', async () => {

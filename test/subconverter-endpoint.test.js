@@ -52,10 +52,12 @@ describe('GET /subconverter', () => {
         const res = await app.request('http://localhost/subconverter?selectedRules=minimal');
         const text = await res.text();
 
-        // minimal: Location:CN, Private, Non-China
-        expect(text).toContain('GEOSITE,geolocation-cn');
-        expect(text).toContain('GEOIP,private');
-        expect(text).toContain('GEOSITE,geolocation-!cn');
+        // minimal: Private, Location:CN, GFW
+        expect(text).toContain('GEOSITE,private');
+        expect(text).toContain('GEOSITE,cn');
+        expect(text).toContain('GEOSITE,gfw');
+        expect(text).toContain('GEOIP,private,no-resolve');
+        expect(text).toContain('GEOIP,cn,no-resolve');
 
         // Should NOT contain rules outside minimal
         expect(text).not.toContain('GEOSITE,google');
@@ -71,7 +73,7 @@ describe('GET /subconverter', () => {
         expect(text).toContain('anti-ad-clash.yaml');
         expect(text).toContain('GEOSITE,category-ai-!cn');
         expect(text).toContain('GEOSITE,google');
-        expect(text).toContain('GEOSITE,bilibili');
+        expect(text).toContain('GEOSITE,discord');
         expect(text).toContain('GEOSITE,youtube');
         expect(text).toContain('GEOSITE,netflix');
         expect(text).toContain('GEOSITE,steam');
@@ -109,8 +111,8 @@ describe('GET /subconverter', () => {
         const res = await app.request('http://localhost/subconverter?selectedRules=minimal');
         const text = await res.text();
 
-        // Node Select and Auto Select groups
-        expect(text).toMatch(/custom_proxy_group=.*节点选择.*select/);
+        // Node Select 组现在叫「🚀 手动选择」
+        expect(text).toMatch(/custom_proxy_group=.*手动选择.*select/);
         expect(text).toMatch(/custom_proxy_group=.*自动选择.*url-test/);
 
         // Fall Back group
@@ -136,10 +138,11 @@ describe('GET /subconverter', () => {
         const res = await app.request(`http://localhost/subconverter?selectedRules=${encodeURIComponent(rules)}`);
         const text = await res.text();
 
-        // Private group should have DIRECT as first option
-        expect(text).toMatch(/custom_proxy_group=.*私有网络.*select.*\[]DIRECT/);
-        // Location:CN group should have DIRECT as first option
-        expect(text).toMatch(/custom_proxy_group=.*国内服务.*select.*\[]DIRECT/);
+        // Private / Location:CN 的规则直接落 DIRECT，不再单独建 proxy group
+        expect(text).toContain('ruleset=DIRECT,[]GEOSITE,private');
+        expect(text).toContain('ruleset=DIRECT,[]GEOSITE,cn');
+        expect(text).not.toMatch(/custom_proxy_group=.*私有网络/);
+        expect(text).not.toMatch(/custom_proxy_group=.*国内服务/);
     });
 
     it('maps other rules to Node Select', async () => {
@@ -148,8 +151,9 @@ describe('GET /subconverter', () => {
         const res = await app.request(`http://localhost/subconverter?selectedRules=${encodeURIComponent(rules)}`);
         const text = await res.text();
 
-        // Google group should reference Node Select
-        expect(text).toMatch(/custom_proxy_group=.*谷歌服务.*select.*\[].*节点选择/);
+        // Google 规则落 GEOSITE/GEOIP，组指向「🚀 手动选择」
+        expect(text).toContain('ruleset=🔎 Google,[]GEOSITE,google');
+        expect(text).toMatch(/custom_proxy_group=.*Google.*select.*手动选择/);
     });
 
     it('respects include_auto_select=false', async () => {
@@ -161,7 +165,7 @@ describe('GET /subconverter', () => {
         expect(text).not.toMatch(/custom_proxy_group=.*自动选择.*url-test/);
 
         // Node Select should not reference Auto Select
-        const nodeSelectLine = text.split('\n').find(l => l.includes('节点选择') && l.includes('custom_proxy_group'));
+        const nodeSelectLine = text.split('\n').find(l => l.includes('手动选择') && l.includes('custom_proxy_group'));
         expect(nodeSelectLine).toBeDefined();
         expect(nodeSelectLine).not.toContain('自动选择');
     });
@@ -185,10 +189,10 @@ describe('GET /subconverter', () => {
         const res = await app.request('http://localhost/subconverter?selectedRules=minimal&lang=en');
         const text = await res.text();
 
-        // English translations
-        expect(text).toContain('Node Select');
-        expect(text).toContain('Auto Select');
-        expect(text).toContain('Fall Back');
+        // 目前 i18n 只提供 zh-CN（resolveLanguage 固定返回 zh-CN），lang=en 也输出中文组名
+        expect(text).toContain('手动选择');
+        expect(text).toContain('自动选择');
+        expect(text).toContain('漏网之鱼');
     });
 
     describe('invalid selectedRules', () => {

@@ -3,7 +3,7 @@
  * Functions for generating rules and rule sets
  */
 
-import { UNIFIED_RULES, PREDEFINED_RULE_SETS, SITE_RULE_SETS, IP_RULE_SETS, CLASH_SITE_RULE_SETS, CLASH_IP_RULE_SETS, CLASH_DNS_POLICY_RULE_SETS } from './rules.js';
+import { UNIFIED_RULES, PREDEFINED_RULE_SETS, SITE_RULE_SETS, IP_RULE_SETS, CLASH_SITE_RULE_SETS, CLASH_IP_RULE_SETS, DNS_POLICY_RULE_SETS } from './rules.js';
 import { SITE_RULE_SET_BASE_URL, IP_RULE_SET_BASE_URL, CLASH_SITE_RULE_SET_BASE_URL, CLASH_IP_RULE_SET_BASE_URL } from './ruleUrls.js';
 
 function toStringArray(value) {
@@ -96,6 +96,9 @@ export function generateRuleSets(selectedRules = [], customRules = []) {
 
 	const siteRuleSets = new Set();
 	const ipRuleSets = new Set();
+
+	// dns.rules 里 rule_set: 引用的规则集必须存在（否则 sing-box 配置无效）
+	DNS_POLICY_RULE_SETS.forEach(rule => siteRuleSets.add(rule));
 
 	const ruleSets = [];
 
@@ -193,7 +196,7 @@ export function generateClashRuleSets(selectedRules = [], customRules = [], useM
 	});
 
 	// dns.nameserver-policy 用 rule-set: 引用这些规则集，即使没勾选对应分流规则也必须存在
-	CLASH_DNS_POLICY_RULE_SETS.forEach(rule => siteRuleSets.add(rule));
+	DNS_POLICY_RULE_SETS.forEach(rule => siteRuleSets.add(rule));
 
 	const site_rule_providers = {};
 	const ip_rule_providers = {};

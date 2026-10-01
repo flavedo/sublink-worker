@@ -74,7 +74,7 @@ describe('Auto Proxy Providers Detection', () => {
             expect(config['proxy-providers']._auto_provider_1.type).toBe('http');
 
             // proxy-groups should have 'use' field
-            const nodeSelect = config['proxy-groups'].find(g => g.name === '🚀 节点选择');
+            const nodeSelect = config['proxy-groups'].find(g => g.name === '🚀 手动选择');
             expect(nodeSelect.use).toContain('_auto_provider_1');
         });
 
@@ -134,7 +134,7 @@ describe('Auto Proxy Providers Detection', () => {
             expect(config.outbound_providers[0].type).toBe('http');
 
             // outbounds should have 'providers' field
-            const nodeSelect = config.outbounds.find(o => o.tag === '🚀 节点选择');
+            const nodeSelect = config.outbounds.find(o => o.tag === '🚀 手动选择');
             expect(nodeSelect.providers).toContain('_auto_provider_1');
         });
 
@@ -262,7 +262,7 @@ describe('Auto Proxy Providers Detection', () => {
             expect(config['proxy-providers'].provider1?.url).toBe('https://user.example.com/sub');
             expect(config['proxy-providers']._auto_provider_1?.url).toBe('https://auto.example.com/clash-sub');
 
-            const nodeSelect = config['proxy-groups'].find(g => g.name === '🚀 节点选择');
+            const nodeSelect = config['proxy-groups'].find(g => g.name === '🚀 手动选择');
             expect(nodeSelect.use).toContain('provider1');
             expect(nodeSelect.use).toContain('_auto_provider_1');
         });
@@ -300,7 +300,7 @@ describe('Auto Proxy Providers Detection', () => {
             expect(config.outbound_providers.map(p => p.tag)).toContain('user-provider');
             expect(config.outbound_providers.map(p => p.tag)).toContain('_auto_provider_1');
 
-            const nodeSelect = config.outbounds.find(o => o.tag === '🚀 节点选择');
+            const nodeSelect = config.outbounds.find(o => o.tag === '🚀 手动选择');
             expect(nodeSelect.providers).toContain('user-provider');
             expect(nodeSelect.providers).toContain('_auto_provider_1');
         });
