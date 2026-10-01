@@ -240,6 +240,252 @@ export const Form = (props) => {
         </div>
       </div>
 
+      {/* Residential Chained Proxy Section */}
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 transition-all duration-300 hover:shadow-md">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <span class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500/20 to-orange-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg">
+              <i class="fas fa-house-signal"></i>
+            </span>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{t('residentialProxyTitle')}</h3>
+                <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
+                  {t('residentialProxyBadge')}
+                </span>
+              </div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t('enableResidentialTip')}</p>
+            </div>
+          </div>
+          <div class="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              x-model="enableResidential"
+              class="sr-only peer"
+              x-on:change="if (enableResidential && residentialNodes.length === 0) fetchResidentialNodes()"
+            />
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300 dark:peer-focus:ring-amber-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-amber-600"></div>
+          </div>
+        </div>
+
+        {/* Content when enabled */}
+        <div
+          x-show="enableResidential"
+          {...{
+            'x-transition:enter': 'transition ease-out duration-300',
+            'x-transition:enter-start': 'opacity-0 transform -translate-y-2',
+            'x-transition:enter-end': 'opacity-100 transform translate-y-0',
+            'x-transition:leave': 'transition ease-in duration-150',
+            'x-transition:leave-start': 'opacity-100 transform translate-y-0',
+            'x-transition:leave-end': 'opacity-0 transform -translate-y-2'
+          }}
+          class="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700/60 space-y-6"
+        >
+          {/* 1. 前置跳板节点选择 */}
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 flex items-center gap-1.5">
+                <i class="fas fa-plane-departure text-gray-400"></i>
+                {t('residentialFront')}
+              </label>
+              <select
+                x-model="residentialFront"
+                class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              >
+                <option value="node-select">{t('followNodeSelect')}</option>
+                <option value="auto-select">{t('followAutoSelect')}</option>
+                <template x-if="nodes.length > 0">
+                  <optgroup label="机场专线节点">
+                    <template x-for="n in nodes" x-bind:key="'front-' + n">
+                      <option x-bind:value="n" x-text="n"></option>
+                    </template>
+                  </optgroup>
+                </template>
+              </select>
+              <p class="text-xs text-gray-400 mt-1">{t('residentialFrontTip')}</p>
+            </div>
+
+            {/* 2. 节点选取模式切换 */}
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 flex items-center gap-1.5">
+                <i class="fas fa-layer-group text-gray-400"></i>
+                {t('residentialMode')}
+              </label>
+              <div class="grid grid-cols-2 gap-2 p-1 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                <button
+                  type="button"
+                  x-on:click="residentialMode = 'dynamic'"
+                  class="py-1.5 text-xs font-semibold rounded-md transition-all flex items-center justify-center gap-1.5"
+                  x-bind:class="residentialMode === 'dynamic' ? 'bg-white dark:bg-gray-800 text-amber-600 dark:text-amber-400 shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900'"
+                >
+                  <i class="fas fa-bolt text-xs"></i>
+                  {t('residentialModeDynamic')}
+                </button>
+                <button
+                  type="button"
+                  x-on:click="residentialMode = 'manual'; if (residentialNodes.length === 0) fetchResidentialNodes();"
+                  class="py-1.5 text-xs font-semibold rounded-md transition-all flex items-center justify-center gap-1.5"
+                  x-bind:class="residentialMode === 'manual' ? 'bg-white dark:bg-gray-800 text-amber-600 dark:text-amber-400 shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900'"
+                >
+                  <i class="fas fa-list-check text-xs"></i>
+                  {t('residentialModeManual')}
+                </button>
+              </div>
+              <p class="text-xs text-gray-400 mt-1" x-text="residentialMode === 'dynamic' ? '每次更新订阅时自动优选存活且速度最快的住宅 IP' : '在可用列表中自主挑选并锁定指定 IP'"></p>
+            </div>
+          </div>
+
+          {/* 3. 落地国家/地区与数量 */}
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-1.5">
+                <i class="fas fa-globe text-gray-400"></i>
+                {t('residentialCountry')}
+              </label>
+              <div class="flex flex-wrap gap-2">
+                {[
+                  { code: 'JP', label: '🇯🇵 日本 (主力)' },
+                  { code: 'KR', label: '🇰🇷 韩国' },
+                  { code: 'US', label: '🇺🇸 美国 (AI)' },
+                  { code: 'TW', label: '🇹🇼 台湾' },
+                  { code: 'ALL', label: '🌐 全部' }
+                ].map(c => (
+                  <button
+                    type="button"
+                    x-on:click={`setResidentialCountry('${c.code}')`}
+                    class="px-3 py-1.5 text-xs font-medium rounded-lg border transition-all"
+                    x-bind:class={`residentialCountry === '${c.code}' ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 font-semibold' : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-300'`}
+                  >
+                    {c.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-1.5">
+                <i class="fas fa-hashtag text-gray-400"></i>
+                {t('residentialCount')}
+              </label>
+              <div class="flex gap-2">
+                {[5, 10, 15, 20].map(cnt => (
+                  <button
+                    type="button"
+                    x-on:click={`residentialCount = ${cnt}`}
+                    class="flex-1 py-1.5 text-xs font-medium rounded-lg border text-center transition-all"
+                    x-bind:class={`residentialCount === ${cnt} ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 font-semibold' : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-300'`}
+                  >
+                    {cnt} 个{cnt === 10 ? ' (推荐)' : ''}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 4. 手动精选 IP 列表 */}
+          <div
+            x-show="residentialMode === 'manual'"
+            class="p-4 rounded-xl bg-gray-50 dark:bg-gray-700/30 border border-gray-200/80 dark:border-gray-700/60 space-y-3"
+          >
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-medium text-gray-800 dark:text-gray-200">{t('residentialNodesTitle')}</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400" x-text="'(' + selectedResidentialIps.length + '/' + residentialNodes.length + ')'"></span>
+              </div>
+              <div class="flex items-center gap-2">
+                <button
+                  type="button"
+                  x-on:click="checkAllResidentialNodes()"
+                  class="px-2.5 py-1 text-xs font-medium bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded border border-gray-200 dark:border-gray-600 hover:text-amber-600 transition-colors"
+                >
+                  {t('selectAll')}
+                </button>
+                <button
+                  type="button"
+                  x-on:click="checkTopResidentialNodes(5)"
+                  class="px-2.5 py-1 text-xs font-medium bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded border border-gray-200 dark:border-gray-600 hover:text-amber-600 transition-colors"
+                >
+                  前5最快
+                </button>
+                <button
+                  type="button"
+                  x-on:click="checkNoResidentialNodes()"
+                  class="px-2.5 py-1 text-xs font-medium bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded border border-gray-200 dark:border-gray-600 hover:text-red-500 transition-colors"
+                >
+                  {t('selectNone')}
+                </button>
+                <button
+                  type="button"
+                  x-on:click="fetchResidentialNodes(true)"
+                  class="px-2.5 py-1 text-xs font-medium bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded border border-amber-200 dark:border-amber-800 hover:bg-amber-100 transition-colors flex items-center gap-1"
+                >
+                  <i class="fas fa-arrows-rotate text-xs" x-bind:class="{'fa-spin': loadingResidentialNodes}"></i>
+                  刷新
+                </button>
+              </div>
+            </div>
+
+            <div x-show="loadingResidentialNodes" class="py-6 text-center text-sm text-gray-500 dark:text-gray-400">
+              <i class="fas fa-spinner fa-spin mr-2"></i>
+              {t('fetchingResidentialNodes')}
+            </div>
+
+            <div
+              x-show="!loadingResidentialNodes && residentialNodes.length > 0"
+              class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-1"
+            >
+              <template x-for="rNode in residentialNodes" x-bind:key="rNode.id">
+                <label class="flex items-center justify-between p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-amber-400 dark:hover:border-amber-500 cursor-pointer transition-colors select-none text-xs">
+                  <div class="flex items-center gap-2 overflow-hidden">
+                    <input
+                      type="checkbox"
+                      x-bind:value="rNode.id"
+                      x-model="selectedResidentialIps"
+                      class="w-4 h-4 text-amber-600 rounded border-gray-300 focus:ring-amber-500 dark:bg-gray-700 dark:border-gray-600"
+                    />
+                    <span class="text-base" x-text="rNode.flag"></span>
+                    <div class="truncate">
+                      <div class="font-medium text-gray-800 dark:text-gray-200 truncate" x-text="rNode.ip"></div>
+                      <div class="text-[10px] text-gray-400" x-text="rNode.countryName + ' • ' + (rNode.ping ? rNode.ping + 'ms' : 'TCP')"></div>
+                    </div>
+                  </div>
+                  <span class="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-semibold text-[11px] whitespace-nowrap" x-text="rNode.speedFormatted"></span>
+                </label>
+              </template>
+            </div>
+
+            <div x-show="!loadingResidentialNodes && residentialNodes.length === 0" class="py-4 text-center text-xs text-gray-400">
+              {t('noResidentialNodesFound')}
+            </div>
+          </div>
+
+          {/* 5. 分流服务优先设置 */}
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-1.5">
+              <i class="fas fa-route text-gray-400"></i>
+              {t('residentialRules')}
+            </label>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {[
+                { name: 'ChatGPT', label: '🤖 ChatGPT / OpenAI' },
+                { name: 'Google', label: '🔎 Google 服务' },
+                { name: 'Netflix', label: '🎥 Netflix / 媒体' }
+              ].map(item => (
+                <label class="flex items-center p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors text-xs select-none">
+                  <input
+                    type="checkbox"
+                    value={item.name}
+                    x-model="residentialRules"
+                    class="w-4 h-4 text-amber-600 rounded border-gray-300 focus:ring-amber-500 dark:bg-gray-700 dark:border-gray-600"
+                  />
+                  <span class="ml-2.5 text-gray-700 dark:text-gray-300 font-medium">{item.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Advanced Options Toggle */}
       <div 
         class="flex items-center justify-between bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors" 

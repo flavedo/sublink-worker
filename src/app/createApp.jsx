@@ -17,6 +17,7 @@ import { ConfigStorageService } from '../services/configStorageService.js';
 import { ServiceError, MissingDependencyError } from '../services/errors.js';
 import { normalizeRuntime } from '../runtime/runtimeConfig.js';
 import { PREDEFINED_RULE_SETS, SING_BOX_CONFIG, SING_BOX_CONFIG_V1_11, generateSubconverterConfig } from '../config/index.js';
+import { getResidentialData, filterResidentialNodes } from '../services/vpngateService.js';
 
 const DEFAULT_USER_AGENT = 'curl/7.74.0';
 
@@ -57,6 +58,48 @@ export function createApp(bindings = {}) {
                 </div>
             </Layout>
         );
+    });
+
+    app.get('/residential-nodes', async (c) => {
+        try {
+            const country = c.req.query('country') || c.req.query('countries') || '';
+            const count = c.req.query('count') || c.req.query('limit') || 50;
+            const refresh = c.req.query('refresh') === 'true';
+
+            const data = await getResidentialData({
+                kv: runtime.kv,
+                forceRefresh: refresh
+            });
+
+            const filtered = filterResidentialNodes(data.nodes, {
+                countries: country ? country.split(',') : [],
+                count: parseInt(count, 10) || 50
+            });
+
+            return c.json({
+                nodes: filtered.map(n => ({
+                    id: n.id,
+                    ip: n.ip,
+                    port: n.port,
+                    country: n.country,
+                    countryName: n.countryName,
+                    flag: n.flag,
+                    speed: n.speed,
+                    speedFormatted: n.speedFormatted,
+                    ping: n.ping,
+                    uptime: n.uptime,
+                    sessions: n.sessions
+                })),
+                countries: data.countries || []
+            });
+        } catch (error) {
+            runtime.logger?.warn?.('Failed to fetch residential nodes', error);
+            return c.json({
+                nodes: [],
+                countries: [],
+                error: error?.message || 'Failed to fetch residential nodes'
+            }, 500);
+        }
     });
 
     app.get('/singbox', async (c) => {
@@ -135,6 +178,23 @@ export function createApp(bindings = {}) {
             const selectNodes = parseSelectNodes(c.req.query('selectNodes') || c.req.query('autoSelectNodes'));
             const manualNodes = parseSelectNodes(c.req.query('manualNodes') || c.req.query('manualSelectNodes'));
 
+            const enableResidential = parseBooleanFlag(c.req.query('enable_residential') || c.req.query('residential'));
+            const residentialFront = c.req.query('residential_front') || c.req.query('res_front');
+            const residentialCountry = c.req.query('residential_country') || c.req.query('res_country');
+            const residentialCount = c.req.query('residential_count') || c.req.query('res_count');
+            const residentialIps = c.req.query('residential_ips') || c.req.query('res_ips');
+            const residentialRules = c.req.query('residential_rules') || c.req.query('res_rules');
+
+            const residentialOptions = enableResidential ? {
+                enabled: true,
+                frontProxy: residentialFront,
+                countries: residentialCountry ? residentialCountry.split(',') : [],
+                count: residentialCount ? parseInt(residentialCount, 10) : 10,
+                ips: residentialIps ? residentialIps.split(',') : [],
+                rules: residentialRules ? residentialRules.split(',') : [],
+                kv: runtime.kv
+            } : null;
+
             let baseConfig;
             if (configId) {
                 const storage = requireConfigStorage(services.configStorage);
@@ -155,7 +215,8 @@ export function createApp(bindings = {}) {
                 skipCertVerify,
                 includePrioritySelect,
                 selectNodes,
-                manualNodes
+                manualNodes,
+                residentialOptions
             );
             await builder.build();
             return c.text(builder.formatConfig(), 200, {

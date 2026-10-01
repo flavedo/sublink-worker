@@ -6,6 +6,7 @@ import { addProxyWithDedup } from './helpers/proxyHelpers.js';
 import { buildSelectorMembers, buildNodeSelectMembers, buildPrioritySelectMembers, uniqueNames } from './helpers/groupBuilder.js';
 import { emitClashRules, sanitizeClashProxyGroups } from './helpers/clashConfigUtils.js';
 import { normalizeGroupName, findGroupIndexByName } from './helpers/groupNameUtils.js';
+import { getResidentialData, filterResidentialNodes, buildResidentialProxyObject } from '../services/vpngateService.js';
 
 /**
  * Check if the client supports MRS (Meta Rule Set) format
@@ -40,7 +41,7 @@ function supportsMrsFormat(userAgent) {
 }
 
 export class ClashConfigBuilder extends BaseConfigBuilder {
-    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, enableClashUI = false, externalController, externalUiDownloadUrl, includeAutoSelect = true, skipCertVerify = false, includePrioritySelect = false, selectNodes = [], manualNodes = []) {
+    constructor(inputString, selectedRules, customRules, baseConfig, lang, userAgent, enableClashUI = false, externalController, externalUiDownloadUrl, includeAutoSelect = true, skipCertVerify = false, includePrioritySelect = false, selectNodes = [], manualNodes = [], residentialOptions = null) {
         if (!baseConfig) {
             baseConfig = CLASH_CONFIG;
         }
@@ -51,6 +52,9 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
         this.externalController = externalController;
         this.externalUiDownloadUrl = externalUiDownloadUrl;
         this.skipCertVerify = skipCertVerify;
+        this.residentialOptions = residentialOptions;
+        this.residentialProxyNames = [];
+        this.residentialGroupName = null;
     }
 
     /**
@@ -309,16 +313,118 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
         return (this.config['proxy-groups'] || []).some(group => group && normalizeGroupName(group.name) === target);
     }
 
+    async build() {
+        const customItems = await this.parseCustomItems();
+        this.addCustomItems(customItems);
+        await this.addResidentialProxies();
+        this.addSelectors();
+        this.applyResidentialGroupPriorities();
+        return this.formatConfig();
+    }
+
+    async addResidentialProxies() {
+        if (!this.residentialOptions?.enabled) return;
+
+        try {
+            const nodeSelectName = this.t('outboundNames.Node Select');
+            const autoSelectName = this.t('outboundNames.Auto Select');
+            let frontProxy = this.residentialOptions.frontProxy;
+
+            if (!frontProxy || frontProxy === 'node-select' || frontProxy === 'Node Select') {
+                frontProxy = nodeSelectName;
+            } else if (frontProxy === 'auto-select' || frontProxy === 'Auto Select') {
+                frontProxy = autoSelectName;
+            }
+
+            let resData = this.residentialOptions.vpngateData;
+            if (!resData) {
+                resData = await getResidentialData({ kv: this.residentialOptions.kv });
+            }
+
+            if (!resData || !Array.isArray(resData.nodes) || resData.nodes.length === 0) {
+                return;
+            }
+
+            const filteredNodes = filterResidentialNodes(resData.nodes, {
+                countries: this.residentialOptions.countries,
+                ips: this.residentialOptions.ips,
+                count: this.residentialOptions.count || 10
+            });
+
+            if (filteredNodes.length === 0) return;
+
+            this.residentialProxyNames = [];
+            filteredNodes.forEach((node, index) => {
+                const proxyObj = buildResidentialProxyObject(node, {
+                    frontProxy,
+                    certificates: resData.certificates,
+                    index,
+                    lang: this.lang
+                });
+                this.addProxyToConfig(proxyObj);
+                this.residentialProxyNames.push(proxyObj.name);
+            });
+
+            const resGroupName = this.t('outboundNames.Residential Auto');
+            this.residentialGroupName = resGroupName;
+
+            this.config['proxy-groups'] = this.config['proxy-groups'] || [];
+            if (!this.hasProxyGroup(resGroupName)) {
+                this.config['proxy-groups'].push({
+                    name: resGroupName,
+                    type: 'fallback',
+                    url: 'https://www.gstatic.com/generate_204',
+                    interval: 1800,
+                    lazy: true,
+                    proxies: [...this.residentialProxyNames]
+                });
+            }
+        } catch (error) {
+            console.warn('Failed to add residential proxies:', error);
+        }
+    }
+
+    applyResidentialGroupPriorities() {
+        if (!this.residentialGroupName || !Array.isArray(this.residentialOptions?.rules) || this.residentialOptions.rules.length === 0) {
+            return;
+        }
+
+        const targetRules = new Set(this.residentialOptions.rules.map(r => String(r).trim().toLowerCase()));
+
+        (this.config['proxy-groups'] || []).forEach(group => {
+            if (!group || !Array.isArray(group.proxies)) return;
+
+            const isMatch = Array.from(targetRules).some(rule => {
+                const localized = this.t(`outboundNames.${rule}`);
+                return (
+                    (group.name && group.name.toLowerCase().includes(rule)) ||
+                    (localized && group.name === localized)
+                );
+            });
+
+            if (isMatch && group.proxies.includes(this.residentialGroupName)) {
+                group.proxies = [
+                    this.residentialGroupName,
+                    ...group.proxies.filter(p => p !== this.residentialGroupName)
+                ];
+            }
+        });
+    }
+
     addAutoSelectGroup(proxyList) {
         if (!this.includeAutoSelect) return;
         this.config['proxy-groups'] = this.config['proxy-groups'] || [];
         const autoName = this.t('outboundNames.Auto Select');
         if (this.hasProxyGroup(autoName)) return;
 
+        // Exclude residential proxies from url-test to avoid concurrent handshake storm
+        const resSet = new Set(this.residentialProxyNames || []);
+        const cleanList = proxyList.filter(name => !resSet.has(name));
+
         const group = {
             name: autoName,
             type: 'url-test',
-            proxies: deepCopy(uniqueNames(this.filterSelectableNodes(proxyList))),
+            proxies: deepCopy(uniqueNames(this.filterSelectableNodes(cleanList))),
             url: 'https://www.gstatic.com/generate_204',
             interval: 300,
             lazy: false
@@ -338,8 +444,11 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
         this.config['proxy-groups'] = this.config['proxy-groups'] || [];
         const priorityName = this.t('outboundNames.Priority Select');
         if (this.hasProxyGroup(priorityName)) return;
+        const resSet = new Set(this.residentialProxyNames || []);
+        const cleanList = proxyList.filter(name => !resSet.has(name));
+
         const list = buildPrioritySelectMembers({
-            proxyList: this.filterManualNodes(proxyList),
+            proxyList: this.filterManualNodes(cleanList),
             translator: this.t
         });
 
@@ -361,12 +470,27 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
         this.config['proxy-groups'] = this.config['proxy-groups'] || [];
         const nodeName = this.t('outboundNames.Node Select');
         if (this.hasProxyGroup(nodeName)) return;
+
+        const resSet = new Set(this.residentialProxyNames || []);
+        const cleanList = proxyList.filter(name => !resSet.has(name));
+
         const list = buildNodeSelectMembers({
-            proxyList: this.filterManualNodes(proxyList),
+            proxyList: this.filterManualNodes(cleanList),
             translator: this.t,
             includeAutoSelect: this.includeAutoSelect,
             includePrioritySelect: this.includePrioritySelect
         });
+
+        // Insert residential fallback group right after Auto Select (or at front)
+        if (this.residentialGroupName) {
+            const autoName = this.t('outboundNames.Auto Select');
+            const autoIdx = list.indexOf(autoName);
+            if (autoIdx >= 0) {
+                list.splice(autoIdx + 1, 0, this.residentialGroupName);
+            } else {
+                list.unshift(this.residentialGroupName);
+            }
+        }
 
         const group = {
             type: "select",
@@ -384,12 +508,27 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
     }
 
     buildSelectGroupMembers(proxyList = []) {
-        return buildSelectorMembers({
-            proxyList: this.filterManualNodes(proxyList),
+        const resSet = new Set(this.residentialProxyNames || []);
+        const cleanList = proxyList.filter(name => !resSet.has(name));
+
+        const members = buildSelectorMembers({
+            proxyList: this.filterManualNodes(cleanList),
             translator: this.t,
             includeAutoSelect: this.includeAutoSelect,
             includePrioritySelect: this.includePrioritySelect
         });
+
+        if (this.residentialGroupName && !members.includes(this.residentialGroupName)) {
+            const nodeName = this.t('outboundNames.Node Select');
+            const nodeIdx = members.indexOf(nodeName);
+            if (nodeIdx >= 0) {
+                members.splice(nodeIdx + 1, 0, this.residentialGroupName);
+            } else {
+                members.push(this.residentialGroupName);
+            }
+        }
+
+        return members;
     }
 
     addOutboundGroups(outbounds, proxyList) {

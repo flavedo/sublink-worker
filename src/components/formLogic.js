@@ -111,6 +111,17 @@ export const formLogicFn = (t) => {
             checkedNodes: [],
             checkedManualNodes: [],
             nodesTimer: null,
+            // Residential Proxy state
+            enableResidential: false,
+            residentialFront: 'node-select',
+            residentialMode: 'dynamic',
+            residentialCountry: 'JP',
+            residentialCount: 10,
+            residentialNodes: [],
+            selectedResidentialIps: [],
+            residentialRules: ['ChatGPT'],
+            loadingResidentialNodes: false,
+            residentialNodesFetched: false,
             // These will be populated from window.APP_TRANSLATIONS
             processingText: '',
             convertText: '',
@@ -148,6 +159,22 @@ export const formLogicFn = (t) => {
                 this.customShortCode = localStorage.getItem('customShortCode') || '';
                 this.autoNodesOpen = localStorage.getItem('autoNodesOpen') === 'true';
                 this.manualNodesOpen = localStorage.getItem('manualNodesOpen') === 'true';
+
+                // Load residential proxy preferences
+                this.enableResidential = localStorage.getItem('enableResidential') === 'true';
+                this.residentialFront = localStorage.getItem('residentialFront') || 'node-select';
+                this.residentialMode = localStorage.getItem('residentialMode') || 'dynamic';
+                this.residentialCountry = localStorage.getItem('residentialCountry') || 'JP';
+                this.residentialCount = parseInt(localStorage.getItem('residentialCount'), 10) || 10;
+                try {
+                    const savedIps = localStorage.getItem('selectedResidentialIps');
+                    if (savedIps) this.selectedResidentialIps = JSON.parse(savedIps);
+                } catch (_) {}
+                try {
+                    const savedRules = localStorage.getItem('residentialRules');
+                    if (savedRules) this.residentialRules = JSON.parse(savedRules);
+                } catch (_) {}
+
                 const initialUrlParams = new URLSearchParams(window.location.search);
                 this.currentConfigId = initialUrlParams.get('configId') || '';
 
@@ -276,6 +303,49 @@ export const formLogicFn = (t) => {
 
             checkNoManualNodes() {
                 this.checkedManualNodes = [];
+            },
+
+            async fetchResidentialNodes(force = false) {
+                this.loadingResidentialNodes = true;
+                try {
+                    const countryParam = this.residentialCountry ? `&country=${encodeURIComponent(this.residentialCountry)}` : '';
+                    const refreshParam = force ? '&refresh=true' : '';
+                    const res = await fetch(`/residential-nodes?limit=50${countryParam}${refreshParam}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        this.residentialNodes = data.nodes || [];
+                        this.residentialNodesFetched = true;
+                        // If no manual selection yet, default to select top residentialCount
+                        if (this.selectedResidentialIps.length === 0 && this.residentialNodes.length > 0) {
+                            this.checkTopResidentialNodes(this.residentialCount || 10);
+                        }
+                    }
+                } catch (err) {
+                    console.error('Failed to fetch residential nodes:', err);
+                } finally {
+                    this.loadingResidentialNodes = false;
+                }
+            },
+
+            checkAllResidentialNodes() {
+                this.selectedResidentialIps = this.residentialNodes.map(n => n.id || `${n.ip}:${n.port}`);
+            },
+
+            checkNoResidentialNodes() {
+                this.selectedResidentialIps = [];
+            },
+
+            checkTopResidentialNodes(count = 5) {
+                const target = this.residentialNodes.slice(0, count);
+                this.selectedResidentialIps = target.map(n => n.id || `${n.ip}:${n.port}`);
+            },
+
+            setResidentialCountry(countryCode) {
+                this.residentialCountry = countryCode;
+                localStorage.setItem('residentialCountry', countryCode);
+                if (this.residentialMode === 'manual' || this.residentialNodesFetched) {
+                    this.fetchResidentialNodes();
+                }
             },
 
             // Restore previously saved checked nodes (by name) that still exist in the
@@ -519,6 +589,29 @@ export const formLogicFn = (t) => {
                     const configId = this.currentConfigId || urlParams.get('configId');
                     if (configId) {
                         params.append('configId', configId);
+                    }
+
+                    // Residential Proxy Parameters
+                    if (this.enableResidential) {
+                        params.append('enable_residential', 'true');
+                        if (this.residentialFront) params.append('res_front', this.residentialFront);
+                        if (this.residentialCountry) params.append('res_country', this.residentialCountry);
+                        if (this.residentialCount) params.append('res_count', String(this.residentialCount));
+                        if (this.residentialMode === 'manual' && this.selectedResidentialIps.length > 0) {
+                            params.append('res_ips', this.selectedResidentialIps.join(','));
+                        }
+                        if (this.residentialRules && this.residentialRules.length > 0) {
+                            params.append('res_rules', this.residentialRules.join(','));
+                        }
+                        localStorage.setItem('enableResidential', 'true');
+                        localStorage.setItem('residentialFront', this.residentialFront);
+                        localStorage.setItem('residentialMode', this.residentialMode);
+                        localStorage.setItem('residentialCountry', this.residentialCountry);
+                        localStorage.setItem('residentialCount', String(this.residentialCount));
+                        localStorage.setItem('selectedResidentialIps', JSON.stringify(this.selectedResidentialIps));
+                        localStorage.setItem('residentialRules', JSON.stringify(this.residentialRules));
+                    } else {
+                        localStorage.setItem('enableResidential', 'false');
                     }
 
                     const queryString = params.toString();
