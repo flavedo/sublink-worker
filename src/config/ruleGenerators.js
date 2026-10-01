@@ -163,11 +163,30 @@ export function generateClashRuleSets(selectedRules = [], customRules = [], useM
 
 	const siteRuleSets = new Set();
 	const ipRuleSets = new Set();
+	const remote_rule_providers = {};
 
 	UNIFIED_RULES.forEach(rule => {
 		if (selectedRulesSet.has(rule.name)) {
 			rule.site_rules.forEach(siteRule => siteRuleSets.add(siteRule));
 			rule.ip_rules.forEach(ipRule => ipRuleSets.add(ipRule));
+			if (Array.isArray(rule.remote_rules)) {
+				rule.remote_rules.forEach(remote => {
+					const providerName = remote.name || remote.url.split('/').pop().replace(/\.ya?ml$/, '');
+					const behavior = remote.behavior || (
+						remote.type === 'clash-domain' ? 'domain' :
+						remote.type === 'clash-classic' ? 'classical' :
+						remote.type === 'clash-ipcidr' ? 'ipcidr' : 'classical'
+					);
+					remote_rule_providers[providerName] = {
+						type: 'http',
+						format: remote.format || 'yaml',
+						behavior: behavior,
+						url: remote.url,
+						path: `./ruleset/${providerName}.yaml`,
+						interval: remote.interval || 86400
+					};
+				});
+			}
 		}
 	});
 
@@ -222,5 +241,5 @@ export function generateClashRuleSets(selectedRules = [], customRules = [], useM
 		});
 	}
 
-	return { site_rule_providers, ip_rule_providers };
+	return { site_rule_providers, ip_rule_providers, remote_rule_providers };
 }

@@ -33,6 +33,20 @@ export const UNIFIED_RULES = [
 		ip_no_resolve: true
 	},
 	{
+		name: 'Ad Block',
+		outbound: 'Ad Block',
+		site_rules: ['category-ads-all'],
+		ip_rules: [],
+		remote_rules: [
+			{
+				name: 'anti-ad',
+				type: 'clash-domain',
+				url: 'https://fastly.jsdelivr.net/gh/privacy-protection-tools/anti-AD@master/anti-ad-clash.yaml',
+				interval: 86400
+			}
+		]
+	},
+	{
 		name: 'Aethersailor Direct',
 		outbound: 'DIRECT',
 		site_rules: [],
@@ -395,10 +409,14 @@ export const DIRECT_DEFAULT_RULES = new Set([
 	'Non-Standard Port'
 ]);
 
+export const REJECT_DEFAULT_RULES = new Set([
+	'Ad Block'
+]);
+
 export const PREDEFINED_RULE_SETS = {
 	minimal: ['Private', 'Location:CN', 'GFW'],
 	balanced: [
-		'Private', 'Location:CN', 'CN Available',
+		'Private', 'Ad Block', 'Location:CN', 'CN Available',
 		'Telegram', 'ChatGPT', 'AI Services',
 		'Google', 'Github', 'Youtube', 'GFW'
 	],

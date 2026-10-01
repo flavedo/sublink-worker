@@ -1,5 +1,5 @@
 import yaml from 'js-yaml';
-import { CLASH_CONFIG, generateRules, generateClashRuleSets, getOutbounds, PREDEFINED_RULE_SETS, DIRECT_DEFAULT_RULES } from '../config/index.js';
+import { CLASH_CONFIG, generateRules, generateClashRuleSets, getOutbounds, PREDEFINED_RULE_SETS, DIRECT_DEFAULT_RULES, REJECT_DEFAULT_RULES } from '../config/index.js';
 import { BaseConfigBuilder } from './BaseConfigBuilder.js';
 import { deepCopy } from '../utils.js';
 import { addProxyWithDedup } from './helpers/proxyHelpers.js';
@@ -397,19 +397,24 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
             if (outbound !== this.t('outboundNames.Node Select')) {
                 const name = this.t(`outboundNames.${outbound}`);
                 if (!this.hasProxyGroup(name)) {
-                    let proxies = this.buildSelectGroupMembers(proxyList);
-                    // For rules that should default to DIRECT, move DIRECT to the front
-                    if (DIRECT_DEFAULT_RULES.has(outbound)) {
-                        proxies = ['DIRECT', ...proxies.filter(p => p !== 'DIRECT')];
+                    let proxies;
+                    if (REJECT_DEFAULT_RULES.has(outbound)) {
+                        proxies = ['REJECT', 'DIRECT'];
+                    } else {
+                        proxies = this.buildSelectGroupMembers(proxyList);
+                        // For rules that should default to DIRECT, move DIRECT to the front
+                        if (DIRECT_DEFAULT_RULES.has(outbound)) {
+                            proxies = ['DIRECT', ...proxies.filter(p => p !== 'DIRECT')];
+                        }
                     }
                     const group = {
                         type: "select",
                         name,
                         proxies
                     };
-                    // Add 'use' field if we have proxy-providers
+                    // Add 'use' field if we have proxy-providers and not a REJECT group
                     const providerNames = this.getAllProviderNames();
-                    if (providerNames.length > 0) {
+                    if (providerNames.length > 0 && !REJECT_DEFAULT_RULES.has(outbound)) {
                         group.use = providerNames;
                     }
                     this.config['proxy-groups'].push(group);
@@ -568,10 +573,11 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
     formatConfig() {
         const rules = this.generateRules();
         const useMrs = supportsMrsFormat(this.userAgent);
-        const { site_rule_providers, ip_rule_providers } = generateClashRuleSets(this.selectedRules, this.customRules, useMrs);
+        const { site_rule_providers, ip_rule_providers, remote_rule_providers } = generateClashRuleSets(this.selectedRules, this.customRules, useMrs);
         this.config['rule-providers'] = {
             ...site_rule_providers,
-            ...ip_rule_providers
+            ...ip_rule_providers,
+            ...(remote_rule_providers || {})
         };
         const ruleResults = emitClashRules(rules, this.t);
 

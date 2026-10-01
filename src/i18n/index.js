@@ -117,6 +117,7 @@ export const translations = {
       'Priority Select': '⭐ 优先选择',
       'Node Select': '🚀 手动选择',
       'Fall Back': '🐟 漏网之鱼',
+      'Ad Block': '🛑 广告拦截',
       'Adobe': '🟥 Adobe',
       'Youtube': '🎬 YouTube',
       'Google': '🔎 Google',

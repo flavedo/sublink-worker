@@ -5,9 +5,9 @@
 
 import { createTranslator } from '../i18n/index.js';
 import { generateRules } from './ruleGenerators.js';
-import { DIRECT_DEFAULT_RULES } from './rules.js';
+import { DIRECT_DEFAULT_RULES, REJECT_DEFAULT_RULES } from './rules.js';
 
-const REJECT_RULES = new Set(['Adobe']);
+const REJECT_RULES = new Set(['Adobe', ...REJECT_DEFAULT_RULES]);
 
 const SPEED_TEST_URL = 'http://www.gstatic.com/generate_204';
 

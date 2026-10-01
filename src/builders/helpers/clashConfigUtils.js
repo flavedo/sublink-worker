@@ -28,13 +28,22 @@ export function emitClashRules(rules = [], translator) {
             });
         });
 
-    rules
-        .filter(rule => Array.isArray(rule.site_rules) && rule.site_rules[0])
-        .forEach(rule => {
-            rule.site_rules.forEach(site => {
-                results.push(`RULE-SET,${site},${translator('outboundNames.' + rule.outbound)}`);
+    rules.forEach(rule => {
+        const outbound = translator('outboundNames.' + rule.outbound);
+        if (Array.isArray(rule.remote_rules)) {
+            rule.remote_rules.forEach(remote => {
+                const providerName = remote.name || remote.url.split('/').pop().replace(/\.ya?ml$/, '');
+                results.push(`RULE-SET,${providerName},${outbound}`);
             });
-        });
+        }
+        if (Array.isArray(rule.site_rules)) {
+            rule.site_rules.forEach(site => {
+                if (site) {
+                    results.push(`RULE-SET,${site},${outbound}`);
+                }
+            });
+        }
+    });
 
     rules
         .filter(rule => Array.isArray(rule.ip_rules) && rule.ip_rules[0])
