@@ -243,7 +243,10 @@ export const Form = (props) => {
       {/* Residential Chained Proxy Section */}
       <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 transition-all duration-300 hover:shadow-md">
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
+          <div
+            class="flex items-center gap-3 cursor-pointer select-none flex-1"
+            x-on:click="enableResidential = !enableResidential; if (enableResidential && residentialMode === 'manual' && residentialNodes.length === 0) fetchResidentialNodes();"
+          >
             <span class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500/20 to-orange-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg">
               <i class="fas fa-house-signal"></i>
             </span>
@@ -257,15 +260,15 @@ export const Form = (props) => {
               <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t('enableResidentialTip')}</p>
             </div>
           </div>
-          <div class="relative inline-flex items-center cursor-pointer">
+          <label class="relative inline-flex items-center cursor-pointer ml-4 select-none">
             <input
               type="checkbox"
               x-model="enableResidential"
               class="sr-only peer"
-              x-on:change="if (enableResidential && residentialNodes.length === 0) fetchResidentialNodes()"
+              x-on:change="if (enableResidential && residentialMode === 'manual' && residentialNodes.length === 0) fetchResidentialNodes();"
             />
             <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300 dark:peer-focus:ring-amber-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-amber-600"></div>
-          </div>
+          </label>
         </div>
 
         {/* Content when enabled */}
