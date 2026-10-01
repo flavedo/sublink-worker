@@ -2,7 +2,6 @@
 /** @jsxImportSource hono/jsx */
 import { PREDEFINED_RULE_SETS, UNIFIED_RULES } from '../config/index.js';
 import { TextareaWithActions } from './TextareaWithActions.jsx';
-import { ValidatedTextarea } from './ValidatedTextarea.jsx';
 import { formLogicFn } from './formLogic.js';
 
 const LINK_FIELDS = [
@@ -349,70 +348,6 @@ export const Form = (props) => {
     </div>
   </div>
 
-  {/* Base Config */ }
-  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                <i class="fas fa-file-code text-gray-400"></i>
-                {t('baseConfigSettings')}
-              </h3>
-              <select x-model="configType" class="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-                <option value="singbox">SingBox (JSON)</option>
-                <option value="clash">Clash (YAML)</option>
-                <option value="surge">Surge (JSON/INI)</option>
-              </select>
-          </div>
-            
-            <ValidatedTextarea
-              id="configEditor"
-              name="configEditor"
-              model="configEditor"
-              rows={5}
-              placeholder="Paste your custom config here..."
-              variant="mono"
-              containerClass="mt-0 group"
-              labelWrapperClass="flex items-center justify-end mb-2"
-              labelActionsWrapperClass="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-              pasteLabel={t('paste')}
-              clearLabel={t('clear')}
-              validation={{
-                button: {
-                  key: 'validate-config',
-                  label: t('validateConfig'),
-                  className:
-                    'px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-xs font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors flex items-center gap-2',
-                  attrs: {
-                    'x-on:click': 'validateBaseConfig()'
-                  }
-                },
-                success: {
-                  show: "configValidationState === 'success'",
-                  textExpr: 'configValidationMessage'
-                },
-                error: {
-                  show: "configValidationState === 'error'",
-                  textExpr: 'configValidationMessage'
-                }
-              }}
-              inlineActionsWrapperClass="absolute bottom-4 right-4 flex gap-2"
-              preserveLabelSpace={false}
-            />
-            
-            <div class="flex justify-end gap-3 mt-4">
-              <button 
-                type="button" 
-                x-on:click="saveBaseConfig()" 
-                x-bind:disabled="savingConfig"
-                class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-medium text-sm disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
-              >
-                <i class="fas" x-bind:class="savingConfig ? 'fa-spinner fa-spin' : 'fa-save'"></i>
-                <span x-text="savingConfig ? savingConfigText : saveConfigText">{t('saveConfig')}</span>
-              </button>
-              <button type="button" x-on:click="clearBaseConfig()" class="px-4 py-2 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors font-medium text-sm" >
-  { t('clearConfig') }
-              </button>
-          </div>
-          </div >
 
   {/* User Agent */ }
   <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">

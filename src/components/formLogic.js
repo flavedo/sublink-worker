@@ -76,7 +76,6 @@ export const formLogicFn = (t) => {
             accordionSections: {
                 rules: true,        // 规则选择 - 默认展开
                 general: false,     // 通用设置
-                baseConfig: false,  // 基础配置
                 ua: false          // User Agent
             },
             selectedRules: [],
