@@ -37,7 +37,7 @@ export const UNIFIED_RULES = [
 	},
 	{
 		name: 'Ad Block',
-		outbound: 'Ad Block',
+		outbound: 'REJECT',
 		// 只保留 anti-AD 一份广告源（clash / subconverter 走下面的 remote_rules）
 		site_rules: [],
 		// sing-box / Surge 只能消费各自的 geox 规则集（.srs/.conf），无法使用 clash-domain 的 anti-AD，
@@ -417,7 +417,6 @@ export const DIRECT_DEFAULT_RULES = new Set([
 ]);
 
 export const REJECT_DEFAULT_RULES = new Set([
-	'Ad Block'
 ]);
 
 export const PREDEFINED_RULE_SETS = {

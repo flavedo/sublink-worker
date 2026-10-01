@@ -25,17 +25,17 @@ describe('Clash Ad Blocking (anti-AD) Feature Tests', () => {
     expect(remote_rule_providers['anti-ad'].url).toContain('anti-ad-clash.yaml');
   });
 
-  it('should create 🛑 广告拦截 proxy group with REJECT and DIRECT options', async () => {
+  it('should route Ad Block directly to REJECT without creating a proxy group', async () => {
     const builder = new ClashConfigBuilder(SS_INPUT, ['Ad Block', 'Location:CN'], [], null, 'zh-CN', 'mihomo/1.0');
     const yamlText = await builder.build();
     const config = yaml.load(yamlText);
 
+    // 广告拦截直接 REJECT，不再创建冗余的 select 策略组
     const adBlockGroup = (config['proxy-groups'] || []).find(g => g && g.name.includes('广告拦截'));
-    expect(adBlockGroup).toBeDefined();
-    expect(adBlockGroup.type).toBe('select');
-    expect(adBlockGroup.proxies).toEqual(['REJECT', 'DIRECT']);
-    // Should NOT have proxy-providers attached
-    expect(adBlockGroup.use).toBeUndefined();
+    expect(adBlockGroup).toBeUndefined();
+
+    // 规则直接指向内置的 REJECT
+    expect(config.rules).toContainEqual('RULE-SET,anti-ad,REJECT');
   });
 
   it('should register anti-ad (and no category-ads-all) in rule-providers', async () => {
