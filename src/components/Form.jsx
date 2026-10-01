@@ -341,34 +341,55 @@ export const Form = (props) => {
           {/* 3. 落地国家/地区与数量 */}
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-1.5">
-                <i class="fas fa-globe text-gray-400"></i>
-                {t('residentialCountry')}
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center justify-between">
+                <span class="flex items-center gap-1.5">
+                  <i class="fas fa-globe text-gray-400"></i>
+                  {t('residentialCountry')}
+                </span>
+                <span class="text-xs text-amber-600 dark:text-amber-400 font-normal" x-text="selectedResidentialCountries.includes('ALL') ? '已选: 全部地区' : '已选 ' + selectedResidentialCountries.length + ' 个地区'"></span>
               </label>
-              <div class="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto pr-1">
+              <div class="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto pr-1">
                 {[
                   { code: 'ALL', label: '🌐 全部地区 (均衡)' },
                   { code: 'JP', label: '🇯🇵 日本' },
                   { code: 'KR', label: '🇰🇷 韩国' },
-                  { code: 'US', label: '🇺🇸 美国 (AI)' },
+                  { code: 'US', label: '🇺🇸 美国' },
                   { code: 'HK', label: '🇭🇰 香港' },
                   { code: 'TW', label: '🇹🇼 台湾' },
                   { code: 'SG', label: '🇸🇬 新加坡' },
                   { code: 'GB', label: '🇬🇧 英国' },
                   { code: 'DE', label: '🇩🇪 德国' },
+                  { code: 'FR', label: '🇫🇷 法国' },
+                  { code: 'NL', label: '🇳🇱 荷兰' },
                   { code: 'CA', label: '🇨🇦 加拿大' },
                   { code: 'AU', label: '🇦🇺 澳大利亚' },
                   { code: 'TH', label: '🇹🇭 泰国' },
+                  { code: 'VN', label: '🇻🇳 越南' },
+                  { code: 'MY', label: '🇲🇾 马来西亚' },
+                  { code: 'PH', label: '🇵🇭 菲律宾' },
+                  { code: 'ID', label: '🇮🇩 印尼' },
+                  { code: 'IN', label: '🇮🇳 印度' },
                   { code: 'RU', label: '🇷🇺 俄罗斯' },
-                  { code: 'VN', label: '🇻🇳 越南' }
+                  { code: 'UA', label: '🇺🇦 乌克兰' },
+                  { code: 'TR', label: '🇹🇷 土耳其' },
+                  { code: 'RO', label: '🇷🇴 罗马尼亚' },
+                  { code: 'BR', label: '🇧🇷 巴西' },
+                  { code: 'AR', label: '🇦🇷 阿根廷' },
+                  { code: 'IT', label: '🇮🇹 意大利' },
+                  { code: 'ES', label: '🇪🇸 西班牙' },
+                  { code: 'SE', label: '🇸🇪 瑞典' },
+                  { code: 'CH', label: '🇨🇭 瑞士' }
                 ].map(c => (
                   <button
                     type="button"
-                    x-on:click={`setResidentialCountry('${c.code}')`}
-                    class="px-2.5 py-1 text-xs font-medium rounded-lg border transition-all"
-                    x-bind:class={`residentialCountry === '${c.code}' ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 font-semibold shadow-sm' : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-300'`}
+                    x-on:click={`toggleResidentialCountry('${c.code}')`}
+                    class="px-2 py-1 text-xs font-medium rounded-lg border transition-all flex items-center gap-1"
+                    x-bind:class={`isResidentialCountrySelected('${c.code}') ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 font-semibold shadow-sm' : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-300'`}
                   >
-                    {c.label}
+                    <template x-if={`isResidentialCountrySelected('${c.code}') && '${c.code}' !== 'ALL'`}>
+                      <i class="fas fa-check text-[10px] text-amber-600 dark:text-amber-400"></i>
+                    </template>
+                    <span>{c.label}</span>
                   </button>
                 ))}
               </div>
@@ -380,17 +401,18 @@ export const Form = (props) => {
                 {t('residentialCount')}
               </label>
               <div class="flex gap-2">
-                {[5, 10, 15, 20].map(cnt => (
+                {[1, 2, 3, 5].map(cnt => (
                   <button
                     type="button"
                     x-on:click={`residentialCount = ${cnt}`}
                     class="flex-1 py-1.5 text-xs font-medium rounded-lg border text-center transition-all"
                     x-bind:class={`residentialCount === ${cnt} ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 font-semibold' : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-300'`}
                   >
-                    {cnt} 个{cnt === 10 ? ' (推荐)' : ''}
+                    每国 {cnt} 个{cnt === 2 ? ' (推荐)' : ''}
                   </button>
                 ))}
               </div>
+              <p class="text-xs text-gray-400 mt-2">{t('residentialCountTip')}</p>
             </div>
           </div>
 

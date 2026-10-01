@@ -64,6 +64,7 @@ export function createApp(bindings = {}) {
         try {
             const country = c.req.query('country') || c.req.query('countries') || '';
             const count = c.req.query('count') || c.req.query('limit') || 50;
+            const countPerCountry = c.req.query('count_per_country') || c.req.query('per_country');
             const refresh = c.req.query('refresh') === 'true';
 
             const data = await getResidentialData({
@@ -73,7 +74,8 @@ export function createApp(bindings = {}) {
 
             const filtered = filterResidentialNodes(data.nodes, {
                 countries: country ? country.split(',') : [],
-                count: parseInt(count, 10) || 50
+                count: parseInt(count, 10) || 50,
+                countPerCountry: countPerCountry ? parseInt(countPerCountry, 10) : undefined
             });
 
             return c.json({
@@ -185,11 +187,13 @@ export function createApp(bindings = {}) {
             const residentialCount = c.req.query('residential_count') || c.req.query('res_count');
             const residentialIps = c.req.query('residential_ips') || c.req.query('res_ips');
 
+            const countVal = residentialCount ? parseInt(residentialCount, 10) : 2;
             const residentialOptions = enableResidential ? {
                 enabled: true,
                 frontProxy: residentialFront,
                 countries: residentialCountry ? residentialCountry.split(',') : [],
-                count: residentialCount ? parseInt(residentialCount, 10) : 10,
+                countPerCountry: countVal,
+                count: countVal,
                 ips: residentialIps ? residentialIps.split(',') : [],
                 kv: runtime.kv
             } : null;

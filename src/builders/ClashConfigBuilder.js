@@ -344,10 +344,12 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
                 return;
             }
 
+            const perCountry = this.residentialOptions.countPerCountry || this.residentialOptions.count || 2;
             const filteredNodes = filterResidentialNodes(resData.nodes, {
                 countries: this.residentialOptions.countries,
                 ips: this.residentialOptions.ips,
-                count: this.residentialOptions.count || 10
+                countPerCountry: perCountry,
+                count: this.residentialOptions.count
             });
 
             if (filteredNodes.length === 0) return;

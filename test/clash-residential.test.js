@@ -175,7 +175,8 @@ describe('Clash Residential Chained Proxy Integration Tests', () => {
             enabled: true,
             frontProxy: '🚀 手动选择',
             countries: ['ALL'],
-            count: 3,
+            countPerCountry: 1,
+            count: 1,
             vpngateData: mockDataWithMultipleRegions
         };
 

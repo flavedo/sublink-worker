@@ -127,12 +127,52 @@ describe('VPNGate Service Tests', () => {
             // Regions represented: JP, KR, US (not 4 JP nodes!)
             expect(new Set(balanced.map(n => n.country)).size).toBe(3);
         });
+
+        it('allocates nodes per country when countPerCountry is specified', () => {
+            const candidatePool = [
+                { id: 'jp-1', ip: '1.1.1.1', country: 'JP', port: 443, speed: 100000000 },
+                { id: 'jp-2', ip: '1.1.1.2', country: 'JP', port: 995, speed: 90000000 },
+                { id: 'jp-3', ip: '1.1.1.3', country: 'JP', port: 1194, speed: 80000000 },
+                { id: 'us-1', ip: '2.2.2.1', country: 'US', port: 443, speed: 50000000 },
+                { id: 'us-2', ip: '2.2.2.2', country: 'US', port: 995, speed: 40000000 },
+                { id: 'kr-1', ip: '3.3.3.1', country: 'KR', port: 443, speed: 60000000 },
+                { id: 'kr-2', ip: '3.3.3.2', country: 'KR', port: 995, speed: 50000000 }
+            ];
+
+            // Request 2 per country for JP and US
+            const selected = filterResidentialNodes(candidatePool, {
+                countries: ['JP', 'US'],
+                countPerCountry: 2
+            });
+
+            expect(selected).toHaveLength(4);
+            const jpCount = selected.filter(n => n.country === 'JP').length;
+            const usCount = selected.filter(n => n.country === 'US').length;
+            expect(jpCount).toBe(2);
+            expect(usCount).toBe(2);
+        });
+
+        it('prioritizes reliable ports (443, 995, 1194) and active sessions over random high ports', () => {
+            const candidatePool = [
+                // Random UPnP high port with 0 sessions but huge speed
+                { id: 'jp-unreliable', ip: '1.1.1.1', country: 'JP', port: 1895, speed: 500000000, sessions: 0 },
+                // Standard port 443 with moderate speed and active sessions
+                { id: 'jp-reliable', ip: '1.1.1.2', country: 'JP', port: 443, speed: 50000000, sessions: 35 }
+            ];
+
+            const selected = filterResidentialNodes(candidatePool, {
+                countries: ['JP'],
+                count: 1
+            });
+
+            expect(selected[0].id).toBe('jp-reliable');
+        });
     });
 
     describe('buildResidentialProxyObject', () => {
         const { nodes, certificates } = parseVpngateCsv(SAMPLE_CSV);
 
-        it('generates valid OpenVPN proxy with dialer-proxy and certs', () => {
+        it('generates valid OpenVPN proxy with dialer-proxy and certs and skip-cert-verify', () => {
             const proxy = buildResidentialProxyObject(nodes[0], {
                 frontProxy: '⚡ 香港专线-01',
                 certificates,
@@ -144,6 +184,7 @@ describe('VPNGate Service Tests', () => {
             expect(proxy.port).toBe(443);
             expect(proxy.proto).toBe('tcp');
             expect(proxy['dialer-proxy']).toBe('⚡ 香港专线-01');
+            expect(proxy['skip-cert-verify']).toBe(true);
             expect(proxy.ca).toBe('TEST_CA_CERTIFICATE_CONTENT');
             expect(proxy.cert).toBe('TEST_CLIENT_CERT_CONTENT');
             expect(proxy.key).toBe('TEST_CLIENT_KEY_CONTENT');

@@ -115,8 +115,9 @@ export const formLogicFn = (t) => {
             enableResidential: false,
             residentialFront: 'node-select',
             residentialMode: 'dynamic',
+            selectedResidentialCountries: ['ALL'],
             residentialCountry: 'ALL',
-            residentialCount: 10,
+            residentialCount: 2,
             residentialNodes: [],
             selectedResidentialIps: [],
             loadingResidentialNodes: false,
@@ -163,10 +164,26 @@ export const formLogicFn = (t) => {
                 this.enableResidential = localStorage.getItem('enableResidential') === 'true';
                 this.residentialFront = localStorage.getItem('residentialFront') || 'node-select';
                 this.residentialMode = localStorage.getItem('residentialMode') || 'dynamic';
-                const explicit = localStorage.getItem('residentialCountryExplicit');
-                const savedCountry = localStorage.getItem('residentialCountry');
-                this.residentialCountry = (explicit && savedCountry) ? savedCountry : 'ALL';
-                this.residentialCount = parseInt(localStorage.getItem('residentialCount'), 10) || 10;
+                try {
+                    const savedCountries = localStorage.getItem('selectedResidentialCountries');
+                    if (savedCountries) {
+                        const parsed = JSON.parse(savedCountries);
+                        if (Array.isArray(parsed) && parsed.length > 0) {
+                            this.selectedResidentialCountries = parsed;
+                            this.residentialCountry = parsed.join(',');
+                        }
+                    } else {
+                        const savedCountry = localStorage.getItem('residentialCountry');
+                        if (savedCountry) {
+                            const list = savedCountry.split(',').map(s => s.trim()).filter(Boolean);
+                            if (list.length > 0) {
+                                this.selectedResidentialCountries = list;
+                                this.residentialCountry = list.join(',');
+                            }
+                        }
+                    }
+                } catch (_) {}
+                this.residentialCount = parseInt(localStorage.getItem('residentialCount'), 10) || 2;
                 try {
                     const savedIps = localStorage.getItem('selectedResidentialIps');
                     if (savedIps) this.selectedResidentialIps = JSON.parse(savedIps);
@@ -305,16 +322,19 @@ export const formLogicFn = (t) => {
             async fetchResidentialNodes(force = false) {
                 this.loadingResidentialNodes = true;
                 try {
-                    const countryParam = this.residentialCountry ? `&country=${encodeURIComponent(this.residentialCountry)}` : '';
+                    const isAll = this.selectedResidentialCountries.includes('ALL');
+                    const countryParam = isAll ? '' : `&countries=${encodeURIComponent(this.selectedResidentialCountries.join(','))}`;
+                    const countParam = this.residentialCount ? `&count_per_country=${this.residentialCount}` : '';
                     const refreshParam = force ? '&refresh=true' : '';
-                    const res = await fetch(`/residential-nodes?limit=50${countryParam}${refreshParam}`);
+                    const res = await fetch(`/residential-nodes?limit=100${countryParam}${countParam}${refreshParam}`);
                     if (res.ok) {
                         const data = await res.json();
                         this.residentialNodes = data.nodes || [];
                         this.residentialNodesFetched = true;
-                        // If no manual selection yet, default to select top residentialCount
+                        // If no manual selection yet, default to select top nodes based on selection
                         if (this.selectedResidentialIps.length === 0 && this.residentialNodes.length > 0) {
-                            this.checkTopResidentialNodes(this.residentialCount || 10);
+                            const defaultCount = (this.selectedResidentialCountries.length * (this.residentialCount || 2)) || 6;
+                            this.checkTopResidentialNodes(Math.min(defaultCount, this.residentialNodes.length));
                         }
                     }
                 } catch (err) {
@@ -337,13 +357,39 @@ export const formLogicFn = (t) => {
                 this.selectedResidentialIps = target.map(n => n.id || `${n.ip}:${n.port}`);
             },
 
-            setResidentialCountry(countryCode) {
-                this.residentialCountry = countryCode;
-                localStorage.setItem('residentialCountry', countryCode);
+            isResidentialCountrySelected(code) {
+                if (code === 'ALL') {
+                    return this.selectedResidentialCountries.includes('ALL');
+                }
+                return this.selectedResidentialCountries.includes(code);
+            },
+
+            toggleResidentialCountry(code) {
+                if (code === 'ALL') {
+                    this.selectedResidentialCountries = ['ALL'];
+                } else {
+                    let current = this.selectedResidentialCountries.filter(c => c !== 'ALL');
+                    if (current.includes(code)) {
+                        current = current.filter(c => c !== code);
+                    } else {
+                        current.push(code);
+                    }
+                    if (current.length === 0) {
+                        current = ['ALL'];
+                    }
+                    this.selectedResidentialCountries = current;
+                }
+                this.residentialCountry = this.selectedResidentialCountries.join(',');
+                localStorage.setItem('selectedResidentialCountries', JSON.stringify(this.selectedResidentialCountries));
+                localStorage.setItem('residentialCountry', this.residentialCountry);
                 localStorage.setItem('residentialCountryExplicit', 'true');
                 if (this.residentialMode === 'manual' || this.residentialNodesFetched) {
                     this.fetchResidentialNodes();
                 }
+            },
+
+            setResidentialCountry(countryCode) {
+                this.toggleResidentialCountry(countryCode);
             },
 
             // Restore previously saved checked nodes (by name) that still exist in the
@@ -593,14 +639,20 @@ export const formLogicFn = (t) => {
                     if (this.enableResidential) {
                         params.append('enable_residential', 'true');
                         if (this.residentialFront) params.append('res_front', this.residentialFront);
-                        if (this.residentialCountry) params.append('res_country', this.residentialCountry);
-                        if (this.residentialCount) params.append('res_count', String(this.residentialCount));
+                        const countries = this.selectedResidentialCountries.join(',');
+                        if (countries && countries !== 'ALL') {
+                            params.append('res_country', countries);
+                        }
+                        if (this.residentialCount) {
+                            params.append('res_count', String(this.residentialCount));
+                        }
                         if (this.residentialMode === 'manual' && this.selectedResidentialIps.length > 0) {
                             params.append('res_ips', this.selectedResidentialIps.join(','));
                         }
                         localStorage.setItem('enableResidential', 'true');
                         localStorage.setItem('residentialFront', this.residentialFront);
                         localStorage.setItem('residentialMode', this.residentialMode);
+                        localStorage.setItem('selectedResidentialCountries', JSON.stringify(this.selectedResidentialCountries));
                         localStorage.setItem('residentialCountry', this.residentialCountry);
                         localStorage.setItem('residentialCount', String(this.residentialCount));
                         localStorage.setItem('selectedResidentialIps', JSON.stringify(this.selectedResidentialIps));
