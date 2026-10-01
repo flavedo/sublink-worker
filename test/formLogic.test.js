@@ -31,5 +31,7 @@ describe('formLogic toString fix', () => {
     expect(typeof data.submitForm).toBe('function');
     expect(typeof data.toggleAccordion).toBe('function');
     expect(data.showAdvanced).toBe(false);
+    expect(data.autoNodesOpen).toBe(false);
+    expect(data.manualNodesOpen).toBe(false);
   });
 });

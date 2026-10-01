@@ -104,7 +104,10 @@ export const Form = (props) => {
         }}
         class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6"
       >
-        <div class="flex items-center justify-between mb-3">
+        <div 
+          class="flex items-center justify-between cursor-pointer select-none"
+          x-on:click="autoNodesOpen = !autoNodesOpen"
+        >
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
             <span class="w-8 h-8 rounded-lg bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 flex items-center justify-center">
               <i class="fas fa-bolt text-sm"></i>
@@ -112,36 +115,55 @@ export const Form = (props) => {
             {t('autoNodeSelection')}
             <span class="text-xs font-normal text-gray-500 dark:text-gray-400" x-text="'(' + checkedNodes.length + '/' + nodes.length + ')'"></span>
           </h3>
-          <div class="flex gap-2">
+          <div class="flex items-center gap-2">
             <button
               type="button"
-              x-on:click="checkAllNodes()"
+              x-on:click="$event.stopPropagation(); checkAllNodes()"
               class="px-3 py-1.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
             >
               {t('selectAll')}
             </button>
             <button
               type="button"
-              x-on:click="checkNoNodes()"
+              x-on:click="$event.stopPropagation(); checkNoNodes()"
               class="px-3 py-1.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors"
             >
               {t('selectNone')}
             </button>
+            <div 
+              class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 transition-transform duration-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+              x-bind:class="{'rotate-180': autoNodesOpen}"
+            >
+              <i class="fas fa-chevron-down text-xs"></i>
+            </div>
           </div>
         </div>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('autoNodeSelectionTip')}</p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-72 overflow-y-auto pr-1">
-          <template x-for="node in nodes" x-bind:key="'auto-' + node">
-            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors select-none">
-              <input
-                type="checkbox"
-                x-bind:value="node"
-                x-model="checkedNodes"
-                class="w-4 h-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
-              />
-              <span class="text-sm text-gray-700 dark:text-gray-300 truncate" x-text="node"></span>
-            </label>
-          </template>
+        <div
+          x-show="autoNodesOpen"
+          {...{
+            'x-transition:enter': 'transition ease-out duration-200',
+            'x-transition:enter-start': 'opacity-0 transform -translate-y-2',
+            'x-transition:enter-end': 'opacity-100 transform translate-y-0',
+            'x-transition:leave': 'transition ease-in duration-150',
+            'x-transition:leave-start': 'opacity-100 transform translate-y-0',
+            'x-transition:leave-end': 'opacity-0 transform -translate-y-2'
+          }}
+          class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700/60"
+        >
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('autoNodeSelectionTip')}</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-72 overflow-y-auto pr-1">
+            <template x-for="node in nodes" x-bind:key="'auto-' + node">
+              <label class="flex items-center gap-2 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors select-none">
+                <input
+                  type="checkbox"
+                  x-bind:value="node"
+                  x-model="checkedNodes"
+                  class="w-4 h-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
+                />
+                <span class="text-sm text-gray-700 dark:text-gray-300 truncate" x-text="node"></span>
+              </label>
+            </template>
+          </div>
         </div>
       </div>
 
@@ -155,7 +177,10 @@ export const Form = (props) => {
         }}
         class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6"
       >
-        <div class="flex items-center justify-between mb-3">
+        <div 
+          class="flex items-center justify-between cursor-pointer select-none"
+          x-on:click="manualNodesOpen = !manualNodesOpen"
+        >
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
             <span class="w-8 h-8 rounded-lg bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 flex items-center justify-center">
               <i class="fas fa-hand-pointer text-sm"></i>
@@ -163,36 +188,55 @@ export const Form = (props) => {
             {t('manualNodeSelection')}
             <span class="text-xs font-normal text-gray-500 dark:text-gray-400" x-text="'(' + checkedManualNodes.length + '/' + nodes.length + ')'"></span>
           </h3>
-          <div class="flex gap-2">
+          <div class="flex items-center gap-2">
             <button
               type="button"
-              x-on:click="checkAllManualNodes()"
+              x-on:click="$event.stopPropagation(); checkAllManualNodes()"
               class="px-3 py-1.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
             >
               {t('selectAll')}
             </button>
             <button
               type="button"
-              x-on:click="checkNoManualNodes()"
+              x-on:click="$event.stopPropagation(); checkNoManualNodes()"
               class="px-3 py-1.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors"
             >
               {t('selectNone')}
             </button>
+            <div 
+              class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 transition-transform duration-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+              x-bind:class="{'rotate-180': manualNodesOpen}"
+            >
+              <i class="fas fa-chevron-down text-xs"></i>
+            </div>
           </div>
         </div>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('manualNodeSelectionTip')}</p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-72 overflow-y-auto pr-1">
-          <template x-for="node in nodes" x-bind:key="'manual-' + node">
-            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors select-none">
-              <input
-                type="checkbox"
-                x-bind:value="node"
-                x-model="checkedManualNodes"
-                class="w-4 h-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
-              />
-              <span class="text-sm text-gray-700 dark:text-gray-300 truncate" x-text="node"></span>
-            </label>
-          </template>
+        <div
+          x-show="manualNodesOpen"
+          {...{
+            'x-transition:enter': 'transition ease-out duration-200',
+            'x-transition:enter-start': 'opacity-0 transform -translate-y-2',
+            'x-transition:enter-end': 'opacity-100 transform translate-y-0',
+            'x-transition:leave': 'transition ease-in duration-150',
+            'x-transition:leave-start': 'opacity-100 transform translate-y-0',
+            'x-transition:leave-end': 'opacity-0 transform -translate-y-2'
+          }}
+          class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700/60"
+        >
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('manualNodeSelectionTip')}</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-72 overflow-y-auto pr-1">
+            <template x-for="node in nodes" x-bind:key="'manual-' + node">
+              <label class="flex items-center gap-2 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors select-none">
+                <input
+                  type="checkbox"
+                  x-bind:value="node"
+                  x-model="checkedManualNodes"
+                  class="w-4 h-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600"
+                />
+                <span class="text-sm text-gray-700 dark:text-gray-300 truncate" x-text="node"></span>
+              </label>
+            </template>
+          </div>
         </div>
       </div>
 

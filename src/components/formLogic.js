@@ -105,6 +105,8 @@ export const formLogicFn = (t) => {
             customShortCode: '',
             parsingUrl: false,
             parseDebounceTimer: null,
+            autoNodesOpen: false,
+            manualNodesOpen: false,
             nodes: [],
             checkedNodes: [],
             checkedManualNodes: [],
@@ -144,6 +146,8 @@ export const formLogicFn = (t) => {
                 this.configEditor = localStorage.getItem('configEditor') || '';
                 this.configType = localStorage.getItem('configType') || 'singbox';
                 this.customShortCode = localStorage.getItem('customShortCode') || '';
+                this.autoNodesOpen = localStorage.getItem('autoNodesOpen') === 'true';
+                this.manualNodesOpen = localStorage.getItem('manualNodesOpen') === 'true';
                 const initialUrlParams = new URLSearchParams(window.location.search);
                 this.currentConfigId = initialUrlParams.get('configId') || '';
 
@@ -187,6 +191,8 @@ export const formLogicFn = (t) => {
                     this.resetConfigValidation();
                 });
                 this.$watch('customShortCode', val => localStorage.setItem('customShortCode', val));
+                this.$watch('autoNodesOpen', val => localStorage.setItem('autoNodesOpen', val));
+                this.$watch('manualNodesOpen', val => localStorage.setItem('manualNodesOpen', val));
                 this.$watch('accordionSections', val => localStorage.setItem('accordionSections', JSON.stringify(val)), { deep: true });
                 // Remember the user's Auto Select node choices.
                 // All nodes selected (the default) clears the record; any other
@@ -727,6 +733,17 @@ export const formLogicFn = (t) => {
                     }
                 }
 
+                const selectNodes = params.get('selectNodes');
+                if (selectNodes) {
+                    this.checkedNodes = selectNodes.split(',').filter(Boolean);
+                    this.autoNodesOpen = true;
+                }
+
+                const selectManualNodes = params.get('selectManualNodes');
+                if (selectManualNodes) {
+                    this.checkedManualNodes = selectManualNodes.split(',').filter(Boolean);
+                    this.manualNodesOpen = true;
+                }
 
                 // Extract other parameters
                 this.includeAutoSelect = params.get('include_auto_select') !== 'false';
