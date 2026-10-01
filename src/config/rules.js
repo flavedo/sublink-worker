@@ -24,6 +24,9 @@ export const SNIFFER_SKIP_DOMAIN = [
 	'+.tjupt.org'
 ];
 
+// 注意：ip_rules 里的名字必须在上游 geo/geoip/<name>.mrs 里真实存在，
+// 否则生成的 provider 会 404（实测 adobe/github/duolingo/microsoft/tiktok/notion 都没有 geoip 分类，
+// 只有 geosite 分类；日志里 "initial rule provider xxx-ip error: 404 Not Found" 就是这些）。
 export const UNIFIED_RULES = [
 	{
 		name: 'Private',
@@ -35,7 +38,11 @@ export const UNIFIED_RULES = [
 	{
 		name: 'Ad Block',
 		outbound: 'Ad Block',
-		site_rules: ['category-ads-all'],
+		// 只保留 anti-AD 一份广告源（clash / subconverter 走下面的 remote_rules）
+		site_rules: [],
+		// sing-box / Surge 只能消费各自的 geox 规则集（.srs/.conf），无法使用 clash-domain 的 anti-AD，
+		// 因此这两个平台仍用生态同源的 category-ads-all
+		geo_site_rules: ['category-ads-all'],
 		ip_rules: [],
 		remote_rules: [
 			{
@@ -212,14 +219,14 @@ export const UNIFIED_RULES = [
 		name: 'Duolingo',
 		outbound: 'Duolingo',
 		site_rules: ['duolingo'],
-		ip_rules: ['duolingo'],
+		ip_rules: [],
 		ip_no_resolve: true
 	},
 	{
 		name: 'Notion',
 		outbound: 'Notion',
-		site_rules: ['Notion'],
-		ip_rules: ['Notion'],
+		site_rules: ['notion'],
+		ip_rules: [],
 		ip_no_resolve: true
 	},
 	{
@@ -261,7 +268,7 @@ export const UNIFIED_RULES = [
 		name: 'TikTok',
 		outbound: 'TikTok',
 		site_rules: ['tiktok'],
-		ip_rules: ['tiktok'],
+		ip_rules: [],
 		ip_no_resolve: true
 	},
 	{
@@ -288,7 +295,7 @@ export const UNIFIED_RULES = [
 		name: 'Github',
 		outbound: 'Github',
 		site_rules: ['github'],
-		ip_rules: ['github'],
+		ip_rules: [],
 		ip_no_resolve: true
 	},
 	{
@@ -353,7 +360,7 @@ export const UNIFIED_RULES = [
 		name: 'Adobe',
 		outbound: 'Adobe',
 		site_rules: ['adobe'],
-		ip_rules: ['adobe'],
+		ip_rules: [],
 		ip_no_resolve: true
 	},
 	{
@@ -368,7 +375,7 @@ export const UNIFIED_RULES = [
 		name: 'Microsoft',
 		outbound: 'Microsoft',
 		site_rules: ['microsoft'],
-		ip_rules: ['microsoft'],
+		ip_rules: [],
 		ip_no_resolve: true
 	},
 	{
@@ -424,7 +431,8 @@ export const PREDEFINED_RULE_SETS = {
 };
 
 export const SITE_RULE_SETS = UNIFIED_RULES.reduce((acc, rule) => {
-	rule.site_rules.forEach(site_rule => {
+	const sites = [...(rule.site_rules || []), ...(rule.geo_site_rules || [])];
+	sites.forEach(site_rule => {
 		acc[site_rule] = `geosite-${site_rule}.srs`;
 	});
 	return acc;
@@ -450,3 +458,6 @@ export const CLASH_IP_RULE_SETS = UNIFIED_RULES.reduce((acc, rule) => {
 	});
 	return acc;
 }, {});
+
+// dns.nameserver-policy 里用 rule-set: 引用的规则集：必须始终生成，否则 mihomo 报 not found rule-set
+export const CLASH_DNS_POLICY_RULE_SETS = ['cn', 'private', 'geolocation-!cn'];

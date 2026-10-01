@@ -68,7 +68,7 @@ describe('GET /subconverter', () => {
         const text = await res.text();
 
         // comprehensive includes all rules
-        expect(text).toContain('GEOSITE,category-ads-all');
+        expect(text).toContain('anti-ad-clash.yaml');
         expect(text).toContain('GEOSITE,category-ai-!cn');
         expect(text).toContain('GEOSITE,google');
         expect(text).toContain('GEOSITE,bilibili');

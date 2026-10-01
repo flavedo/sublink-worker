@@ -422,14 +422,14 @@ export class SingboxConfigBuilder extends BaseConfigBuilder {
             this.config.route.rules.push(attachProtocolIfNeeded(entry, rule));
         });
 
-        rules.filter(rule => !!rule.site_rules[0]).map(rule => {
-            this.config.route.rules.push(attachProtocolIfNeeded({
-                rule_set: [
-                    ...(rule.site_rules.length > 0 && rule.site_rules[0] !== '' ? rule.site_rules : []),
-                ],
-                outbound: this.t(`outboundNames.${rule.outbound}`)
-            }, rule));
-        });
+        rules.map(rule => ({ rule, sites: (rule.geo_site_rules || rule.site_rules || []).filter(site => site && site !== '') }))
+            .filter(({ sites }) => sites.length > 0)
+            .map(({ rule, sites }) => {
+                this.config.route.rules.push(attachProtocolIfNeeded({
+                    rule_set: [...sites],
+                    outbound: this.t(`outboundNames.${rule.outbound}`)
+                }, rule));
+            });
 
         rules.filter(rule => !!rule.ip_rules[0]).map(rule => {
             this.config.route.rules.push(attachProtocolIfNeeded({

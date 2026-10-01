@@ -3,7 +3,7 @@
  * Functions for generating rules and rule sets
  */
 
-import { UNIFIED_RULES, PREDEFINED_RULE_SETS, SITE_RULE_SETS, IP_RULE_SETS, CLASH_SITE_RULE_SETS, CLASH_IP_RULE_SETS } from './rules.js';
+import { UNIFIED_RULES, PREDEFINED_RULE_SETS, SITE_RULE_SETS, IP_RULE_SETS, CLASH_SITE_RULE_SETS, CLASH_IP_RULE_SETS, CLASH_DNS_POLICY_RULE_SETS } from './rules.js';
 import { SITE_RULE_SET_BASE_URL, IP_RULE_SET_BASE_URL, CLASH_SITE_RULE_SET_BASE_URL, CLASH_IP_RULE_SET_BASE_URL } from './ruleUrls.js';
 
 function toStringArray(value) {
@@ -52,8 +52,9 @@ export function generateRules(selectedRules = [], customRules = []) {
 
 	UNIFIED_RULES.forEach(rule => {
 		if (selectedRules.includes(rule.name)) {
-			rules.push({
+				rules.push({
 				site_rules: rule.site_rules,
+				geo_site_rules: rule.geo_site_rules,
 				ip_rules: rule.ip_rules,
 				ip_no_resolve: rule.ip_no_resolve || false,
 				domain_suffix: rule?.domain_suffix,
@@ -101,6 +102,7 @@ export function generateRuleSets(selectedRules = [], customRules = []) {
 	UNIFIED_RULES.forEach(rule => {
 		if (selectedRulesSet.has(rule.name)) {
 			rule.site_rules.forEach(siteRule => siteRuleSets.add(siteRule));
+			(rule.geo_site_rules || []).forEach(siteRule => siteRuleSets.add(siteRule));
 			rule.ip_rules.forEach(ipRule => ipRuleSets.add(ipRule));
 		}
 	});
@@ -189,6 +191,9 @@ export function generateClashRuleSets(selectedRules = [], customRules = [], useM
 			}
 		}
 	});
+
+	// dns.nameserver-policy 用 rule-set: 引用这些规则集，即使没勾选对应分流规则也必须存在
+	CLASH_DNS_POLICY_RULE_SETS.forEach(rule => siteRuleSets.add(rule));
 
 	const site_rule_providers = {};
 	const ip_rule_providers = {};

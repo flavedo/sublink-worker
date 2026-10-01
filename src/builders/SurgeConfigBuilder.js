@@ -406,11 +406,13 @@ export class SurgeConfigBuilder extends BaseConfigBuilder {
             });
         });
 
-        rules.filter(rule => rule.site_rules[0] !== '').map(rule => {
-            rule.site_rules.forEach(site => {
-                finalConfig.push(`RULE-SET,${SURGE_SITE_RULE_SET_BASEURL}${site}.conf,${this.t('outboundNames.' + rule.outbound)}`);
+        rules.map(rule => ({ rule, sites: (rule.geo_site_rules || rule.site_rules || []).filter(site => site && site !== '') }))
+            .filter(({ sites }) => sites.length > 0)
+            .map(({ rule, sites }) => {
+                sites.forEach(site => {
+                    finalConfig.push(`RULE-SET,${SURGE_SITE_RULE_SET_BASEURL}${site}.conf,${this.t('outboundNames.' + rule.outbound)}`);
+                });
             });
-        });
 
         rules.filter(rule => rule.ip_rules[0] !== '').map(rule => {
             rule.ip_rules.forEach(ip => {

@@ -17,7 +17,8 @@ describe('Clash Ad Blocking (anti-AD) Feature Tests', () => {
   it('generateClashRuleSets should generate remote_rule_providers for anti-ad', () => {
     const { site_rule_providers, remote_rule_providers } = generateClashRuleSets(['Ad Block'], [], true);
 
-    expect(site_rule_providers['category-ads-all']).toBeDefined();
+    // 只保留 anti-ad 一份广告源
+    expect(site_rule_providers['category-ads-all']).toBeUndefined();
     expect(remote_rule_providers['anti-ad']).toBeDefined();
     expect(remote_rule_providers['anti-ad'].behavior).toBe('domain');
     expect(remote_rule_providers['anti-ad'].format).toBe('yaml');
@@ -37,13 +38,13 @@ describe('Clash Ad Blocking (anti-AD) Feature Tests', () => {
     expect(adBlockGroup.use).toBeUndefined();
   });
 
-  it('should register anti-ad and category-ads-all in rule-providers', async () => {
+  it('should register anti-ad (and no category-ads-all) in rule-providers', async () => {
     const builder = new ClashConfigBuilder(SS_INPUT, ['Ad Block'], [], null, 'zh-CN', 'mihomo/1.0');
     const yamlText = await builder.build();
     const config = yaml.load(yamlText);
 
     expect(config['rule-providers']['anti-ad']).toBeDefined();
-    expect(config['rule-providers']['category-ads-all']).toBeDefined();
+    expect(config['rule-providers']['category-ads-all']).toBeUndefined();
   });
 
   it('should place Ad Block rules before Location:CN rules to avoid bypass', async () => {
