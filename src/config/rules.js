@@ -216,6 +216,12 @@ export const UNIFIED_RULES = [
 		ip_rules: []
 	},
 	{
+		name: 'Reddit',
+		outbound: 'Reddit',
+		site_rules: ['reddit'],
+		ip_rules: []
+	},
+	{
 		name: 'Duolingo',
 		outbound: 'Duolingo',
 		site_rules: ['duolingo'],
@@ -462,5 +468,4 @@ export const CLASH_IP_RULE_SETS = UNIFIED_RULES.reduce((acc, rule) => {
 	});
 	return acc;
 }, {});
-
 

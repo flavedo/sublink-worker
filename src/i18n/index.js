@@ -142,6 +142,7 @@ export const translations = {
       'Duolingo': '📚 Duolingo',
       'Investing': '💰 财经投资',
       'X': '🐦 X',
+      'Reddit': '💬 Reddit',
       'Speedtest': '🚝 测速工具',
       'Steam': '🎮 Steam',
       'Crypto': '🪙 Crypto',
