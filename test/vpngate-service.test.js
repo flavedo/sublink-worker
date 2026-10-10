@@ -7,6 +7,25 @@ import {
     getResidentialData
 } from '../src/services/vpngateService.js';
 
+describe('residential availability ranking', () => {
+    it('keeps availability ahead of arbitrarily high advertised speed', () => {
+        const nodes = [
+            { id: 'fast-idle', country: 'JP', port: 50000, speed: 10000000000, sessions: 0 },
+            { id: 'active', country: 'JP', port: 443, speed: 10000000, sessions: 2, ping: 20 }
+        ];
+        expect(filterResidentialNodes(nodes, { countPerCountry: 1 })[0].id).toBe('active');
+        expect(filterResidentialNodes(nodes, { countPerCountry: 1 })[0].id).toBe('active');
+    });
+
+    it('honors explicitly selected IPs even when their ranking is lower', () => {
+        const nodes = [
+            { id: 'manual', ip: '1.1.1.1', country: 'JP', port: 50000, sessions: 0 },
+            { id: 'active', ip: '2.2.2.2', country: 'JP', port: 443, sessions: 2 }
+        ];
+        expect(filterResidentialNodes(nodes, { ips: ['1.1.1.1'] }).map(n => n.id)).toEqual(['manual']);
+    });
+});
+
 // Base64 helper for tests
 const b64 = (str) => Buffer.from(str).toString('base64');
 

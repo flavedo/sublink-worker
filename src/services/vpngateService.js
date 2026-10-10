@@ -286,25 +286,18 @@ export const RELIABLE_PORTS = new Set([443, 995, 1194, 5555, 8443, 8843]);
  * avoiding the high failure rate of UPnP high-range dynamic ports.
  */
 export function calculateNodeQualityScore(node) {
-    let score = node.speed || 0;
-
-    // 1. Reliable port priority: ports 443, 995, 1194, etc. have ~95% TCP connectivity
-    // compared to UPnP high ports which have 80% failure rate
-    if (RELIABLE_PORTS.has(Number(node.port))) {
-        score += 1000000000; // 1 Gbps virtual boost to prioritize standard ports
+    // Bound each component so advertised multi-Gbps speeds cannot overwhelm
+    // availability signals. Sessions are an upstream hint, not a local probe.
+    const sessions = Math.max(0, Number(node.sessions) || 0);
+    const speed = Math.max(0, Number(node.speed) || 0);
+    const ping = Number(node.ping);
+    let score = sessions > 0 ? 1000000 : 0;
+    if (RELIABLE_PORTS.has(Number(node.port))) score += 100000;
+    score += Math.min(sessions, 100) * 100;
+    if (Number.isFinite(ping) && ping > 0) {
+        score += Math.max(0, 600 - ping) * 10;
     }
-
-    // 2. Active sessions: nodes with current active sessions are confirmed alive right now
-    const sessions = Number(node.sessions) || 0;
-    if (sessions > 0) {
-        score += Math.min(sessions, 100) * 1000000;
-    }
-
-    // 3. Ping: lower ping is better
-    const ping = Number(node.ping) || 0;
-    if (ping > 0 && ping < 600) {
-        score += (600 - ping) * 10000;
-    }
+    score += Math.min(1000, Math.log2(1 + speed) * 20);
 
     return score;
 }

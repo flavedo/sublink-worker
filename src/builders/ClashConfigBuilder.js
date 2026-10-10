@@ -337,7 +337,7 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
 
             let resData = this.residentialOptions.vpngateData;
             if (!resData) {
-                resData = await getResidentialData({ kv: this.residentialOptions.kv });
+                resData = await getResidentialData({ kv: this.residentialOptions.kv, forceRefresh: true });
             }
 
             if (!resData || !Array.isArray(resData.nodes) || resData.nodes.length === 0) {
