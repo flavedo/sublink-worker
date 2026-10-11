@@ -368,9 +368,9 @@ export class BaseConfigBuilder {
 
     orderSelectorGroups() {
         const names = [
-            'Node Select', 'Residential Select', 'Residential Front', 'Auto Select', 'Priority Select',
+            'Node Select', 'Auto Select', 'Residential Front', 'Residential Select', 'Priority Select',
             'Youtube', 'Cloudflare', 'Google', 'IBKR',
-            'ChatGPT', 'ClaudeCode', 'Gemini', 'AI Services', 'Docker', 'Github'
+            'ChatGPT', 'ClaudeCode', 'Gemini', 'AI Services', 'Docker', 'Github', 'Social Media'
         ].map(name => this.t(`outboundNames.${name}`));
         const priority = new Map(names.map((name, index) => [name, index]));
         const nameOf = group => typeof group === 'string'

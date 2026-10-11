@@ -156,6 +156,9 @@ describe('Clash Residential Chained Proxy Integration Tests', () => {
         expect(openvpnProxies[0]['dialer-proxy']).toBe('🏠 家宽前置');
         const frontGroup = config['proxy-groups'].find(g => g.name === '🏠 家宽前置');
         expect(frontGroup.proxies).toEqual(['⚡ 香港专线-01', '⚡ 日本专线-01']);
+        expect(config['proxy-groups'].slice(0, 4).map(group => group.name)).toEqual([
+            '🚀 手动选择', '⚡ 自动选择', '🏠 家宽前置', '🏠 家宽选择'
+        ]);
         expect(frontGroup.proxies).not.toContain('🚀 手动选择');
         expect(frontGroup.proxies).not.toContain('🏠 家宽选择');
         const manualGroup = config['proxy-groups'].find(g => g.name === '🚀 手动选择');

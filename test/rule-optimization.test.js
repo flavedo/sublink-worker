@@ -110,7 +110,7 @@ describe('Rule optimization', () => {
             expect(groups).not.toContain(t('outboundNames.X'));
             if (format !== 'subconverter') {
                 const front = ['Node Select', 'Auto Select', 'Youtube', 'Cloudflare', 'Google', 'IBKR',
-                    'ChatGPT', 'ClaudeCode', 'Gemini', 'AI Services', 'Docker', 'Github']
+                    'ChatGPT', 'ClaudeCode', 'Gemini', 'AI Services', 'Docker', 'Github', 'Social Media']
                     .map(name => t(`outboundNames.${name}`));
                 expect(groups.slice(0, front.length)).toEqual(front);
             }

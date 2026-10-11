@@ -122,15 +122,14 @@ describe('GET /subconverter', () => {
         expect(text).toContain('[]FINAL');
     });
 
-    it('maps Ad Block directly to REJECT without proxy group', async () => {
+    it('maps Ad Block to a selector with REJECT and DIRECT', async () => {
         const app = createTestApp();
         const rules = JSON.stringify(['Ad Block', 'Google']);
         const res = await app.request(`http://localhost/subconverter?selectedRules=${encodeURIComponent(rules)}`);
         const text = await res.text();
 
-        // 广告拦截直接指向 REJECT，不创建冗余的 proxy group
-        expect(text).toMatch(/ruleset=REJECT,clash-domain:/);
-        expect(text).not.toMatch(/custom_proxy_group=.*广告拦截/);
+        expect(text).toMatch(/ruleset=.*广告拦截,clash-domain:/);
+        expect(text).toMatch(/custom_proxy_group=.*广告拦截`select`\[\]REJECT`\[\]DIRECT/);
     });
 
     it('maps Private and Location:CN to DIRECT', async () => {
