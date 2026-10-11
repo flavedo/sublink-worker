@@ -394,25 +394,16 @@ export class SurgeConfigBuilder extends BaseConfigBuilder {
             });
         });
 
-        rules.filter(rule => !!rule.domain_suffix).map(rule => {
-            rule.domain_suffix.forEach(suffix => {
-                finalConfig.push(`DOMAIN-SUFFIX,${suffix},${this.t('outboundNames.' + rule.outbound)}`);
+        const domainLines = [];
+        rules.forEach(rule => {
+            const outbound = this.t('outboundNames.' + rule.outbound);
+            (rule.domain_suffix || []).forEach(suffix => domainLines.push(`DOMAIN-SUFFIX,${suffix},${outbound}`));
+            (rule.domain_keyword || []).forEach(keyword => domainLines.push(`DOMAIN-KEYWORD,${keyword},${outbound}`));
+            (rule.geo_site_rules || rule.site_rules || []).filter(Boolean).forEach(site => {
+                domainLines.push(`RULE-SET,${SURGE_SITE_RULE_SET_BASEURL}${site}.conf,${outbound}`);
             });
         });
-
-        rules.filter(rule => !!rule.domain_keyword).map(rule => {
-            rule.domain_keyword.forEach(keyword => {
-                finalConfig.push(`DOMAIN-KEYWORD,${keyword},${this.t('outboundNames.' + rule.outbound)}`);
-            });
-        });
-
-        rules.map(rule => ({ rule, sites: (rule.geo_site_rules || rule.site_rules || []).filter(site => site && site !== '') }))
-            .filter(({ sites }) => sites.length > 0)
-            .map(({ rule, sites }) => {
-                sites.forEach(site => {
-                    finalConfig.push(`RULE-SET,${SURGE_SITE_RULE_SET_BASEURL}${site}.conf,${this.t('outboundNames.' + rule.outbound)}`);
-                });
-            });
+        finalConfig.push(...new Set(domainLines));
 
         rules.filter(rule => rule.ip_rules[0] !== '').map(rule => {
             rule.ip_rules.forEach(ip => {

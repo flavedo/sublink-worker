@@ -3,7 +3,7 @@
  * Functions for generating rules and rule sets
  */
 
-import { UNIFIED_RULES, PREDEFINED_RULE_SETS, SITE_RULE_SETS, IP_RULE_SETS, CLASH_SITE_RULE_SETS, CLASH_IP_RULE_SETS, DNS_POLICY_RULE_SETS } from './rules.js';
+import { UNIFIED_RULES, PREDEFINED_RULE_SETS, SITE_RULE_SETS, IP_RULE_SETS, CLASH_SITE_RULE_SETS, CLASH_IP_RULE_SETS, DNS_POLICY_RULE_SETS, RULE_PRIORITIES } from './rules.js';
 import { SITE_RULE_SET_BASE_URL, IP_RULE_SET_BASE_URL, CLASH_SITE_RULE_SET_BASE_URL, CLASH_IP_RULE_SET_BASE_URL } from './ruleUrls.js';
 
 function toStringArray(value) {
@@ -50,10 +50,12 @@ export function generateRules(selectedRules = [], customRules = []) {
 
 	const rules = [];
 
-	UNIFIED_RULES.forEach(rule => {
+	[...UNIFIED_RULES].sort((a, b) => (RULE_PRIORITIES[a.name] ?? 50) - (RULE_PRIORITIES[b.name] ?? 50)).forEach(rule => {
 		if (selectedRules.includes(rule.name)) {
 				rules.push({
-				site_rules: rule.site_rules,
+				site_rules: rule.name === 'Social Media'
+					? rule.site_rules.filter(site => !selectedRules.includes({ twitter: 'X', reddit: 'Reddit', instagram: 'Instagram', discord: 'Discord' }[site]))
+					: rule.site_rules,
 				geo_site_rules: rule.geo_site_rules,
 				ip_rules: rule.ip_rules,
 				ip_no_resolve: rule.ip_no_resolve || false,
@@ -66,8 +68,7 @@ export function generateRules(selectedRules = [], customRules = []) {
 		}
 	});
 
-	customRules.reverse();
-	customRules.forEach((rule) => {
+	[...customRules].reverse().forEach((rule) => {
 		rules.unshift({
 			site_rules: toStringArray(rule.site),
 			ip_rules: toStringArray(rule.ip),

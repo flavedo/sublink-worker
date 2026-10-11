@@ -3,65 +3,38 @@ export function emitClashRules(rules = [], translator) {
         throw new Error('emitClashRules requires a translator function');
     }
     const results = [];
+    const emitRemote = (rule, phase) => {
+        (rule.remote_rules || []).filter(remote => (remote.match_phase || 'domain') === phase).forEach(remote => {
+            const providerName = remote.name || remote.url.split('/').pop().replace(/\.ya?ml$/, '');
+            results.push(`RULE-SET,${providerName},${translator('outboundNames.' + rule.outbound)}`);
+        });
+    };
 
-    rules
-        .filter(rule => Array.isArray(rule.src_ip_cidr) && rule.src_ip_cidr.length > 0)
-        .forEach(rule => {
-            rule.src_ip_cidr.forEach(cidr => {
-                if (!cidr) return;
-                results.push(`SRC-IP-CIDR,${cidr},${translator('outboundNames.' + rule.outbound)}`);
-            });
+    // Source-based overrides retain precedence over destination rules.
+    rules.forEach(rule => {
+        (rule.src_ip_cidr || []).filter(Boolean).forEach(cidr => {
+            results.push(`SRC-IP-CIDR,${cidr},${translator('outboundNames.' + rule.outbound)}`);
         });
-    rules
-        .filter(rule => Array.isArray(rule.domain_suffix) && rule.domain_suffix.length > 0)
-        .forEach(rule => {
-            rule.domain_suffix.forEach(suffix => {
-                results.push(`DOMAIN-SUFFIX,${suffix},${translator('outboundNames.' + rule.outbound)}`);
-            });
-        });
+    });
 
-    rules
-        .filter(rule => Array.isArray(rule.domain_keyword) && rule.domain_keyword.length > 0)
-        .forEach(rule => {
-            rule.domain_keyword.forEach(keyword => {
-                results.push(`DOMAIN-KEYWORD,${keyword},${translator('outboundNames.' + rule.outbound)}`);
-            });
-        });
+    // Emit each domain policy together so broad rules cannot jump ahead of exceptions.
+    rules.forEach(rule => {
+        const outbound = translator('outboundNames.' + rule.outbound);
+        (rule.domain_suffix || []).forEach(suffix => results.push(`DOMAIN-SUFFIX,${suffix},${outbound}`));
+        (rule.domain_keyword || []).forEach(keyword => results.push(`DOMAIN-KEYWORD,${keyword},${outbound}`));
+        emitRemote(rule, 'domain');
+        (rule.site_rules || []).filter(Boolean).forEach(site => results.push(`RULE-SET,${site},${outbound}`));
+    });
 
     rules.forEach(rule => {
         const outbound = translator('outboundNames.' + rule.outbound);
-        if (Array.isArray(rule.remote_rules)) {
-            rule.remote_rules.forEach(remote => {
-                const providerName = remote.name || remote.url.split('/').pop().replace(/\.ya?ml$/, '');
-                results.push(`RULE-SET,${providerName},${outbound}`);
-            });
-        }
-        if (Array.isArray(rule.site_rules)) {
-            rule.site_rules.forEach(site => {
-                if (site) {
-                    results.push(`RULE-SET,${site},${outbound}`);
-                }
-            });
-        }
+        emitRemote(rule, 'ip');
+        (rule.ip_rules || []).filter(Boolean).forEach(ip => results.push(`RULE-SET,${ip}-ip,${outbound},no-resolve`));
+        (rule.ip_cidr || []).filter(Boolean).forEach(cidr => results.push(`IP-CIDR,${cidr},${outbound},no-resolve`));
     });
 
-    rules
-        .filter(rule => Array.isArray(rule.ip_rules) && rule.ip_rules[0])
-        .forEach(rule => {
-            rule.ip_rules.forEach(ip => {
-                results.push(`RULE-SET,${ip}-ip,${translator('outboundNames.' + rule.outbound)},no-resolve`);
-            });
-        });
-
-    rules
-        .filter(rule => Array.isArray(rule.ip_cidr) && rule.ip_cidr.length > 0)
-        .forEach(rule => {
-            rule.ip_cidr.forEach(cidr => {
-                results.push(`IP-CIDR,${cidr},${translator('outboundNames.' + rule.outbound)},no-resolve`);
-            });
-        });
-
-    return results;
+    rules.forEach(rule => emitRemote(rule, 'fallback'));
+    return [...new Set(results)];
 }
 
 const normalize = (s) => typeof s === 'string' ? s.trim() : s;

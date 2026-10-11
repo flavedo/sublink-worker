@@ -363,6 +363,30 @@ export class BaseConfigBuilder {
         if (this.pendingUserProxyGroups && this.pendingUserProxyGroups.length > 0) {
             this.mergeUserProxyGroups(this.pendingUserProxyGroups);
         }
+        this.orderSelectorGroups();
+    }
+
+    orderSelectorGroups() {
+        const names = [
+            'Node Select', 'Residential Select', 'Residential Front', 'Auto Select', 'Priority Select',
+            'Youtube', 'Cloudflare', 'Google', 'IBKR',
+            'ChatGPT', 'ClaudeCode', 'Gemini', 'AI Services', 'Docker', 'Github'
+        ].map(name => this.t(`outboundNames.${name}`));
+        const priority = new Map(names.map((name, index) => [name, index]));
+        const nameOf = group => typeof group === 'string'
+            ? group.split('=')[0].trim() : (group.name || group.tag);
+        const order = groups => [...groups].sort((a, b) =>
+            (priority.get(nameOf(a)) ?? names.length) - (priority.get(nameOf(b)) ?? names.length));
+
+        if (Array.isArray(this.config['proxy-groups'])) {
+            this.config['proxy-groups'] = order(this.config['proxy-groups']);
+        }
+        if (Array.isArray(this.config.outbounds)) {
+            const isGroup = outbound => ['selector', 'urltest'].includes(outbound.type);
+            const groups = order(this.config.outbounds.filter(isGroup));
+            let index = 0;
+            this.config.outbounds = this.config.outbounds.map(outbound => isGroup(outbound) ? groups[index++] : outbound);
+        }
     }
 
     /**

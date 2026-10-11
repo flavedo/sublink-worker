@@ -67,7 +67,7 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 			});
 		}
 		if (rule.remote_rules) {
-			rule.remote_rules.forEach(remote => {
+			rule.remote_rules.filter(remote => !remote.match_phase || remote.match_phase === 'domain').forEach(remote => {
 				if (remote.type === 'clash-domain') {
 					lines.push(`ruleset=${groupName},clash-domain:${remote.url}`);
 				} else if (remote.type === 'clash-classic') {
@@ -80,6 +80,9 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 	rules.forEach(rule => {
 		const groupName = resolveGroupName(rule, t);
 		const noResolve = rule.ip_no_resolve ? ',no-resolve' : '';
+		(rule.remote_rules || []).filter(remote => remote.match_phase === 'ip').forEach(remote => {
+			lines.push(`ruleset=${groupName},${remote.type}:${remote.url}`);
+		});
 
 		if (rule.ip_rules) {
 			rule.ip_rules.forEach(ip => {
@@ -91,6 +94,12 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 				if (cidr) lines.push(`ruleset=${groupName},[]IP-CIDR,${cidr}`);
 			});
 		}
+	});
+
+	rules.forEach(rule => {
+		(rule.remote_rules || []).filter(remote => remote.match_phase === 'fallback').forEach(remote => {
+			lines.push(`ruleset=${resolveGroupName(rule, t)},${remote.type}:${remote.url}`);
+		});
 	});
 
 	const fallBackName = t('outboundNames.Fall Back');
@@ -167,5 +176,5 @@ export function generateSubconverterConfig({ selectedRules = [], customRules = [
 	lines.push('enable_rule_generator=true');
 	lines.push('overwrite_original_rules=true');
 
-	return lines.join('\n');
+	return lines.filter((line, index) => !line.startsWith('ruleset=') || lines.indexOf(line) === index).join('\n');
 }

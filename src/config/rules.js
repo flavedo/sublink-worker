@@ -60,7 +60,7 @@ export const UNIFIED_RULES = [
 		ip_rules: [],
 		remote_rules: [
 			{ type: 'clash-domain', url: 'https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.yaml' },
-			{ type: 'clash-classic', url: 'https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Classical_IP.yaml' }
+			{ type: 'clash-classic', match_phase: 'ip', url: 'https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Classical_IP.yaml' }
 		]
 	},
 	{
@@ -70,7 +70,7 @@ export const UNIFIED_RULES = [
 		ip_rules: [],
 		remote_rules: [
 			{ type: 'clash-domain', url: 'https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Domain.yaml' },
-			{ type: 'clash-classic', url: 'https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Classical_IP.yaml' }
+			{ type: 'clash-classic', match_phase: 'ip', url: 'https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Classical_IP.yaml' }
 		]
 	},
 	{
@@ -150,11 +150,7 @@ export const UNIFIED_RULES = [
 		name: 'ClaudeCode',
 		outbound: 'ClaudeCode',
 		site_rules: ['anthropic'],
-		ip_rules: [],
-		domain_suffix: [
-			'anthropic.com',
-			'claude.ai'
-		]
+		ip_rules: []
 	},
 	{
 		name: 'IBKR',
@@ -171,9 +167,6 @@ export const UNIFIED_RULES = [
 		site_rules: ['paypal'],
 		ip_rules: [],
 		domain_suffix: [
-			'paypal.com',
-			'paypal.me',
-			'paypalobjects.com',
 			'paypal-mktg.com'
 		]
 	},
@@ -204,10 +197,7 @@ export const UNIFIED_RULES = [
 		name: 'ChatGPT',
 		outbound: 'ChatGPT',
 		site_rules: ['openai'],
-		ip_rules: [],
-		domain_suffix: [
-			'openai.com'
-		]
+		ip_rules: []
 	},
 	{
 		name: 'X',
@@ -243,11 +233,13 @@ export const UNIFIED_RULES = [
 	},
 	{
 		name: 'Grok',
-		outbound: 'Grok',
+		outbound: 'AI Services',
 		site_rules: [],
 		ip_rules: [],
 		domain_suffix: [
 			'grok.com',
+			'grokipedia.com',
+			'grok.x.com',
 			'x.ai'
 		]
 	},
@@ -352,7 +344,8 @@ export const UNIFIED_RULES = [
 	{
 		name: 'Social Media',
 		outbound: 'Social Media',
-		site_rules: ['category-social-media-!cn'],
+		// Explicit sources retain Reddit/Discord coverage when their individual groups are disabled.
+		site_rules: ['twitter', 'reddit', 'instagram', 'discord', 'category-social-media-!cn'],
 		ip_rules: []
 	},
 	{
@@ -409,7 +402,7 @@ export const UNIFIED_RULES = [
 		site_rules: [],
 		ip_rules: [],
 		remote_rules: [
-			{ type: 'clash-classic', url: 'https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Port_Direct.yaml' }
+			{ type: 'clash-classic', match_phase: 'fallback', url: 'https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Port_Direct.yaml' }
 		]
 	}
 ];
@@ -432,6 +425,10 @@ export const PREDEFINED_RULE_SETS = {
 		'Telegram', 'ChatGPT', 'AI Services',
 		'Google', 'Github', 'Youtube', 'GFW'
 	],
+	// Keep dedicated AI, payment, finance, media and application selectors.
+	compact: UNIFIED_RULES.map(rule => rule.name).filter(name => ![
+		'X', 'Reddit', 'Instagram', 'Discord'
+	].includes(name)),
 	comprehensive: UNIFIED_RULES.map(rule => rule.name)
 };
 
@@ -469,3 +466,12 @@ export const CLASH_IP_RULE_SETS = UNIFIED_RULES.reduce((acc, rule) => {
 	return acc;
 }, {});
 
+// Domain exceptions precede broad service rules; IP rules are emitted separately.
+export const RULE_PRIORITIES = {
+	Private: 0, 'Ad Block': 10,
+	PersonalDirect: 20, PersonalProxy: 20, MTeam: 20, Provider: 20, PublicTracker: 20,
+	Youtube: 30, Gemini: 30, ClaudeCode: 30, ChatGPT: 30, Grok: 30,
+	'CN Available': 40,
+	'Aethersailor Direct': 70, 'Aethersailor Proxy': 70,
+	GFW: 80, 'Location:CN': 90, 'Non-Standard Port': 100
+};

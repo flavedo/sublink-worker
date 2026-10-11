@@ -290,10 +290,10 @@ export function createApp(bindings = {}) {
                     if (Array.isArray(parsed)) {
                         selectedRules = parsed;
                     } else {
-                        return c.text('Invalid selectedRules: must be a preset name (minimal, balanced, comprehensive) or a JSON array', 400);
+                        return c.text('Invalid selectedRules: must be a preset name (minimal, balanced, compact, comprehensive) or a JSON array', 400);
                     }
                 } catch {
-                    return c.text(`Invalid selectedRules: "${rawSelectedRules}" is not a valid preset name or JSON array. Valid presets: minimal, balanced, comprehensive`, 400);
+                    return c.text(`Invalid selectedRules: "${rawSelectedRules}" is not a valid preset name or JSON array. Valid presets: minimal, balanced, compact, comprehensive`, 400);
                 }
             }
 

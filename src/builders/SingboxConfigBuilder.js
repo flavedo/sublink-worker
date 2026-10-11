@@ -411,25 +411,21 @@ export class SingboxConfigBuilder extends BaseConfigBuilder {
             }, rule));
         });
 
-        rules.filter(rule => hasMatchValues(rule.domain_suffix) || hasMatchValues(rule.domain_keyword)).map(rule => {
-            const entry = {
-                outbound: this.t(`outboundNames.${rule.outbound}`)
-            };
-
-            if (hasMatchValues(rule.domain_suffix)) entry.domain_suffix = rule.domain_suffix;
-            if (hasMatchValues(rule.domain_keyword)) entry.domain_keyword = rule.domain_keyword;
-
-            this.config.route.rules.push(attachProtocolIfNeeded(entry, rule));
-        });
-
-        rules.map(rule => ({ rule, sites: (rule.geo_site_rules || rule.site_rules || []).filter(site => site && site !== '') }))
-            .filter(({ sites }) => sites.length > 0)
-            .map(({ rule, sites }) => {
+        rules.forEach(rule => {
+            if (hasMatchValues(rule.domain_suffix) || hasMatchValues(rule.domain_keyword)) {
+                const entry = { outbound: this.t(`outboundNames.${rule.outbound}`) };
+                if (hasMatchValues(rule.domain_suffix)) entry.domain_suffix = rule.domain_suffix;
+                if (hasMatchValues(rule.domain_keyword)) entry.domain_keyword = rule.domain_keyword;
+                this.config.route.rules.push(attachProtocolIfNeeded(entry, rule));
+            }
+            const sites = (rule.geo_site_rules || rule.site_rules || []).filter(Boolean);
+            if (sites.length) {
                 this.config.route.rules.push(attachProtocolIfNeeded({
-                    rule_set: [...sites],
+                    rule_set: sites,
                     outbound: this.t(`outboundNames.${rule.outbound}`)
                 }, rule));
-            });
+            }
+        });
 
         rules.filter(rule => !!rule.ip_rules[0]).map(rule => {
             this.config.route.rules.push(attachProtocolIfNeeded({
@@ -448,6 +444,14 @@ export class SingboxConfigBuilder extends BaseConfigBuilder {
                 ip_cidr: rule.ip_cidr,
                 outbound: this.t(`outboundNames.${rule.outbound}`)
             }, rule));
+        });
+
+        const seenRules = new Set();
+        this.config.route.rules = this.config.route.rules.filter(rule => {
+            const key = JSON.stringify(rule);
+            if (seenRules.has(key)) return false;
+            seenRules.add(key);
+            return true;
         });
 
         this.config.route.rules.unshift(
