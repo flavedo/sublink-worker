@@ -113,6 +113,9 @@ describe('Rule optimization', () => {
                     'ChatGPT', 'ClaudeCode', 'Gemini', 'AI Services', 'Docker', 'Github', 'Social Media']
                     .map(name => t(`outboundNames.${name}`));
                 expect(groups.slice(0, front.length)).toEqual(front);
+                expect(groups.slice(-2)).toEqual([
+                    t('outboundNames.Ad Block'), t('outboundNames.Fall Back')
+                ]);
             }
         });
     }

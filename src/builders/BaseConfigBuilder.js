@@ -375,8 +375,14 @@ export class BaseConfigBuilder {
         const priority = new Map(names.map((name, index) => [name, index]));
         const nameOf = group => typeof group === 'string'
             ? group.split('=')[0].trim() : (group.name || group.tag);
+        const rank = group => {
+            const name = nameOf(group);
+            if (name === this.t('outboundNames.Ad Block')) return names.length + 1;
+            if (name === this.t('outboundNames.Fall Back')) return names.length + 2;
+            return priority.get(name) ?? names.length;
+        };
         const order = groups => [...groups].sort((a, b) =>
-            (priority.get(nameOf(a)) ?? names.length) - (priority.get(nameOf(b)) ?? names.length));
+            rank(a) - rank(b));
 
         if (Array.isArray(this.config['proxy-groups'])) {
             this.config['proxy-groups'] = order(this.config['proxy-groups']);
