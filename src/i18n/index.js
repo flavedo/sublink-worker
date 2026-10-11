@@ -159,6 +159,7 @@ export const translations = {
       'Non-Standard Port': '🔀 非标端口',
       'GLOBAL': 'GLOBAL',
       'Residential Select': '🏠 家宽选择',
+      'Residential Front': '🏠 家宽前置',
       'Residential Auto': '🏠 家宽选择'
     },
     residentialProxyTitle: '家宽链式代理 (住宅 IP)',
@@ -167,7 +168,7 @@ export const translations = {
     enableResidentialTip: '基于 VPNGate 住宅宽带落地，搭配前置机场/VPS跳板穿透，获得 100% 纯正家庭宽带 IP',
     residentialFront: '前置跳板节点',
     residentialFrontTip: '选择用于过墙加速的前置代理（dialer-proxy）',
-    followNodeSelect: '🚀 跟随手动选择 (推荐)',
+    followNodeSelect: '🏠 家宽前置独立选择 (推荐)',
     followAutoSelect: '⚡ 跟随自动选择',
     residentialMode: '节点选取模式',
     residentialModeDynamic: '动态优选模式 (推荐)',

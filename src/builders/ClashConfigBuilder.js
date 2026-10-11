@@ -328,9 +328,10 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
             const nodeSelectName = this.t('outboundNames.Node Select');
             const autoSelectName = this.t('outboundNames.Auto Select');
             let frontProxy = this.residentialOptions.frontProxy;
+            const useResidentialFront = !frontProxy || ['node-select', 'Node Select', nodeSelectName].includes(frontProxy);
 
-            if (!frontProxy || frontProxy === 'node-select' || frontProxy === 'Node Select') {
-                frontProxy = nodeSelectName;
+            if (useResidentialFront) {
+                frontProxy = this.t('outboundNames.Residential Front');
             } else if (frontProxy === 'auto-select' || frontProxy === 'Auto Select') {
                 frontProxy = autoSelectName;
             }
@@ -353,6 +354,20 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
             });
 
             if (filteredNodes.length === 0) return;
+
+            // Keep the dialer independent of selectors that can select residential nodes.
+            if (useResidentialFront) {
+                const providerNames = this.getAllProviderNames();
+                const proxies = uniqueNames(this.filterManualNodes(this.getProxyList()));
+                const group = {
+                    name: frontProxy,
+                    type: 'select',
+                    proxies: proxies.length || providerNames.length ? proxies : ['DIRECT']
+                };
+                if (providerNames.length) group.use = providerNames;
+                this.config['proxy-groups'] = this.config['proxy-groups'] || [];
+                this.config['proxy-groups'].push(group);
+            }
 
             this.residentialProxyNames = [];
             const countryCountMap = new Map();

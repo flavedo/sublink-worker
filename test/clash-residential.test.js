@@ -121,10 +121,10 @@ describe('Clash Residential Chained Proxy Integration Tests', () => {
         expect(chatGptGroup.proxies[0]).not.toBe('🏠 家宽选择');
     });
 
-    it('filters residential nodes by specified IPs', async () => {
+    it.each([undefined, 'node-select', 'Node Select', '🚀 手动选择'])('uses an independent front selector for %s and filters by IP', async (frontProxy) => {
         const residentialOptions = {
             enabled: true,
-            frontProxy: '🚀 手动选择',
+            frontProxy,
             ips: ['121.160.88.99:443'],
             vpngateData: MOCK_VPNGATE_DATA
         };
@@ -153,7 +153,13 @@ describe('Clash Residential Chained Proxy Integration Tests', () => {
         const openvpnProxies = config.proxies.filter(p => p.type === 'openvpn');
         expect(openvpnProxies).toHaveLength(1);
         expect(openvpnProxies[0].server).toBe('121.160.88.99');
-        expect(openvpnProxies[0]['dialer-proxy']).toBe('🚀 手动选择');
+        expect(openvpnProxies[0]['dialer-proxy']).toBe('🏠 家宽前置');
+        const frontGroup = config['proxy-groups'].find(g => g.name === '🏠 家宽前置');
+        expect(frontGroup.proxies).toEqual(['⚡ 香港专线-01', '⚡ 日本专线-01']);
+        expect(frontGroup.proxies).not.toContain('🚀 手动选择');
+        expect(frontGroup.proxies).not.toContain('🏠 家宽选择');
+        const manualGroup = config['proxy-groups'].find(g => g.name === '🚀 手动选择');
+        expect(manualGroup.proxies).toContain('🏠 家宽选择');
     });
 
     it('spreads residential nodes evenly across regions in Clash config', async () => {
