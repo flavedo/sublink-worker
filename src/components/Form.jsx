@@ -240,6 +240,34 @@ export const Form = (props) => {
         </div>
       </div>
 
+      {/* Advanced Options Toggle */}
+      <div
+        class="flex items-center justify-between bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+        x-on:click="showAdvanced = !showAdvanced"
+        role="button"
+        tabindex="0"
+        {...{
+          'x-on:keydown.enter.prevent': 'showAdvanced = !showAdvanced',
+          'x-on:keydown.space.prevent': 'showAdvanced = !showAdvanced'
+        }}
+      >
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 flex items-center justify-center">
+            <i class="fas fa-sliders-h"></i>
+          </div>
+          <span class="font-semibold text-gray-900 dark:text-white">{t('advancedOptions')}</span>
+        </div>
+        <div
+          class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 transition-transform duration-300"
+          x-bind:class="{'rotate-180': showAdvanced}"
+        >
+          <i class="fas fa-chevron-down"></i>
+        </div>
+      </div>
+
+  {/* Advanced Options Content */ }
+  <div x-show="showAdvanced" {...{'x-transition:enter': 'transition ease-out duration-300', 'x-transition:enter-start': 'opacity-0 transform -translate-y-4', 'x-transition:enter-end': 'opacity-100 transform translate-y-0', 'x-transition:leave': 'transition ease-in duration-200', 'x-transition:leave-start': 'opacity-100 transform translate-y-0', 'x-transition:leave-end': 'opacity-0 transform -translate-y-4'}} class="space-y-6">
+
       {/* Residential Chained Proxy Section */}
       <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 transition-all duration-300 hover:shadow-md">
         <div class="flex items-center justify-between">
@@ -496,33 +524,6 @@ export const Form = (props) => {
         </div>
       </div>
 
-      {/* Advanced Options Toggle */}
-      <div 
-        class="flex items-center justify-between bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors" 
-        x-on:click="showAdvanced = !showAdvanced"
-        role="button"
-        tabindex="0"
-        {...{
-          'x-on:keydown.enter.prevent': 'showAdvanced = !showAdvanced',
-          'x-on:keydown.space.prevent': 'showAdvanced = !showAdvanced'
-        }}
-      >
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 flex items-center justify-center">
-            <i class="fas fa-sliders-h"></i>
-          </div>
-          <span class="font-semibold text-gray-900 dark:text-white">{t('advancedOptions')}</span>
-        </div>
-        <div 
-          class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 transition-transform duration-300" 
-          x-bind:class="{'rotate-180': showAdvanced}"
-        >
-          <i class="fas fa-chevron-down"></i>
-        </div>
-      </div>
-
-  {/* Advanced Options Content */ }
-  <div x-show="showAdvanced" {...{'x-transition:enter': 'transition ease-out duration-300', 'x-transition:enter-start': 'opacity-0 transform -translate-y-4', 'x-transition:enter-end': 'opacity-100 transform translate-y-0', 'x-transition:leave': 'transition ease-in duration-200', 'x-transition:leave-start': 'opacity-100 transform translate-y-0', 'x-transition:leave-end': 'opacity-0 transform -translate-y-4'}} class="space-y-6">
 
     {/* Rule Selection */ }
     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
