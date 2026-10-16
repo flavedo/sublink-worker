@@ -147,6 +147,38 @@ describe('Rule optimization', () => {
         }
     }
 
+    for (const format of ['clash', 'singbox', 'surge', 'subconverter']) {
+        for (const preset of ['balanced', 'compact', 'comprehensive']) {
+            it(`${format}/${preset}: keeps specific AI and Discord policies before Google hosting`, async () => {
+                const lines = entries(format, await build(format, preset));
+                const index = site => lines.findIndex(hasSite(format, site));
+                const before = (specific, broad) => {
+                    expect(index(specific)).toBeGreaterThanOrEqual(0);
+                    expect(index(broad)).toBeGreaterThanOrEqual(0);
+                    expect(index(specific)).toBeLessThan(index(broad));
+                };
+                // Without a Gemini selector, the AI fallback must handle AI Studio/API domains.
+                before('openai', 'category-ai-!cn');
+                before('category-ai-!cn', 'google');
+                before('google', 'google-cn');
+                if (preset !== 'balanced') {
+                    before('google-gemini', 'category-ai-!cn');
+                    // Includes discord-attachments-uploads-prd.storage.googleapis.com.
+                    before('discord', 'google');
+                    if (preset === 'comprehensive') {
+                        for (const site of ['twitter', 'reddit', 'instagram', 'discord']) {
+                            before(site, 'category-social-media-!cn');
+                        }
+                    }
+                    if (format !== 'singbox') {
+                        const group = preset === 'compact' ? 'Social Media' : 'Discord';
+                        expect(lines[index('discord')]).toContain(t(`outboundNames.${group}`));
+                    }
+                }
+            });
+        }
+    }
+
     for (const format of ['clash', 'subconverter']) {
         it(`${format}: defers port fallback until after service IP rules and removes exact duplicates`, async () => {
             const lines = entries(format, await build(format));

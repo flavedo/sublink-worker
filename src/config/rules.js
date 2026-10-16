@@ -472,6 +472,9 @@ export const RULE_PRIORITIES = {
 	Private: 0, 'Ad Block': 10,
 	PersonalDirect: 20, PersonalProxy: 20, MTeam: 20, Provider: 20, PublicTracker: 20,
 	Youtube: 30, Gemini: 30, ClaudeCode: 30, ChatGPT: 30, Grok: 30,
+	// Specific AI/social policies precede Google's shared hosting domains.
+	'AI Services': 31,
+	X: 32, Reddit: 32, Instagram: 32, Discord: 32, 'Social Media': 33,
 	// Google resources must use the service policy before google-cn can force DIRECT.
 	Google: 35,
 	'CN Available': 40,
