@@ -87,7 +87,9 @@ describe('Rule optimization', () => {
             }
             before('google-gemini', 'google-cn');
             before('youtube', 'google-cn');
-            before('google-cn', 'google');
+            before('google-gemini', 'google');
+            before('youtube', 'google');
+            before('google', 'google-cn');
             before('google-cn', 'gfw');
             before('category-game-platforms-download', 'steam');
             const suffixIndex = lines.findIndex(line => line.includes('obsidian.md'));
@@ -118,6 +120,31 @@ describe('Rule optimization', () => {
                 ]);
             }
         });
+    }
+
+    for (const format of ['clash', 'singbox', 'surge', 'subconverter']) {
+        for (const preset of ['balanced', 'compact', 'comprehensive']) {
+            it(`${format}/${preset}: routes Google resources before the google-cn direct policy`, async () => {
+                const lines = entries(format, await build(format, preset));
+                const direct = lines.findIndex(hasSite(format, 'google-cn'));
+                const google = lines.findIndex(hasSite(format, 'google'));
+                const gstatic = lines.findIndex(line => format === 'singbox'
+                    ? line === 'domain:gstatic.com'
+                    : format === 'subconverter'
+                        ? line.endsWith(',[]DOMAIN-SUFFIX,gstatic.com')
+                        : line.includes('DOMAIN-SUFFIX,gstatic.com,'));
+                expect(direct).toBeGreaterThanOrEqual(0);
+                expect(google).toBeGreaterThanOrEqual(0);
+                expect(gstatic).toBeGreaterThanOrEqual(0);
+                expect(google).toBeLessThan(direct);
+                expect(gstatic).toBeLessThan(direct);
+                if (format !== 'singbox') {
+                    expect(lines[google]).toContain(t('outboundNames.Google'));
+                    expect(lines[gstatic]).toContain(t('outboundNames.Google'));
+                    expect(lines[direct]).toContain('DIRECT');
+                }
+            });
+        }
     }
 
     for (const format of ['clash', 'subconverter']) {

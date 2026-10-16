@@ -472,6 +472,8 @@ export const RULE_PRIORITIES = {
 	Private: 0, 'Ad Block': 10,
 	PersonalDirect: 20, PersonalProxy: 20, MTeam: 20, Provider: 20, PublicTracker: 20,
 	Youtube: 30, Gemini: 30, ClaudeCode: 30, ChatGPT: 30, Grok: 30,
+	// Google resources must use the service policy before google-cn can force DIRECT.
+	Google: 35,
 	'CN Available': 40,
 	'Aethersailor Direct': 70, 'Aethersailor Proxy': 70,
 	GFW: 80, 'Location:CN': 90, 'Non-Standard Port': 100
