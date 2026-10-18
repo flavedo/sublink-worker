@@ -86,10 +86,14 @@ export const UNIFIED_RULES = [
 	{
 		name: 'PublicTracker',
 		outbound: 'DIRECT',
-		site_rules: [
-			'category-public-tracker',
-			'category-pt'
-		],
+		site_rules: ['category-public-tracker'],
+		ip_rules: [],
+		domain_suffix: ['tracker.m-team.cc']
+	},
+	{
+		name: 'PT',
+		outbound: 'DIRECT',
+		site_rules: ['category-pt'],
 		ip_rules: [],
 		domain_suffix: [
 			'ptfans.cc',
@@ -469,15 +473,32 @@ export const CLASH_IP_RULE_SETS = UNIFIED_RULES.reduce((acc, rule) => {
 
 // Domain exceptions precede broad service rules; IP rules are emitted separately.
 export const RULE_PRIORITIES = {
-	Private: 0, 'Ad Block': 10,
-	PersonalDirect: 20, PersonalProxy: 20, MTeam: 20, Provider: 20, PublicTracker: 20,
-	Youtube: 30, Gemini: 30, ClaudeCode: 30, ChatGPT: 30, Grok: 30,
+	Private: 0, 
+	'Ad Block': 10,
+	PersonalDirect: 20, 
+	PublicTracker: 19,
+	PersonalProxy: 20, 
+	MTeam: 20, 
+	Provider: 20,
+	PT: 20,
+	Youtube: 30,
+	Gemini: 30, 
+	ClaudeCode: 30, 
+	ChatGPT: 30,
+	Grok: 30,
 	// Specific AI/social policies precede Google's shared hosting domains.
 	'AI Services': 31,
-	X: 32, Reddit: 32, Instagram: 32, Discord: 32, 'Social Media': 33,
+	X: 32,
+	Reddit: 32, 
+	Instagram: 32, 
+	Discord: 32, 
+	'Social Media': 33,
 	// Google resources must use the service policy before google-cn can force DIRECT.
 	Google: 35,
 	'CN Available': 40,
-	'Aethersailor Direct': 70, 'Aethersailor Proxy': 70,
-	GFW: 80, 'Location:CN': 90, 'Non-Standard Port': 100
+	'Aethersailor Direct': 70, 
+	'Aethersailor Proxy': 70,
+	GFW: 80, 
+	'Location:CN': 90, 
+	'Non-Standard Port': 100
 };
