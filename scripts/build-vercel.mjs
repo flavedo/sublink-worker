@@ -1,4 +1,5 @@
 import { build } from 'esbuild';
+import './write-build-info.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';

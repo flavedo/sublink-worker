@@ -1,9 +1,14 @@
 /** @jsxRuntime automatic */
 /** @jsxImportSource hono/jsx */
 import { APP_NAME, GITHUB_REPO, DOCS_URL, APP_VERSION } from '../constants.js';
+import { BUILD_TIME } from '../buildInfo.js';
 
 export const Footer = () => {
     const currentYear = new Date().getFullYear();
+    const buildTime = BUILD_TIME && new Intl.DateTimeFormat('zh-CN', {
+        timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23'
+    }).format(new Date(BUILD_TIME));
 
     return (
         <footer class="mt-12 py-8 border-t border-gray-200 dark:border-gray-800 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
@@ -12,6 +17,7 @@ export const Footer = () => {
                     <div class="flex flex-col md:flex-row items-center gap-2 md:gap-4 text-gray-600 dark:text-gray-400 text-center md:text-left">
                         <span class="text-sm">© {currentYear} {APP_NAME}. All rights reserved.</span>
                         <span class="hidden md:inline text-gray-300 dark:text-gray-700">|</span>
+                        <div class="flex flex-wrap items-center justify-center gap-2">
                         <a
                             href={`${GITHUB_REPO}/releases/tag/v${APP_VERSION}`}
                             target="_blank"
@@ -21,6 +27,12 @@ export const Footer = () => {
                         >
                             v{APP_VERSION}
                         </a>
+                        {buildTime && (
+                            <time datetime={BUILD_TIME} class="text-xs text-gray-500 dark:text-gray-400" title="部署构建时间（北京时间 UTC+8）">
+                                构建于 {buildTime} (UTC+8)
+                            </time>
+                        )}
+                        </div>
                     </div>
 
                     <div class="flex items-center gap-6">

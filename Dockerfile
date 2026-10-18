@@ -6,6 +6,7 @@ COPY pnpm-lock.yaml pnpm-lock.yaml
 RUN npm install
 
 COPY src ./src
+COPY scripts ./scripts
 COPY public ./public
 
 RUN npm run build:node

@@ -8,5 +8,8 @@ kv_namespaces = [
   { binding = "SUBLINK_KV", id = "525ba792823e4baba1d80b843fcb6ce5" }
 ]
 
+[build]
+command = "node scripts/write-build-info.mjs"
+
 [assets]
 directory = "./public"
