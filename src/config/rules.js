@@ -54,6 +54,22 @@ export const UNIFIED_RULES = [
 		]
 	},
 	{
+		name: 'PCDN',
+		outbound: 'REJECT',
+		site_rules: [],
+		ip_rules: [],
+		// Match the PCDN delivery domains listed in the router mitigation note.
+		domain_suffix: [
+			'mcdn.bilivideo.cn',
+			'mcdn.bilivideo.com',
+			'szbdyd.com',
+			'mountaintoys.cn',
+			'pcdn.biliapi.net'
+		],
+		// Covers PCDN control-plane hosts such as pcdn-*.biliapi.net.
+		domain_keyword: ['pcdn']
+	},
+	{
 		name: 'Aethersailor Direct',
 		outbound: 'DIRECT',
 		site_rules: [],
@@ -175,8 +191,8 @@ export const UNIFIED_RULES = [
 		]
 	},
 	{
-		name: 'Lebara',
-		outbound: 'Lebara',
+		name: 'UK Mobile',
+		outbound: 'UK Mobile',
 		site_rules: [],
 		ip_rules: [],
 		domain_suffix: [
@@ -422,13 +438,14 @@ export const DIRECT_DEFAULT_RULES = new Set([
 ]);
 
 export const REJECT_DEFAULT_RULES = new Set([
-	'Ad Block'
+	'Ad Block',
+	'PCDN'
 ]);
 
 export const PREDEFINED_RULE_SETS = {
-	minimal: ['Private', 'Location:CN', 'GFW'],
+	minimal: ['Private', 'PCDN', 'Location:CN', 'GFW'],
 	balanced: [
-		'Private', 'Ad Block', 'Location:CN', 'CN Available',
+		'Private', 'Ad Block', 'PCDN', 'Location:CN', 'CN Available',
 		'Telegram', 'ChatGPT', 'AI Services',
 		'Google', 'Github', 'Youtube', 'GFW'
 	],
@@ -476,6 +493,7 @@ export const CLASH_IP_RULE_SETS = UNIFIED_RULES.reduce((acc, rule) => {
 // Domain exceptions precede broad service rules; IP rules are emitted separately.
 export const RULE_PRIORITIES = {
 	Private: 0, 
+	PCDN: 5,
 	'Ad Block': 10,
 	PersonalDirect: 20, 
 	PublicTracker: 19,
