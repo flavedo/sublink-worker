@@ -58,13 +58,26 @@ export const UNIFIED_RULES = [
 		outbound: 'REJECT',
 		site_rules: [],
 		ip_rules: [],
-		// Match the PCDN delivery domains listed in the router mitigation note.
+		// PCDN delivery/control domains from the router note and public blocklists.
 		domain_suffix: [
 			'mcdn.bilivideo.cn',
 			'mcdn.bilivideo.com',
+			'mcdn.bilivideo.net',
 			'szbdyd.com',
 			'mountaintoys.cn',
-			'pcdn.biliapi.net'
+			'pcdn.biliapi.net',
+			// Public PCDN lists also identify these shared/video platform endpoints.
+			'onethingpcs.com',
+			'tpa-hcdn.iqiyi.com',
+			// Common PCDN infrastructure domains (not specific to one video app).
+			'bsccdn.net',
+			'gjfzpt.cn',
+			'jomodns.cn',
+			'kuiniuca.com',
+			'pkoplink.com',
+			'saxysec.com',
+			'uhabo.com',
+			'xycdn.com'
 		],
 		// Covers PCDN control-plane hosts such as pcdn-*.biliapi.net.
 		domain_keyword: ['pcdn']
