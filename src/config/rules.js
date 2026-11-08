@@ -181,7 +181,9 @@ export const UNIFIED_RULES = [
 		ip_rules: [],
 		domain_suffix: [
 			'lebara.co.uk',
-			'lebara-new.app.baqend.com'
+			'lebara-new.app.baqend.com',
+			'co.uk',
+			'asda.com'
 		]
 	},
 	{
