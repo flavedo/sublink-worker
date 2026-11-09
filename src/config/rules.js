@@ -334,7 +334,7 @@ export const UNIFIED_RULES = [
 	},
 	{
 		name: 'Duolingo',
-		outbound: 'Duolingo',
+		outbound: 'DIRECT',
 		site_rules: ['duolingo'],
 		ip_rules: [],
 		ip_no_resolve: true
@@ -444,6 +444,16 @@ export const UNIFIED_RULES = [
 			'bybit'
 		],
 		ip_rules: []
+	},
+	{
+		name: 'Kraken',
+		outbound: 'Kraken',
+		site_rules: [],
+		ip_rules: [],
+		domain_suffix: [
+			'kraken.com',
+			'kraken.zendesk.com'
+		]
 	},
 	{
 		name: 'Moomoo',
@@ -607,6 +617,7 @@ export const RULE_PRIORITIES = {
 	Grok: 30,
 	// Specific AI/social policies precede Google's shared hosting domains.
 	'AI Services': 31,
+	Kraken: 34,
 	X: 32,
 	Reddit: 32, 
 	Instagram: 32, 

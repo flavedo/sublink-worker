@@ -148,6 +148,7 @@ export const translations = {
       'Speedtest': '🚝 测速工具',
       'Steam': '🎮 Steam',
       'Crypto': '🪙 Crypto',
+      'Kraken': '🟣 Kraken',
       'IBKR': '🏦 盈透证券',
       'PayPal': '💳 PayPal',
       'UK Mobile': '📱 UK Mobile',
